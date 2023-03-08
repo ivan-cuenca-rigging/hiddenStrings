@@ -36,7 +36,7 @@ hiddenStrings © 2023 by Iván Cuenca Ruiz is licensed under Attribution-NonComm
 
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-image]][cc-by-nc-sa]
 
-[LICENSE](https://github.com/ivan-cuenca-rigging/hiddenStrings/blob/main/LICENSE)
+[LICENSE](https://github.com/ivan-cuenca-rigging/hiddenStrings/blob/main/LICENSE.md)
 
 --------------------------------------------
 
