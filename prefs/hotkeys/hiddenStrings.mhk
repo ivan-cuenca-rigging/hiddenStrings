@@ -1,0 +1,262 @@
+//Maya Preference 2023 (Release 1)
+//
+//
+
+//
+// The runtime commands referenced by the hotkeys
+//
+runTimeCommand
+	-label ""
+	-annotation "Node Editor Window"
+	-longAnnotation ""
+	-category "Custom Scripts"
+	-image ""
+	-tags ""
+	-keywords ""
+	-plugin ""
+	-helpUrl ""
+	-hotkeyCtx ""
+	-commandLanguage "python"
+	-command ("from maya import cmds\n\n\ncmds.NodeEditorWindow()")
+	nodeEditorWindow;
+
+runTimeCommand
+	-label ""
+	-annotation ""
+	-longAnnotation ""
+	-category "Custom Scripts"
+	-image ""
+	-tags ""
+	-keywords ""
+	-plugin ""
+	-helpUrl ""
+	-hotkeyCtx ""
+	-commandLanguage "python"
+	-command ("from maya import cmds\n\n\nfor nd in cmds.ls(sl=True):\n    for axis in ['X', 'Y' ,'Z']:\n        try:\n            cmds.setAttr('{}.rotate{}'.format(nd, axis), 0)\n        except:\n            pass")
+	resetRotation;
+
+runTimeCommand
+	-label ""
+	-annotation ""
+	-longAnnotation ""
+	-category "Custom Scripts"
+	-image ""
+	-tags ""
+	-keywords ""
+	-plugin ""
+	-helpUrl ""
+	-hotkeyCtx ""
+	-commandLanguage "python"
+	-command ("from maya import cmds\n\n\ncmds.ArtPaintSkinWeightsToolOptions()")
+	paintSkinTool;
+
+runTimeCommand
+	-label ""
+	-annotation ""
+	-longAnnotation ""
+	-category "Custom Scripts"
+	-image ""
+	-tags ""
+	-keywords ""
+	-plugin ""
+	-helpUrl ""
+	-hotkeyCtx ""
+	-commandLanguage "python"
+	-command ("from maya import cmds\n\nprint(end=str(cmds.ls(sl=True, flatten=True)))")
+	printSelection;
+
+runTimeCommand
+	-label ""
+	-annotation ""
+	-longAnnotation ""
+	-category "Custom Scripts"
+	-image ""
+	-tags ""
+	-keywords ""
+	-plugin ""
+	-helpUrl ""
+	-hotkeyCtx ""
+	-commandLanguage "python"
+	-command ("wf_panel = cmds.getPanel(withFocus=True)\nisolate_select_set = cmds.isolateSelect(wf_panel, query=True, vo=True)\nobjects_in_isolate = cmds.sets(isolate_select_set, query=True)\nsel = cmds.ls(sl=True)\nif objects_in_isolate == None:\n    cmds.isolateSelect(wf_panel, addSelected=True)\nelse:\n    if sel[0] in objects_in_isolate:\n        cmds.isolateSelect(wf_panel, removeSelected=True)\n    else:\n        cmds.isolateSelect(wf_panel, addSelected=True)")
+	addToIsolate;
+
+runTimeCommand
+	-label ""
+	-annotation ""
+	-longAnnotation ""
+	-category "Custom Scripts"
+	-image ""
+	-tags ""
+	-keywords ""
+	-plugin ""
+	-helpUrl ""
+	-hotkeyCtx ""
+	-commandLanguage "python"
+	-command ("from maya import cmds\n\n\nfor nd in cmds.ls(sl=True):\n    for axis in ['X', 'Y' ,'Z']:\n        try:\n            cmds.setAttr('{}.translate{}'.format(nd, axis), 0)\n        except:\n            pass")
+	resetTranslate;
+
+runTimeCommand
+	-label ""
+	-annotation ""
+	-longAnnotation ""
+	-category "Custom Scripts"
+	-image ""
+	-tags ""
+	-keywords ""
+	-plugin ""
+	-helpUrl ""
+	-hotkeyCtx ""
+	-commandLanguage "python"
+	-command ("from maya import cmds\nperspPanel = cmds.getPanel( withLabel='Persp View') \nif (cmds.modelEditor( perspPanel, query=1, sel=1)) == 1:\n    cmds.modelEditor( perspPanel, edit=True, sel=0)\nelse:\n    cmds.modelEditor( perspPanel, edit=True, sel=1)")
+	toggleHiglighting;
+
+runTimeCommand
+	-label ""
+	-annotation ""
+	-longAnnotation ""
+	-category "Custom Scripts"
+	-image ""
+	-tags ""
+	-keywords ""
+	-plugin ""
+	-helpUrl ""
+	-hotkeyCtx ""
+	-commandLanguage "python"
+	-command ("from maya import cmds\n\n\nfor nd in cmds.ls(sl=True):\n    user_attrs = cmds.listAttr(nd, ud=True)\n    if user_attrs:\n        for user_attr in cmds.listAttr(nd, ud=True):\n            try:\n                user_attr_dv = cmds.attributeQuery(user_attr, node=nd, listDefault=True)[0]\n                cmds.setAttr('{}.{}'.format(nd, user_attr), user_attr_dv)\n            except:\n                pass\n    for attr in 'trs':\n        for axis in 'xyz':\n            attr_value = 1 if attr == 's' else 0\n            try:\n                cmds.setAttr('{}.{}{}'.format(nd, attr, axis), attr_value)\n            except:\n                pass\n\n")
+	resetValues;
+
+runTimeCommand
+	-label ""
+	-annotation ""
+	-longAnnotation ""
+	-category "Custom Scripts"
+	-image ""
+	-tags ""
+	-keywords ""
+	-plugin ""
+	-helpUrl ""
+	-hotkeyCtx ""
+	-commandLanguage "mel"
+	-command ("string $visPanel[]=`getPanel -vis`;\nint $mode;\nif (size($visPanel)>0)\n{\nfor ($panel in $visPanel)\n{\nif (`match \"^modelPanel\" $panel`==\"modelPanel\")\n{\n$mode=`modelEditor -q -xray $panel`;\nif ($mode>0)\nmodelEditor -e -xray 0 $panel;\nelse\nmodelEditor -e -xray 1 $panel;\n}\n}\nprint (\"\\nxray=\"+$mode+\".\");\n} else\nprint (\"\\nNo model panels to modify.\");")
+	toggleXRay;
+
+runTimeCommand
+	-label ""
+	-annotation ""
+	-longAnnotation ""
+	-category "Custom Scripts"
+	-image ""
+	-tags ""
+	-keywords ""
+	-plugin ""
+	-helpUrl ""
+	-hotkeyCtx ""
+	-commandLanguage "mel"
+	-command ("string $selectedPanel = `getPanel -wf`;\nint $shadedWireState = `modelEditor -q -wos $selectedPanel`;\nif(`modelEditor -ex $selectedPanel`)\n{\n    setWireframeOnShadedOption (!$shadedWireState) $selectedPanel;\n}")
+	toggleWireFrame;
+
+runTimeCommand
+	-label ""
+	-annotation ""
+	-longAnnotation ""
+	-category "Custom Scripts"
+	-image ""
+	-tags ""
+	-keywords ""
+	-plugin ""
+	-helpUrl ""
+	-hotkeyCtx ""
+	-commandLanguage "python"
+	-command ("from maya import cmds\n\n\nfor nd in cmds.ls(sl=True):\n    for axis in ['X', 'Y' ,'Z']:\n        try:\n            cmds.setAttr('{}.scale{}'.format(nd, axis), 1)\n        except:\n            pass")
+	resetScale;
+
+//
+// The name commands referenced by the hotkeys
+//
+nameCommand
+	-annotation "resetValuesNameCommand"
+	-sourceType "mel"
+	-command ("resetValues")
+	resetValuesNameCommand;
+
+nameCommand
+	-annotation "paintSkinToolNameCommand"
+	-sourceType "mel"
+	-command ("paintSkinTool")
+	paintSkinToolNameCommand;
+
+nameCommand
+	-annotation "resetRotationNameCommand"
+	-sourceType "mel"
+	-command ("resetRotation")
+	resetRotationNameCommand;
+
+nameCommand
+	-annotation "resetScaleNameCommand"
+	-sourceType "mel"
+	-command ("resetScale")
+	resetScaleNameCommand;
+
+nameCommand
+	-annotation "resetTranslateNameCommand"
+	-sourceType "mel"
+	-command ("resetTranslate")
+	resetTranslateNameCommand;
+
+nameCommand
+	-annotation "printSelectionNameCommand"
+	-sourceType "mel"
+	-command ("printSelection")
+	printSelectionNameCommand;
+
+nameCommand
+	-annotation "toggleWireFrameNameCommand"
+	-sourceType "mel"
+	-command ("toggleWireFrame")
+	toggleWireFrameNameCommand;
+
+nameCommand
+	-annotation "toggleXRayNameCommand"
+	-sourceType "mel"
+	-command ("toggleXRay")
+	toggleXRayNameCommand;
+
+nameCommand
+	-annotation "toggleHiglightingNameCommand"
+	-sourceType "mel"
+	-command ("toggleHiglighting")
+	toggleHiglightingNameCommand;
+
+nameCommand
+	-annotation "nodeEditorWindowNameCommand"
+	-sourceType "mel"
+	-command ("nodeEditorWindow")
+	nodeEditorWindowNameCommand;
+
+nameCommand
+	-annotation "addToIsolateNameCommand"
+	-sourceType "mel"
+	-command ("addToIsolate")
+	addToIsolateNameCommand;
+
+//
+// The user hotkeys
+//
+//
+// The hotkey set
+//
+hotkeySet -source "Maya_Default" -current hiddenStrings;
+//
+// The hotkey contexts and hotkeys
+//
+hotkey -keyShortcut "3" -alt -name ("toggleWireFrameNameCommand");
+hotkey -keyShortcut "r" -alt -name ("resetScaleNameCommand");
+hotkey -keyShortcut "w" -alt -name ("resetTranslateNameCommand");
+hotkey -keyShortcut "s" -alt -name ("paintSkinToolNameCommand");
+hotkey -keyShortcut "5" -alt -name ("toggleHiglightingNameCommand");
+hotkey -keyShortcut "e" -alt -name ("resetRotationNameCommand");
+hotkey -keyShortcut "4" -alt -name ("toggleXRayNameCommand");
+hotkey -keyShortcut "2" -ctl -name ("addToIsolateNameCommand");
+hotkey -keyShortcut "n" -name ("nodeEditorWindowNameCommand");
+hotkey -keyShortcut "p" -alt -name ("printSelectionNameCommand");
+hotkey -keyShortcut "q" -alt -name ("resetValuesNameCommand");
