@@ -11,8 +11,13 @@ from maya import cmds
 from hiddenStrings.ui import markingMenu
 
 
+create_userSetup_bool = True
+
 load_markingMenu_bool = True
+markingMenu_click_input = 3  # 1 -> left click, 2 -> middle click, 3 -> right click
+
 load_hotkeys_bool = True
+
 load_plugins_bool = True
 
 
@@ -102,14 +107,14 @@ def load_markingMenu():
     """
     load marking menu
     """
-    markingMenu.MarkingMenu()
+    markingMenu.MarkingMenu(markingMenu_click_input)
 
 
 def unload_markingMenu():
     """
     Unload marking menu
     """
-    markingMenu.MarkingMenu().delete()
+    markingMenu.MarkingMenu(markingMenu_click_input).delete()
 
 
 def load_plugins():
@@ -144,7 +149,8 @@ def unload_plugins():
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-set_user_setup()
+if create_userSetup_bool:
+    set_user_setup()
 
 if load_markingMenu_bool:
     load_markingMenu()

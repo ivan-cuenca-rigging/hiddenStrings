@@ -26,9 +26,11 @@ if builder_exists:
 
 
 class MarkingMenu(object):
-    def __init__(self):
+    def __init__(self, click_input):
         self.menu_name = "hiddenStrings"
         self.icon_path = r'{}//icons//hiddenStrings_white.png'.format(os.path.dirname(os.path.dirname(__file__)))
+
+        self.click_input = click_input
 
         self.delete()
         self.build()
@@ -39,10 +41,11 @@ class MarkingMenu(object):
         """
         self.delete()
 
-        cmds.popupMenu(self.menu_name, markingMenu=True, button=3,
-                       allowOptionBoxes=True,
-                       shiftModifier=True, altModifier=True,
-                       parent="viewPanes")
+        cmds.popupMenu(self.menu_name, markingMenu=True, allowOptionBoxes=True, parent="viewPanes",
+                       button=self.click_input,
+                       ctrlModifier=False,
+                       altModifier=True,
+                       shiftModifier=True)
 
         self.marking_menu_config()
 
