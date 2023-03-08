@@ -141,10 +141,6 @@ class MarkingMenu(object):
 
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 
-        cmds.menuItem(parent=blend_shape_menu, label='Transfer blendShape', enable=False)
-
-        cmds.menuItem(parent=blend_shape_menu, divider=True)
-
         cmds.menuItem(parent=blend_shape_menu, label='Import BlendShapes',
                       command=importBlendShapeWindow.ImportBlendShapeWindow)
         cmds.menuItem(parent=blend_shape_menu, label='Export BlendShapes',
@@ -262,7 +258,7 @@ class MarkingMenu(object):
                               target=cmds.ls(selection=True)[-1],
                               source_skin_index=1,
                               target_skin_index=1,
-                              surface_association='closestComponent')
+                              surface_association='closestPoint')
 
     @staticmethod
     def connect_translate_rotate_scale(*args):

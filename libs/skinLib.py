@@ -220,7 +220,6 @@ def transfer_skin(source, target, source_skin_index=1, target_skin_index=1, surf
     # Transfer skinCluster
     set_labels()
     cmds.copySkinWeights(sourceSkin=source_skin_cluster, destinationSkin=target_skin_cluster,
-                         normalize=True,
                          surfaceAssociation=surface_association,
                          influenceAssociation='label')
 
