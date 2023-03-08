@@ -8,16 +8,21 @@ from maya import cmds
 
 # Project imports
 import hiddenStrings
-from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
 from hiddenStrings.libs import guideLib, blendShapeLib, connectionLib, skinLib
 from hiddenStrings.tools import storeSelection, showHideLocalRotationAxis
-from hiddenStrings.ui.bodyWindows import (rootWindow,
-                                          neckWindow, spineWindow,
-                                          legWindow, armWindow)
 from hiddenStrings.ui.connectionWindows import (connectOffsetParentMatrixWindow, connectTranslateRotateScaleWindow,
                                                 connectTranslateWindow, connectRotateWindow, connectScaleWindow)
 from hiddenStrings.ui.skinsWindows import importSkinWindow, exportSkinWindow, transferSkinWindow
 from hiddenStrings.ui.toolsWindows import shapeManagerWindow, renamerWindow
+
+
+builder_exists = os.path.exists(r'{}\builder'.format(os.path.dirname(os.path.dirname(__file__))))
+
+if builder_exists:
+    from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
+    from hiddenStrings.ui.bodyWindows import (rootWindow,
+                                              neckWindow, spineWindow,
+                                              legWindow, armWindow)
 
 
 class MarkingMenu(object):
@@ -99,29 +104,8 @@ class MarkingMenu(object):
                       image=self.icon_path, command=hiddenStrings.reload)
 
         # ---------- East ----------
-        builder_menu = cmds.menuItem(parent=self.menu_name, label='Builder', radialPosition='E', subMenu=True)
-
-        # ----- Build  -----
-        cmds.menuItem(parent=builder_menu, label='Build', radialPosition='N', command=self.build_rig)
-
-        # ----- Body guides Menu -----
-        self.body_menu(menu_parent=builder_menu, radial_position='SW')
-
-        # ----- Templates Guides Menu -----
-        self.templates_menu(menu_parent=builder_menu, radial_position='S')
-
-        # ----- Face guides Menu -----
-        self.face_menu(builder_menu, radial_position='SE')
-
-        # ----- Delete guides -----
-        cmds.menuItem(parent=builder_menu, label='             Builder utils             ', enable=False)
-        cmds.menuItem(parent=builder_menu, divider=True)
-
-        cmds.menuItem(parent=builder_menu, label='Skin Pose', command=skinLib.set_skin_pose)
-
-        cmds.menuItem(parent=builder_menu, divider=True)
-
-        cmds.menuItem(parent=builder_menu, label='Delete guides', command=guideLib.delete_guides)
+        if builder_exists:
+            self.builder_menu()
 
     def shapes_menu(self, menu_parent, radial_position):
         """
@@ -247,91 +231,6 @@ class MarkingMenu(object):
         cmds.menuItem(parent=connections_menu, optionBox=True,
                       command=connectOffsetParentMatrixWindow.ConnectOffsetParentMatrixWindow)
 
-    def body_menu(self, menu_parent, radial_position):
-        """
-        Create the body menu items
-        """
-        body_guides_menu = cmds.menuItem(parent=menu_parent, label='Body Guides', radialPosition=radial_position,
-                                         subMenu=True)
-
-        cmds.menuItem(parent=body_guides_menu, label='             Body             ', enable=False)
-        cmds.menuItem(parent=body_guides_menu, divider=True)
-
-        # Root guides
-        cmds.menuItem(parent=body_guides_menu, label='Root', command=self.create_root_guides)
-        cmds.menuItem(optionBox=True, command=rootWindow.RootWindow)
-
-        # Spine guides
-        cmds.menuItem(parent=body_guides_menu, label='Spine', command=self.create_column_guides)
-        cmds.menuItem(optionBox=True, command=spineWindow.SpineWindow)
-
-        # Neck guides
-        cmds.menuItem(parent=body_guides_menu, label='Neck', command=self.create_neck_guides)
-        cmds.menuItem(optionBox=True, command=neckWindow.NeckWindow)
-
-        # Arms guides
-        cmds.menuItem(parent=body_guides_menu, label='Arms', command=self.create_arm_guides)
-        cmds.menuItem(optionBox=True, command=armWindow.ArmWindow)
-
-        # Legs guides
-        cmds.menuItem(parent=body_guides_menu, label='Legs', command=self.create_leg_guides)
-        cmds.menuItem(optionBox=True, command=legWindow.LegWindow)
-
-    @staticmethod
-    def face_menu(menu_parent, radial_position):
-        """
-        Create the face menu items
-        """
-        face_guides_menu = cmds.menuItem(parent=menu_parent, label='Face Guides', radialPosition=radial_position,
-                                         subMenu=True, enable=False)
-
-        cmds.menuItem(parent=face_guides_menu, label='             Face             ', enable=False)
-        cmds.menuItem(parent=face_guides_menu, divider=True)
-
-        # Brows guides
-        cmds.menuItem(parent=face_guides_menu, label='Brows', enable=False)
-        cmds.menuItem(optionBox=True, enable=False)
-
-        # Eyelids guides
-        cmds.menuItem(parent=face_guides_menu, label='Eyelids', enable=False)
-        cmds.menuItem(optionBox=True, enable=False)
-
-        # Cheeks Up guides
-        cmds.menuItem(parent=face_guides_menu, label='Cheeks Up', enable=False)
-        cmds.menuItem(optionBox=True, enable=False)
-
-        # Cheeks guides
-        cmds.menuItem(parent=face_guides_menu, label='Cheeks', enable=False)
-        cmds.menuItem(optionBox=True, enable=False)
-
-        # Ears guides
-        cmds.menuItem(parent=face_guides_menu, label='Ears', enable=False)
-        cmds.menuItem(optionBox=True, enable=False)
-
-        # Mouth guides
-        cmds.menuItem(parent=face_guides_menu, label='Mouth', enable=False)
-        cmds.menuItem(optionBox=True, enable=False)
-
-    def templates_menu(self, menu_parent, radial_position):
-        """
-        Create the templates menu items
-        """
-        template_guides_menu = cmds.menuItem(parent=menu_parent, label='Templates Guides',
-                                             radialPosition=radial_position, subMenu=True)
-
-        cmds.menuItem(parent=template_guides_menu, label='             Templates             ', enable=False)
-        cmds.menuItem(parent=template_guides_menu, divider=True)
-
-        cmds.menuItem(parent=template_guides_menu, label='Biped', command=self.create_biped_guides)
-
-        cmds.menuItem(parent=template_guides_menu, label='Quadruped', enable=False)
-
-        cmds.menuItem(parent=template_guides_menu, label='Bird', enable=False)
-
-        cmds.menuItem(parent=template_guides_menu, divider=True)
-
-        cmds.menuItem(parent=template_guides_menu, label='Face', enable=False)
-
     # ---------- methods ----------
     @staticmethod
     def set_labels(*args):
@@ -447,6 +346,138 @@ class MarkingMenu(object):
         cmds.transferShape()
 
     @staticmethod
+    def connection_editor(*args):
+        """
+        Open the Connection editor
+        """
+        cmds.ConnectionEditor()
+
+    @staticmethod
+    def shape_editor(*args):
+        """
+        Open the shape editor
+        """
+        cmds.ShapeEditor()
+
+    @staticmethod
+    def paint_skin_editor(*args):
+        """
+        Open the paint skin weights tool
+        """
+        cmds.ArtPaintSkinWeightsToolOptions()
+
+    # Builder
+    def builder_menu(self):
+        builder_menu = cmds.menuItem(parent=self.menu_name, label='Builder', radialPosition='E', subMenu=True)
+
+        # ----- Build  -----
+        cmds.menuItem(parent=builder_menu, label='Build', radialPosition='N', command=self.build_rig)
+
+        # ----- Body guides Menu -----
+        self.body_menu(menu_parent=builder_menu, radial_position='SW')
+
+        # ----- Templates Guides Menu -----
+        self.templates_menu(menu_parent=builder_menu, radial_position='S')
+
+        # ----- Face guides Menu -----
+        self.face_menu(builder_menu, radial_position='SE')
+
+        # ----- Delete guides -----
+        cmds.menuItem(parent=builder_menu, label='             Builder utils             ', enable=False)
+        cmds.menuItem(parent=builder_menu, divider=True)
+
+        cmds.menuItem(parent=builder_menu, label='Skin Pose', command=skinLib.set_skin_pose)
+
+        cmds.menuItem(parent=builder_menu, divider=True)
+
+        cmds.menuItem(parent=builder_menu, label='Delete guides', command=guideLib.delete_guides)
+
+    def body_menu(self, menu_parent, radial_position):
+        """
+        Create the body menu items
+        """
+        body_guides_menu = cmds.menuItem(parent=menu_parent, label='Body Guides', radialPosition=radial_position,
+                                         subMenu=True)
+
+        cmds.menuItem(parent=body_guides_menu, label='             Body             ', enable=False)
+        cmds.menuItem(parent=body_guides_menu, divider=True)
+
+        # Root guides
+        cmds.menuItem(parent=body_guides_menu, label='Root', command=self.create_root_guides)
+        cmds.menuItem(optionBox=True, command=rootWindow.RootWindow)
+
+        # Spine guides
+        cmds.menuItem(parent=body_guides_menu, label='Spine', command=self.create_column_guides)
+        cmds.menuItem(optionBox=True, command=spineWindow.SpineWindow)
+
+        # Neck guides
+        cmds.menuItem(parent=body_guides_menu, label='Neck', command=self.create_neck_guides)
+        cmds.menuItem(optionBox=True, command=neckWindow.NeckWindow)
+
+        # Arms guides
+        cmds.menuItem(parent=body_guides_menu, label='Arms', command=self.create_arm_guides)
+        cmds.menuItem(optionBox=True, command=armWindow.ArmWindow)
+
+        # Legs guides
+        cmds.menuItem(parent=body_guides_menu, label='Legs', command=self.create_leg_guides)
+        cmds.menuItem(optionBox=True, command=legWindow.LegWindow)
+
+    @staticmethod
+    def face_menu(menu_parent, radial_position):
+        """
+        Create the face menu items
+        """
+        face_guides_menu = cmds.menuItem(parent=menu_parent, label='Face Guides', radialPosition=radial_position,
+                                         subMenu=True, enable=False)
+
+        cmds.menuItem(parent=face_guides_menu, label='             Face             ', enable=False)
+        cmds.menuItem(parent=face_guides_menu, divider=True)
+
+        # Brows guides
+        cmds.menuItem(parent=face_guides_menu, label='Brows', enable=False)
+        cmds.menuItem(optionBox=True, enable=False)
+
+        # Eyelids guides
+        cmds.menuItem(parent=face_guides_menu, label='Eyelids', enable=False)
+        cmds.menuItem(optionBox=True, enable=False)
+
+        # Cheeks Up guides
+        cmds.menuItem(parent=face_guides_menu, label='Cheeks Up', enable=False)
+        cmds.menuItem(optionBox=True, enable=False)
+
+        # Cheeks guides
+        cmds.menuItem(parent=face_guides_menu, label='Cheeks', enable=False)
+        cmds.menuItem(optionBox=True, enable=False)
+
+        # Ears guides
+        cmds.menuItem(parent=face_guides_menu, label='Ears', enable=False)
+        cmds.menuItem(optionBox=True, enable=False)
+
+        # Mouth guides
+        cmds.menuItem(parent=face_guides_menu, label='Mouth', enable=False)
+        cmds.menuItem(optionBox=True, enable=False)
+
+    def templates_menu(self, menu_parent, radial_position):
+        """
+        Create the templates menu items
+        """
+        template_guides_menu = cmds.menuItem(parent=menu_parent, label='Templates Guides',
+                                             radialPosition=radial_position, subMenu=True)
+
+        cmds.menuItem(parent=template_guides_menu, label='             Templates             ', enable=False)
+        cmds.menuItem(parent=template_guides_menu, divider=True)
+
+        cmds.menuItem(parent=template_guides_menu, label='Biped', command=self.create_biped_guides)
+
+        cmds.menuItem(parent=template_guides_menu, label='Quadruped', enable=False)
+
+        cmds.menuItem(parent=template_guides_menu, label='Bird', enable=False)
+
+        cmds.menuItem(parent=template_guides_menu, divider=True)
+
+        cmds.menuItem(parent=template_guides_menu, label='Face', enable=False)
+
+    @staticmethod
     def build_rig(*args):
         """
         Look for the guides' groups and create the rig
@@ -458,7 +489,7 @@ class MarkingMenu(object):
             side = guide_group.split('_')[1]
 
             module_name = cmds.getAttr('{}.moduleName'.format(guide_group))
-            root_path = r'{}\builder\modules'.format(os.path.dirname(os.path.dirname(__file__)))
+            root_path = r'{}\builder\modules'.format(hiddenStrings.hidden_strings_path)
 
             for i in os.scandir(root_path):
                 if i.is_dir():
@@ -536,23 +567,3 @@ class MarkingMenu(object):
         leg_l_module.create_guides()
         leg_r_module.create_guides(connect_to_opposite_value=True)
 
-    @staticmethod
-    def connection_editor(*args):
-        """
-        Open the Connection editor
-        """
-        cmds.ConnectionEditor()
-
-    @staticmethod
-    def shape_editor(*args):
-        """
-        Open the shape editor
-        """
-        cmds.ShapeEditor()
-
-    @staticmethod
-    def paint_skin_editor(*args):
-        """
-        Open the paint skin weights tool
-        """
-        cmds.ArtPaintSkinWeightsToolOptions()
