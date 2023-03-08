@@ -46,6 +46,6 @@ class ExportBlendShapeWindow(windowHelper.WindowHelper):
         """
         Open the explorer window to set the path
         """
-        folder_path = cmds.fileDialog2(dialogStyle=2, fileMode=3)
+        folder_path = cmds.fileDialog2(dialogStyle=2, fileMode=2)
         if folder_path:
             cmds.textFieldGrp(self.export_path, edit=True, text=folder_path[0])

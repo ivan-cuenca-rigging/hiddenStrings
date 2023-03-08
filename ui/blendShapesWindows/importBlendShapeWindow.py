@@ -48,7 +48,7 @@ class ImportBlendShapeWindow(windowHelper.WindowHelper):
         Open the explorer window to set the path
         """
         if cmds.checkBoxGrp(self.import_folder, query=True, value1=True):
-            folder_path = cmds.fileDialog2(dialogStyle=2, fileMode=3)
+            folder_path = cmds.fileDialog2(dialogStyle=2, fileMode=2)
         else:
             folder_path = cmds.fileDialog2(dialogStyle=2, fileMode=1)
 
