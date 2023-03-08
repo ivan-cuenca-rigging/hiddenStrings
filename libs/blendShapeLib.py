@@ -353,7 +353,7 @@ def export_blend_shape(node, path):
                                 compact=True)
 
     print(end='\n')
-    print(end='{} has been exported'.format(path))
+    print(end=r'{}/{}.json has been exported'.format(path, blend_shape_name))
 
 
 def export_blend_shapes(node_list, path):

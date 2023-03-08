@@ -13,6 +13,7 @@ from hiddenStrings.tools import storeSelection, showHideLocalRotationAxis
 from hiddenStrings.ui.connectionWindows import (connectOffsetParentMatrixWindow, connectTranslateRotateScaleWindow,
                                                 connectTranslateWindow, connectRotateWindow, connectScaleWindow)
 from hiddenStrings.ui.skinsWindows import importSkinWindow, exportSkinWindow, transferSkinWindow
+from hiddenStrings.ui.blendShapesWindows import importBlendShapeWindow, exportBlendShapeWindow
 from hiddenStrings.ui.toolsWindows import shapeManagerWindow, renamerWindow
 
 
@@ -114,46 +115,48 @@ class MarkingMenu(object):
         """
         Create the shapes menu items
         """
-        shape_menu = cmds.menuItem(parent=menu_parent, label='Shapes', radialPosition=radial_position,
-                                   subMenu=True)
+        blend_shape_menu = cmds.menuItem(parent=menu_parent, label='BlendShapes', radialPosition=radial_position,
+                                         subMenu=True)
 
-        cmds.menuItem(parent=shape_menu, label='Shape Editor', radialPosition='N',
+        cmds.menuItem(parent=blend_shape_menu, label='Shape Editor', radialPosition='N',
                       command=self.shape_editor)
 
-        cmds.menuItem(parent=shape_menu, label='                 Shapes Utils', enable=False)
-        cmds.menuItem(parent=shape_menu, divider=True)
+        cmds.menuItem(parent=blend_shape_menu, label='             blendShapes Utils', enable=False)
+        cmds.menuItem(parent=blend_shape_menu, divider=True)
 
-        cmds.menuItem(parent=shape_menu, label='Edit Blendshape / In-Between',
+        cmds.menuItem(parent=blend_shape_menu, label='Edit Blendshape / In-Between',
                       command=blendShapeLib.edit_target_or_in_between)
 
-        cmds.menuItem(parent=shape_menu, label='Sculpt tool',
+        cmds.menuItem(parent=blend_shape_menu, label='Sculpt tool',
                       command=self.set_mesh_bulge_tool)
 
-        cmds.menuItem(parent=shape_menu, label='Transfer Shape',
+        cmds.menuItem(parent=blend_shape_menu, label='Transfer Shape',
                       command=self.transfer_shape_command)
 
-        cmds.menuItem(parent=shape_menu, divider=True)
+        cmds.menuItem(parent=blend_shape_menu, divider=True)
 
-        cmds.menuItem(parent=shape_menu, label='Rename all blendShapes',
+        cmds.menuItem(parent=blend_shape_menu, label='Rename all blendShapes',
                       command=self.rename_all_blend_shapes)
 
-        cmds.menuItem(parent=shape_menu, divider=True)
+        cmds.menuItem(parent=blend_shape_menu, divider=True)
 
-        cmds.menuItem(parent=shape_menu, label='Trigger', enable=False)
+        cmds.menuItem(parent=blend_shape_menu, label='Trigger', enable=False)
 
-        cmds.menuItem(parent=shape_menu, divider=True)
+        cmds.menuItem(parent=blend_shape_menu, divider=True)
 
-        cmds.menuItem(parent=shape_menu, label='Transfer blendShape', enable=False)
+        cmds.menuItem(parent=blend_shape_menu, label='Transfer blendShape', enable=False)
 
-        cmds.menuItem(parent=shape_menu, divider=True)
+        cmds.menuItem(parent=blend_shape_menu, divider=True)
 
-        cmds.menuItem(parent=shape_menu, label='Import BlendShapes', enable=False)
-        cmds.menuItem(parent=shape_menu, label='Export BlendShapes', enable=False)
+        cmds.menuItem(parent=blend_shape_menu, label='Import BlendShapes',
+                      command=importBlendShapeWindow.ImportBlendShapeWindow)
+        cmds.menuItem(parent=blend_shape_menu, label='Export BlendShapes',
+                      command=exportBlendShapeWindow.ExportBlendShapeWindow)
 
-        cmds.menuItem(parent=shape_menu, divider=True)
+        cmds.menuItem(parent=blend_shape_menu, divider=True)
 
-        cmds.menuItem(parent=shape_menu, label='Import BlendShapes connections', enable=False)
-        cmds.menuItem(parent=shape_menu, label='Export BlendShapes connections', enable=False)
+        cmds.menuItem(parent=blend_shape_menu, label='Import BlendShapes connections', enable=False)
+        cmds.menuItem(parent=blend_shape_menu, label='Export BlendShapes connections', enable=False)
 
     def skins_menu(self, menu_parent, radial_position):
         """
