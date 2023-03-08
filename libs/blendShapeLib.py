@@ -166,7 +166,7 @@ def get_next_target_index(blend_shape):
 
 def get_blend_shape_data(blend_shape):
     """
-    Get blendshape data, including target in betweens values and deltas
+    Get blendshape data, including target in-between values and deltas
     :param blend_shape: str
     """
     check_blendshape(blend_shape=blend_shape)
@@ -177,12 +177,15 @@ def get_blend_shape_data(blend_shape):
     blend_shape_data['blendShape'] = blend_shape
     blend_shape_data['targets'] = dict()
 
-    # targets_list = cmds.listAttr('{}.weight'.format(blend_shape), multi=True)
     targets_order_list = cmds.getAttr('{}.targetDirectory[0].childIndices'.format(blend_shape))
     for target_order in targets_order_list:
         target = get_target_name(blend_shape=blend_shape, target_index=target_order)
-        print(target)
+
         blend_shape_data['targets'][target] = dict()
+
+        blend_shape_data['targets'][target]['envelope'] = round(cmds.getAttr('{}.{}'.format(blend_shape, target)), 3)
+
+        blend_shape_data['targets'][target]['target_values'] = dict()
         target_value_list = get_target_values(blend_shape=blend_shape, target=target)
         for target_value in target_value_list:
             target_value = round(target_value, 3)
@@ -204,7 +207,7 @@ def get_blend_shape_data(blend_shape):
             target_data['inputPointsTarget'] = points_target
             target_data['inputComponentsTarget'] = component_target
 
-            blend_shape_data['targets'][target][target_value] = target_data
+            blend_shape_data['targets'][target]['target_values'][target_value] = target_data
 
     return blend_shape_data
 
@@ -384,9 +387,10 @@ def import_blend_shape(node, path):
             add_target(blend_shape=blend_shape, target=target)
 
         target_index = get_target_index(blend_shape=blend_shape, target=target)
-        for target_value in blend_shape_data['targets'][target]:
-            points_target = blend_shape_data['targets'][target][target_value]['inputPointsTarget']
-            components_target = blend_shape_data['targets'][target][target_value]['inputComponentsTarget']
+        for target_value in blend_shape_data['targets'][target]['target_values']:
+            points_target = blend_shape_data['targets'][target]['target_values'][target_value]['inputPointsTarget']
+            components_target = blend_shape_data[
+                                              'targets'][target]['target_values'][target_value]['inputComponentsTarget']
             pretty_target_value = target_value
             target_value = int(float(target_value) * 1000 + 5000)
 
@@ -420,6 +424,7 @@ def import_blend_shape(node, path):
                                                                                                       target_value),
                              '{}_{}'.format(target, pretty_target_value),
                              type='string')
+            cmds.setAttr('{}.{}'.format(blend_shape, target), blend_shape_data['targets'][target]['envelope'])
     print(end='\n')
     print(end=r'{}\{}.json has been imported'.format(path, file_name))
 
@@ -495,4 +500,3 @@ def order_shape_editor_blend_shapes(blend_shape_list):
 
     # Set the shape editor index order
     cmds.setAttr('shapeEditorManager.blendShapeDirectory[0].childIndices', blend_shape_index_order, type='Int32Array')
-
