@@ -81,7 +81,7 @@ class WindowHelper(object):
             cmds.windowPref(self.window, remove=True)
 
         self.window = cmds.window(self.window, title=self.title, widthHeight=self.size, sizeable=False,
-                                  minimizeButton=False, maximizeButton=False)
+                                  minimizeButton=True, maximizeButton=False)
 
         return self.window
 

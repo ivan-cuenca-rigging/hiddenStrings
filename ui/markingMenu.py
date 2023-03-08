@@ -9,7 +9,7 @@ from maya import cmds
 # Project imports
 import hiddenStrings
 from hiddenStrings.libs import guideLib, blendShapeLib, connectionLib, skinLib
-from hiddenStrings.tools import storeSelection, showHideLocalRotationAxis
+from hiddenStrings.tools import saveLoadSelection, showHideLocalRotationAxis
 from hiddenStrings.ui.connectionWindows import (connectOffsetParentMatrixWindow, connectTranslateRotateScaleWindow,
                                                 connectTranslateWindow, connectRotateWindow, connectScaleWindow)
 from hiddenStrings.ui.skinsWindows import importSkinWindow, exportSkinWindow, transferSkinWindow
@@ -77,8 +77,8 @@ class MarkingMenu(object):
         cmds.menuItem(parent=self.menu_name, label='                Tools', enable=False)
         cmds.menuItem(parent=self.menu_name, divider=True)
 
-        cmds.menuItem(parent=self.menu_name, label='Save selection', command=storeSelection.save_selection)
-        cmds.menuItem(parent=self.menu_name, label='Load selection', command=storeSelection.load_selection)
+        cmds.menuItem(parent=self.menu_name, label='Save selection', command=saveLoadSelection.save_selection)
+        cmds.menuItem(parent=self.menu_name, label='Load selection', command=saveLoadSelection.load_selection)
 
         cmds.menuItem(parent=self.menu_name, divider=True)
 
@@ -130,9 +130,6 @@ class MarkingMenu(object):
         cmds.menuItem(parent=blend_shape_menu, label='Sculpt tool',
                       command=self.set_mesh_bulge_tool)
 
-        cmds.menuItem(parent=blend_shape_menu, label='Transfer Shape',
-                      command=self.transfer_shape_command)
-
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 
         cmds.menuItem(parent=blend_shape_menu, label='Rename all blendShapes',
@@ -166,7 +163,7 @@ class MarkingMenu(object):
                                   subMenu=True)
 
         cmds.menuItem(parent=skin_menu, label='Paint Skin Weights', radialPosition='NW',
-                      command=self.shape_editor)
+                      command=self.paint_skin_editor)
 
         cmds.menuItem(parent=skin_menu, label='             Skins Utils             ', enable=False)
         cmds.menuItem(parent=skin_menu, divider=True)
