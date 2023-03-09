@@ -28,6 +28,8 @@ def set_labels():
 
             print(end='labels has been set')
         else:
+            cmds.setAttr('{}.type'.format(jnt), 18)
+            cmds.setAttr('{}.otherType'.format(jnt), jnt, type='string')
             cmds.warning('{} has an incorrect name, should be renamed with the following pattern:'
                          ' descriptor_side_usage'.format(jnt))
 
