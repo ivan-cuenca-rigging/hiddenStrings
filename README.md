@@ -76,7 +76,7 @@ parameters to False in the `__init__.py`
 
 Hold <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>Right click</kbd> to open the marking menu
 
-<kbd>&uarr;</kbd> Shapes utils
+<kbd>&uarr;</kbd> blendShapes utils
 
 <kbd>&#8598; </kbd> Skins utils
 
