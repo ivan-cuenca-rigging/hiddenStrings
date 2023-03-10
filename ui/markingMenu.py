@@ -10,12 +10,11 @@ from maya import cmds
 import hiddenStrings
 from hiddenStrings.libs import guideLib, blendShapeLib, connectionLib, skinLib
 from hiddenStrings.tools import saveLoadSelection, showHideLocalRotationAxis
+from hiddenStrings.ui.blendShapesWindows import importBlendShapeWindow, exportBlendShapeWindow
 from hiddenStrings.ui.connectionWindows import (connectOffsetParentMatrixWindow, connectTranslateRotateScaleWindow,
                                                 connectTranslateWindow, connectRotateWindow, connectScaleWindow)
 from hiddenStrings.ui.skinsWindows import importSkinWindow, exportSkinWindow, transferSkinWindow
-from hiddenStrings.ui.blendShapesWindows import importBlendShapeWindow, exportBlendShapeWindow
 from hiddenStrings.ui.toolsWindows import shapeManagerWindow, renamerWindow
-
 
 builder_exists = os.path.exists(r'{}\builder'.format(os.path.dirname(os.path.dirname(__file__))))
 
@@ -71,7 +70,7 @@ class MarkingMenu(object):
         self.connections_menu(menu_parent=self.menu_name, radial_position='W')
 
         # ---------- South ----------
-        # self.import_export_menu(menu_parent=self.menu_name)
+        self.maya_editors_menu(menu_parent=self.menu_name, radial_position='S')
 
         # ---------- South List ----------
         cmds.menuItem(parent=self.menu_name, label='                Tools', enable=False)
@@ -119,7 +118,7 @@ class MarkingMenu(object):
                                          subMenu=True)
 
         cmds.menuItem(parent=blend_shape_menu, label='Shape Editor', radialPosition='N',
-                      command=self.shape_editor)
+                      command=cmds.ShapeEditor)
 
         cmds.menuItem(parent=blend_shape_menu, label='             blendShapes Utils', enable=False)
         cmds.menuItem(parent=blend_shape_menu, divider=True)
@@ -159,7 +158,7 @@ class MarkingMenu(object):
                                   subMenu=True)
 
         cmds.menuItem(parent=skin_menu, label='Paint Skin Weights', radialPosition='NW',
-                      command=self.paint_skin_editor)
+                      command=cmds.ArtPaintSkinWeightsToolOptions)
 
         cmds.menuItem(parent=skin_menu, label='             Skins Utils             ', enable=False)
         cmds.menuItem(parent=skin_menu, divider=True)
@@ -229,6 +228,38 @@ class MarkingMenu(object):
                       command=self.connect_offset_parent_matrix)
         cmds.menuItem(parent=connections_menu, optionBox=True,
                       command=connectOffsetParentMatrixWindow.ConnectOffsetParentMatrixWindow)
+
+
+    def maya_editors_menu(self, menu_parent, radial_position):
+        """
+        Create the maya editors menu items
+        """
+        maya_editors_menu = cmds.menuItem(parent=menu_parent, label='Maya Editors', radialPosition=radial_position,
+                                          subMenu=True)
+
+        cmds.menuItem(parent=maya_editors_menu, label='Shape Editor', radialPosition='N',
+                      command=cmds.ShapeEditor)
+
+        cmds.menuItem(parent=maya_editors_menu, label='Paint Skin Weights', radialPosition='NW',
+                      command=cmds.ArtPaintSkinWeightsToolOptions)
+
+        cmds.menuItem(parent=maya_editors_menu, label='Connection Editor', radialPosition='W',
+                      command=cmds.ConnectionEditor)
+
+        cmds.menuItem(parent=maya_editors_menu, label='Graph Editor', radialPosition='E',
+                      command=cmds.GraphEditor)
+
+        cmds.menuItem(parent=maya_editors_menu, label='Reference Editor', radialPosition='NE',
+                      command=cmds.ReferenceEditor)
+
+        cmds.menuItem(parent=maya_editors_menu, label='Component Editor', radialPosition='SW',
+                      command=cmds.ComponentEditor)
+
+        cmds.menuItem(parent=maya_editors_menu, label='Set Driven Key Editor', radialPosition='SE',
+                      command=cmds.SetDrivenKey)
+
+        cmds.menuItem(parent=maya_editors_menu, label='Node Editor', radialPosition='S',
+                      command=cmds.NodeEditorWindow)
 
     # ---------- methods ----------
     @staticmethod
@@ -350,20 +381,6 @@ class MarkingMenu(object):
         Open the Connection editor
         """
         cmds.ConnectionEditor()
-
-    @staticmethod
-    def shape_editor(*args):
-        """
-        Open the shape editor
-        """
-        cmds.ShapeEditor()
-
-    @staticmethod
-    def paint_skin_editor(*args):
-        """
-        Open the paint skin weights tool
-        """
-        cmds.ArtPaintSkinWeightsToolOptions()
 
     # Builder
     def builder_menu(self):
@@ -565,4 +582,3 @@ class MarkingMenu(object):
 
         leg_l_module.create_guides()
         leg_r_module.create_guides(connect_to_opposite_value=True)
-
