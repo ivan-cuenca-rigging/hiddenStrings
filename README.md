@@ -92,10 +92,6 @@ Hold <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>Right click</kbd> to open the mark
 
 ## HotKeys ##
 
-Run this code in maya as python:
-
-       hiddenStrings.import_hotkeys()
-
 ### Keys: ###
 
 <kbd>Alt</kbd> + <kbd>P</kbd> &rarr; Print selection
