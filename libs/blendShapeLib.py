@@ -134,6 +134,14 @@ def get_target_values(blend_shape, target):
     return target_values_list
 
 
+def get_blend_shape_index(blend_shape):
+    """
+    Get the blendShape index
+    :param blend_shape: string
+    return index
+    """
+
+
 def get_target_index(blend_shape, target):
     """
     Get the last index of a blendshape
@@ -162,6 +170,39 @@ def get_next_target_index(blend_shape):
         index = 0
 
     return int(index)
+
+
+def get_blend_shapes_from_shape_editor():
+    """
+    Get blendShapes from the shape editor
+    return blendShape list [blendShape1, blendShape2, ...]
+    """
+    selection_list = mel.eval('getShapeEditorTreeviewSelection(11)')
+
+    return mel.eval('getShapeEditorTreeviewSelection(11)')
+
+
+def get_targets_from_shape_editor(as_index=True):
+    """
+    Get targets from the shape editor
+    :param as_index: bool
+    return target list as_index -> [blendShape1.0, blendShape1.1, ...] not as_index [blendShape1.target, ...]
+    """
+    selection_list = mel.eval('getShapeEditorTreeviewSelection(24)')
+    if not as_index:
+        selection_list = ['{}.{}'.format(x.split('.')[0],
+                                         get_target_name(blend_shape=x.split('.')[0],
+                                                         target_index=x.split('.')[1])) for x in selection_list]
+
+    return selection_list
+
+
+def get_in_betweens_from_shape_editor():
+    """
+    Get in-between targets from the shape editor
+    return target list [blendShape1.0.5, blendShape1.0.3, ...]
+    """
+    return mel.eval('getShapeEditorTreeviewSelection(16)')
 
 
 def get_blend_shape_data(blend_shape):
@@ -449,7 +490,7 @@ def edit_target_or_in_between(*args):
     """
     Set on edit a target or an in-between target even when there is a direct connection
     """
-    inbetween_shape_editor_values = mel.eval('getShapeEditorTreeviewSelection(16)')
+    inbetween_shape_editor_values = get_in_betweens_from_shape_editor()
     if inbetween_shape_editor_values:
         blendshape_node, target_index, inbetween_index = inbetween_shape_editor_values[0].split('.')
 
@@ -458,7 +499,7 @@ def edit_target_or_in_between(*args):
         cmds.sculptTarget(blendshape_node, edit=True, target=int(target_index), inbetweenWeight=inbetween_value)
 
     else:
-        target_shape_editor_values = mel.eval('getShapeEditorTreeviewSelection(24)')
+        target_shape_editor_values = get_targets_from_shape_editor()
         if target_shape_editor_values:
             blendshape_node, target_index = target_shape_editor_values[0].split('.')
             cmds.sculptTarget(blendshape_node, edit=True, target=int(target_index))
@@ -471,13 +512,9 @@ def copy_target_connection(source=None, target_list=None, *args):
     :param target_list: list, [blendShape.target, ...]
     """
     if not source and not target_list:
-        target_selection_list = mel.eval('getShapeEditorTreeviewSelection(24)')
-        source = target_selection_list[0].split('.')
-        source = '{}.{}'.format(source[0], get_target_name(blend_shape=source[0], target_index=source[1]))
-
-        target_list = ['{}.{}'.format(x.split('.')[0],
-                                      get_target_name(blend_shape=x.split('.')[0],
-                                                      target_index=x.split('.')[1])) for x in target_selection_list[1:]]
+        target_selection_list = get_targets_from_shape_editor(as_index=False)
+        source = target_selection_list[0]
+        target_list = target_selection_list[1:]
 
     source_input_connections = cmds.listConnections(source, destination=False, plugs=True)[0]
     for target in target_list:
