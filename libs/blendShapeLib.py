@@ -101,6 +101,15 @@ def get_blend_shape_node(blend_shape):
     return node
 
 
+def get_blend_shape_index(blend_shape):
+    """
+    Get the blendShape index
+    :param blend_shape: string
+    return index
+    """
+    return cmds.listConnections('{}.midLayerParent'.format(blend_shape), plugs=True)[0].split('[')[-1].split(']')[0]
+
+
 def get_target_name(blend_shape, target_index):
     """
     Get the target's name
@@ -132,14 +141,6 @@ def get_target_values(blend_shape, target):
             target_values_list.append(target_value)
 
     return target_values_list
-
-
-def get_blend_shape_index(blend_shape):
-    """
-    Get the blendShape index
-    :param blend_shape: string
-    return index
-    """
 
 
 def get_target_index(blend_shape, target):
@@ -177,8 +178,6 @@ def get_blend_shapes_from_shape_editor():
     Get blendShapes from the shape editor
     return blendShape list [blendShape1, blendShape2, ...]
     """
-    selection_list = mel.eval('getShapeEditorTreeviewSelection(11)')
-
     return mel.eval('getShapeEditorTreeviewSelection(11)')
 
 
@@ -368,15 +367,6 @@ def remove_in_between(blend_shape, target, value):
         cmds.error('the in-between at {} does not exists in {}.{}'.format(value, blend_shape, target))
 
 
-def transfer_blend_shape(source, target):
-    """
-    Transfer the blendshape targets with cvWrap
-    :param source: str
-    :param target: str
-    """
-    pass
-
-
 def export_blend_shape(node, path):
     """
     Export blendShape of the node given
@@ -534,8 +524,7 @@ def order_shape_editor_blend_shapes(blend_shape_list):
     for blend_shape in blend_shape_list[::-1]:
         check_blendshape(blend_shape)
 
-        blend_shape_index = cmds.listConnections('{}.midLayerParent'.format(blend_shape),
-                                                 plugs=True)[0].split('[')[-1].split(']')[0]
+        blend_shape_index = get_blend_shape_index(blend_shape=blend_shape)
         blend_shape_dict[blend_shape] = blend_shape_index
 
     # Re-order the shape editor index order
