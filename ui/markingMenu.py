@@ -229,7 +229,14 @@ class MarkingMenu(object):
         cmds.menuItem(parent=connections_menu, optionBox=True,
                       command=connectOffsetParentMatrixWindow.ConnectOffsetParentMatrixWindow)
 
-    def maya_editors_menu(self, menu_parent, radial_position):
+        cmds.menuItem(parent=connections_menu, label='Transform to offsetParentMatrix',
+                      command=connectionLib.transform_to_offset_parent_matrix)
+
+        cmds.menuItem(parent=connections_menu, label='offsetParentMatrix to transform',
+                      command=connectionLib.offset_parent_matrix_to_transform)
+
+    @staticmethod
+    def maya_editors_menu(menu_parent, radial_position):
         """
         Create the maya editors menu items
         """

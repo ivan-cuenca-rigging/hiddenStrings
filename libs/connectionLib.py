@@ -313,6 +313,50 @@ def connect_matrix_from_attribute(driver_and_attr, driven):
                 cmds.setAttr('{}.{}{}'.format(driven, attr, axis), value)
 
 
+def transform_to_offset_parent_matrix(node, world_space=True, *args):
+    """
+    set matrix in the offsetParentMatrix and set transform to default
+    :param node: str
+    :param world_space: bool
+    """
+    if not node:
+        node = cmds.ls(selection=True)[0]
+
+    if world_space:
+        node_matrix = cmds.xform(node, query=True, worldSpace=True, matrix=True)
+    else:
+        node_matrix = cmds.xform(node, query=True, objectSpace=True, matrix=True)
+
+    cmds.setAttr('{}.offsetParentMatrix'.format(node), node_matrix, type='matrix')
+
+    for attr in ['translate', 'rotate', 'scale']:
+        for axis in 'XYZ':
+            value = 0 if attr != 'scale' else 1
+            cmds.setAttr('{}.{}{}'.format(node, attr, axis), value)
+
+
+def offset_parent_matrix_to_transform(node, world_space=True, *args):
+    """
+    set matrix in the transform and set offsetParentMatrix to default
+    :param node: str
+    :param world_space: bool
+    """
+    if not node:
+        node = cmds.ls(selection=True)[0]
+
+    if world_space:
+        node_matrix = cmds.xform(node, query=True, worldSpace=True, matrix=True)
+    else:
+        node_matrix = cmds.xform(node, query=True, objectSpace=True, matrix=True)
+
+    cmds.setAttr('{}.offsetParentMatrix'.format(node), mathLib.identity_matrix, type='matrix')
+
+    if world_space:
+        cmds.xform(node, worldSpace=True, matrix=node_matrix)
+    else:
+        cmds.xform(node, objectSpace=True, matrix=node_matrix)
+
+
 def connect_point_matrix_mult_to_a_cv(driver, crv_and_cv):
     """
     connect only the position from a worldMatrix to a cv
