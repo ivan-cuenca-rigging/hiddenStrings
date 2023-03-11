@@ -2,7 +2,7 @@
 from maya import cmds
 
 # Project imports
-from hiddenStrings.libs import usageLib, mathLib
+from hiddenStrings.libs import sideLib, usageLib, mathLib
 from hiddenStrings.libs.helpers import attributeHelper
 
 
@@ -226,8 +226,12 @@ def connect_offset_parent_matrix(driver, driven,
     :return multMatrix node
     """
     if len(driven.split('_')) != 3:
-        cmds.error('Names must have 3 fields {descriptor}_{side}_{usage}')
-    desc, side, usage = driven.split('_')
+        desc = driven
+        side = sideLib.center
+        usage = ''
+        cmds.warning('Names must have 3 fields {descriptor}_{side}_{usage}')
+    else:
+        desc, side, usage = driven.split('_')
 
     # Get the difference between the two objects
     matrix_difference = mathLib.multiply_matrices_4_by_4(cmds.getAttr('{}.worldMatrix'.format(driven)),

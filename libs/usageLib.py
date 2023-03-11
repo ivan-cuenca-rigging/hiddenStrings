@@ -71,6 +71,8 @@ quat_to_euler = 'qte'
 point_on_curve_info = 'pocinfo'
 nearest_point_on_curve = 'npoc'
 
+test = 'test'
+
 # Valid usages
 valid_usages = [control,
                 nurbs,
