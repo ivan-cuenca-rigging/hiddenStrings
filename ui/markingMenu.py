@@ -240,7 +240,7 @@ class MarkingMenu(object):
         """
         Create the maya editors menu items
         """
-        maya_editors_menu = cmds.menuItem(parent=menu_parent, label='Maya Editors', radialPosition=radial_position,
+        maya_editors_menu = cmds.menuItem(parent=menu_parent, label='Maya editors', radialPosition=radial_position,
                                           subMenu=True)
 
         cmds.menuItem(parent=maya_editors_menu, label='Shape Editor', radialPosition='N',
