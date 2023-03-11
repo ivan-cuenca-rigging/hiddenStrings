@@ -61,7 +61,7 @@ class MarkingMenu(object):
         Create the marking menu items
         """
         # ---------- North ----------
-        self.shapes_menu(menu_parent=self.menu_name, radial_position='N')
+        self.blend_shapes_menu(menu_parent=self.menu_name, radial_position='N')
 
         # ---------- North-West ----------
         self.skins_menu(menu_parent=self.menu_name, radial_position='NW')
@@ -110,7 +110,7 @@ class MarkingMenu(object):
         if builder_exists:
             self.builder_menu()
 
-    def shapes_menu(self, menu_parent, radial_position):
+    def blend_shapes_menu(self, menu_parent, radial_position):
         """
         Create the shapes menu items
         """
@@ -137,6 +137,8 @@ class MarkingMenu(object):
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 
         cmds.menuItem(parent=blend_shape_menu, label='Trigger', enable=False)
+        cmds.menuItem(parent=blend_shape_menu, label='Copy target connection',
+                      command=blendShapeLib.copy_target_connection)
 
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 

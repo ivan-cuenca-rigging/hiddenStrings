@@ -464,15 +464,24 @@ def edit_target_or_in_between(*args):
             cmds.sculptTarget(blendshape_node, edit=True, target=int(target_index))
 
 
-# bs_list = cmds.getAttr('shapeEditorManager.blendShapeDirectory[0].childIndices')
-# new_bs_order = [2, 1]
-#
-# for index in new_bs_order:
-#     bs_list.remove(index)
-#
-# new_bs_order = new_bs_order + bs_list
-#
-# cmds.setAttr('shapeEditorManager.blendShapeDirectory[0].childIndices', new_bs_order, type='Int32Array')
+def copy_target_connection(source=None, target_list=None, *args):
+    """
+    copy blendShape target's connections
+    :param source: str, blendShape.target
+    :param target_list: list, [blendShape.target, ...]
+    """
+    if not source and not target_list:
+        target_selection_list = mel.eval('getShapeEditorTreeviewSelection(24)')
+        source = target_selection_list[0].split('.')
+        source = '{}.{}'.format(source[0], get_target_name(blend_shape=source[0], target_index=source[1]))
+
+        target_list = ['{}.{}'.format(x.split('.')[0],
+                                      get_target_name(blend_shape=x.split('.')[0],
+                                                      target_index=x.split('.')[1])) for x in target_selection_list[1:]]
+
+    source_input_connections = cmds.listConnections(source, destination=False, plugs=True)[0]
+    for target in target_list:
+        cmds.connectAttr(source_input_connections, target)
 
 
 def order_shape_editor_blend_shapes(blend_shape_list):
