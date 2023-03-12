@@ -601,22 +601,28 @@ def export_connections(file_name, path):
         # Move file pointer to the beginning of a file
         connections_file.seek(0)
 
-        # Truncate the file
+        # empty the file
         connections_file.truncate()
 
-        # lines to keep in the file
+        # ----- Lines to keep in the file -----
+        # Get lines that are not indented (createNode, connectNode, sceneInfo, selects)
         no_indented_line_list = [index for index, value in enumerate(lines) if not value.startswith('\t')]
 
-        main_index_list = [index for index, value in enumerate(lines) if
-                           value.startswith('createNode') or value.startswith('connectAttr')]
+        # Get the lines with createNode or connectAttr
+        main_line_list = [index for index, value in enumerate(lines) if
+                          value.startswith('createNode') or value.startswith('connectAttr')]
 
+        # Create ranges between a main line and the next non-indented line
+        # This range is to store the setAttr lines of that createNode
         range_list = [(value, no_indented_line_list[no_indented_line_list.index(value) + 1]) for index, value in
-                      enumerate(main_index_list) if value in no_indented_line_list if value != main_index_list[-1]]
+                      enumerate(main_line_list) if value in no_indented_line_list if value != main_line_list[-1]]
 
+        # Store all the lines that we want to export
         lines_to_write = [x for sublist in
                           [[x for x in range(start_index, end_index)] for start_index, end_index in range_list] for x in
                           sublist]
 
+        # Write lines to the file
         for index in lines_to_write:
             if 'rename' not in lines[index]:
                 connections_file.writelines(lines[index])
