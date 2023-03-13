@@ -15,8 +15,8 @@ def export_data_to_json(data, file_name, file_path, relative_path=True, use_inde
     :return: file path name with ".json"
     """
     if relative_path:
-        script_path = os.path.dirname(os.path.dirname(__file__))
-        file_path_name_with_extension = '{}/{}/{}.json'.format(script_path, file_path, file_name)
+        module_path = os.path.dirname(os.path.dirname(__file__))
+        file_path_name_with_extension = '{}/{}/{}.json'.format(module_path, file_path, file_name)
     else:
         file_path_name_with_extension = '{}/{}.json'.format(file_path, file_name)
 

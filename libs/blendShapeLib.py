@@ -1,8 +1,6 @@
-# Imports
-import os
 from collections import OrderedDict
 # Maya imports
-from maya import mel, cmds
+from maya import cmds, mel
 
 # Project imports
 from hiddenStrings.libs import usageLib, jsonLib
@@ -365,115 +363,6 @@ def remove_in_between(blend_shape, target, value):
         mel.eval('blendShapeDeleteInBetweenTarget {} {} {}'.format(blend_shape, index, value))
     else:
         cmds.error('the in-between at {} does not exists in {}.{}'.format(value, blend_shape, target))
-
-
-def export_blend_shape(node, path):
-    """
-    Export blendShape of the node given
-    :param node: str
-    :param path: str
-    """
-    if not cmds.objExists(node):
-        cmds.error('{} does not exists in the scene'.format(node))
-    blend_shape_name = get_blend_shape(node)
-
-    check_blendshape(blend_shape=blend_shape_name)
-    blend_shape_data = get_blend_shape_data(blend_shape_name)
-
-    jsonLib.export_data_to_json(data=blend_shape_data, file_name=blend_shape_name, file_path=path, relative_path=False,
-                                compact=True)
-
-    print(end='\n')
-    print(end=r'{}/{}.json has been exported'.format(path, blend_shape_name))
-
-
-def export_blend_shapes(node_list, path):
-    """
-    Export blendShapes of the nodes given
-    :param node_list: list
-    :param path: str
-    """
-    for node in node_list:
-        export_blend_shape(node=node, path=path)
-
-
-def import_blend_shape(node, path):
-    """
-    Import blendShape from path
-    :param node: str
-    :param path: str
-    """
-    file_name = os.path.basename(path).split('.json')[0]
-    path = os.path.dirname(path)
-
-    blend_shape = get_blend_shape(node=node)
-    if blend_shape:
-        blend_shape = rename_blend_shape(blend_shape=blend_shape)
-    else:
-        blend_shape = create_blend_shape(node=node)
-
-    blend_shape_data = jsonLib.import_data_from_json(file_name=file_name, file_path=path, relative_path=False)
-    for target in blend_shape_data['targets']:
-        if not check_target(blend_shape=blend_shape, target=target):
-            add_target(blend_shape=blend_shape, target=target)
-
-        target_index = get_target_index(blend_shape=blend_shape, target=target)
-        for target_value in blend_shape_data['targets'][target]['target_values']:
-            points_target = blend_shape_data['targets'][target]['target_values'][target_value]['inputPointsTarget']
-            components_target = blend_shape_data[
-                                              'targets'][target]['target_values'][target_value]['inputComponentsTarget']
-            pretty_target_value = target_value
-            target_value = int(float(target_value) * 1000 + 5000)
-
-            if target_value != 6000 and not check_in_between(blend_shape=blend_shape,
-                                                             target=target,
-                                                             value=target_value):
-                add_in_between(blend_shape=blend_shape,
-                               existing_target=target,
-                               in_between_target='{}_{}'.format(target, pretty_target_value),
-                               value=pretty_target_value)
-
-            if points_target and components_target:
-                cmds.setAttr('{}.inputTarget[0].inputTargetGroup[{}].inputTargetItem[{}].inputPointsTarget'.format(
-                    blend_shape,
-                    target_index,
-                    target_value),
-                    len(points_target),
-                    *points_target,
-                    type='pointArray')
-                cmds.setAttr('{}.inputTarget[0].inputTargetGroup[{}].inputTargetItem[{}].inputComponentsTarget'.format(
-                    blend_shape,
-                    target_index,
-                    target_value),
-                    len(components_target),
-                    *components_target,
-                    type='componentList')
-
-            if target_value != 6000:
-                cmds.setAttr('{}.inbetweenInfoGroup[{}].inbetweenInfo[{}].inbetweenTargetName'.format(blend_shape,
-                                                                                                      target_index,
-                                                                                                      target_value),
-                             '{}_{}'.format(target, pretty_target_value),
-                             type='string')
-            cmds.setAttr('{}.{}'.format(blend_shape, target), blend_shape_data['targets'][target]['envelope'])
-    print(end='\n')
-    print(end=r'{}\{}.json has been imported'.format(path, file_name))
-
-
-def import_blend_shapes(path):
-    """
-    Import all json blendShapes from folder
-    :param path: string
-    """
-    file_list = [x for x in os.listdir(path) if x.endswith('.json')]
-    for blend_shape_file in file_list:
-        # Get json file node
-        blend_shape_data = jsonLib.import_data_from_json(file_name=blend_shape_file.split('.')[0],
-                                                         file_path=path,
-                                                         relative_path=False)
-
-        import_blend_shape(node=blend_shape_data['node'], path=r'{}\{}'.format(path, blend_shape_file))
-    pass
 
 
 def edit_target_or_in_between(*args):

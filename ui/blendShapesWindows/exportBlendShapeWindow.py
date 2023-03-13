@@ -6,7 +6,7 @@ from maya import cmds
 
 # Project imports
 from hiddenStrings.libs.helpers import windowHelper
-from hiddenStrings.libs import blendShapeLib
+from hiddenStrings.libs import importExportLib
 
 
 class ExportBlendShapeWindow(windowHelper.WindowHelper):
@@ -40,7 +40,7 @@ class ExportBlendShapeWindow(windowHelper.WindowHelper):
 
         export_path = cmds.textFieldGrp(self.export_path, query=True, text=True)
 
-        blendShapeLib.export_blend_shapes(node_list=cmds.ls(selection=True), path=export_path)
+        importExportLib.export_blend_shapes(node_list=cmds.ls(selection=True), path=export_path)
 
     def file_dialog_command(self, *args):
         """

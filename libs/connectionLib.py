@@ -3,9 +3,10 @@ import os
 
 # Maya imports
 from maya import cmds
+from maya import mel
 
 # Project imports
-from hiddenStrings.libs import sideLib, usageLib, mathLib, jsonLib
+from hiddenStrings.libs import sideLib, usageLib, mathLib
 from hiddenStrings.libs.helpers import attributeHelper
 
 
@@ -174,7 +175,7 @@ def create_pole_with_matrices(driver, driven, start_joint):
                                                                                        start_usage_capitalize,
                                                                                        start_side,
                                                                                        usageLib.point_matrix_mult))
-    
+
     cmds.connectAttr('{}.parentMatrix'.format(start_joint), '{}.inMatrix'.format(start_point_mat_mult))
     cmds.connectAttr('{}.translate'.format(start_joint), '{}.inPoint'.format(start_point_mat_mult))
 
@@ -554,95 +555,3 @@ def create_follow(base,
         cmds.connectAttr('{}.{}'.format(driven, attr_name), '{}.{}.rotateWeight'.format(blend_matrix, target_index))
 
     return blend_matrix
-
-
-def export_connections(file_name, path):
-    """
-    Export nodes and connections to .mel file excluding the edge nodes
-    :param file_name: str
-    :param path: str
-    """
-    node_list = cmds.ls(sl=True)
-
-    edge_connections_string = str()
-    for node in node_list:
-        inputs_list = cmds.listConnections(node, destination=False, plugs=True)
-        if inputs_list:
-            inputs_list = [x for x in inputs_list if x.split('.')[0] in node_list]
-            inputs_list = [(x, cmds.listConnections(x, source=False, plugs=True)[0]) for x in inputs_list]
-        outputs_list = cmds.listConnections(node, source=False, plugs=True)
-
-        if outputs_list:
-            outputs_list = [x for x in outputs_list if x.split('.')[0] in node_list]
-            outputs_list = [(cmds.listConnections(x, destination=False, plugs=True)[0], x) for x in outputs_list]
-
-        if not bool(inputs_list) or not bool(outputs_list):
-            if bool(inputs_list):
-                for input_value in inputs_list:
-                    edge_connections_string += '\nconnectAttr "{}" "{}";'.format(input_value[0], input_value[1])
-
-            if bool(outputs_list):
-                for output_value in outputs_list:
-                    edge_connections_string += '\nconnectAttr "{}" "{}";'.format(output_value[0], output_value[1])
-
-            cmds.select(node, deselect=True)
-
-    if os.path.exists(r'{}\{}.ma'.format(path, file_name)):
-        os.remove(r'{}\{}.ma'.format(path, file_name))
-
-    cmds.file(r'{}\{}.ma'.format(path, file_name), type='mayaAscii', exportSelectedStrict=True, force=True)
-
-    os.replace(r'{}\{}.ma'.format(path, file_name), r'{}\{}.mel'.format(path, file_name))
-
-    with open(r'{}\{}.mel'.format(path, file_name), 'r+') as connections_file:
-        # Read and store all lines into list
-        lines = connections_file.readlines()
-
-        # Move file pointer to the beginning of a file
-        connections_file.seek(0)
-
-        # empty the file
-        connections_file.truncate()
-
-        # ----- Lines to keep in the file -----
-        # Get lines that are not indented (createNode, connectNode, sceneInfo, selects)
-        no_indented_line_list = [index for index, value in enumerate(lines) if not value.startswith('\t')]
-
-        # Get the lines with createNode or connectAttr
-        main_line_list = [index for index, value in enumerate(lines) if
-                          value.startswith('createNode') or value.startswith('connectAttr')]
-
-        # Create ranges between a main line and the next non-indented line
-        # This range is to store the setAttr lines of that createNode
-        range_list = [(value, no_indented_line_list[no_indented_line_list.index(value) + 1]) for index, value in
-                      enumerate(main_line_list) if value in no_indented_line_list if value != main_line_list[-1]]
-
-        # Store all the lines that we want to export
-        lines_to_write = [x for sublist in
-                          [[x for x in range(start_index, end_index)] for start_index, end_index in range_list] for x in
-                          sublist]
-
-        # Write lines to the file
-        for index in lines_to_write:
-            if 'rename' not in lines[index]:
-                connections_file.writelines(lines[index])
-
-        # Write edge connections
-        if len(edge_connections_string) != 0:
-            connections_file.write(edge_connections_string)
-
-    cmds.select(node_list)
-
-    print(end='\n')
-    print(end=r'{}/{}.mel has been exported'.format(path, file_name))
-
-
-def import_connections(path):
-    """
-    Import connections from mel file
-    """
-    #  TODO if a node exists don't create it
-    cmds.file(path, i=True)  # i = import
-
-    print(end='\n')
-    print(end=r'{} has been imported'.format(path))

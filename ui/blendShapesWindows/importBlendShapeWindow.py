@@ -3,7 +3,7 @@ from maya import cmds
 
 # Project imports
 from hiddenStrings.libs.helpers import windowHelper
-from hiddenStrings.libs import blendShapeLib
+from hiddenStrings.libs import importExportLib
 
 
 class ImportBlendShapeWindow(windowHelper.WindowHelper):
@@ -38,10 +38,10 @@ class ImportBlendShapeWindow(windowHelper.WindowHelper):
         import_path = cmds.textFieldGrp(self.import_path, query=True, text=True)
 
         if import_folder:
-            blendShapeLib.import_blend_shapes(path=import_path)
+            importExportLib.import_blend_shapes(path=import_path)
         else:
             node = cmds.ls(sl=True)[0]
-            blendShapeLib.import_blend_shape(node=node, path=import_path)
+            importExportLib.import_blend_shape(node=node, path=import_path)
 
     def file_dialog_command(self, *args):
         """

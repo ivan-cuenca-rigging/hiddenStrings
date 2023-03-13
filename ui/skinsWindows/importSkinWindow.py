@@ -3,7 +3,7 @@ from maya import cmds
 
 # Project imports
 from hiddenStrings.libs.helpers import windowHelper
-from hiddenStrings.libs import skinLib
+from hiddenStrings.libs import importExportLib
 
 
 class ImportSkinWindow(windowHelper.WindowHelper):
@@ -50,12 +50,12 @@ class ImportSkinWindow(windowHelper.WindowHelper):
         import_path = cmds.textFieldGrp(self.import_path, query=True, text=True)
 
         if import_folder:
-            skinLib.import_skin_clusters(path=import_path, import_method=import_method)
+            importExportLib.import_skin_clusters(path=import_path, import_method=import_method)
         else:
             node = cmds.ls(sl=True)[0]
             skin_index = cmds.intFieldGrp(self.skin_index, query=True, value1=True)
-            skinLib.import_skin_cluster(node=node, path=import_path,
-                                        skin_index=skin_index, import_method=import_method)
+            importExportLib.import_skin_cluster(node=node, path=import_path,
+                                                skin_index=skin_index, import_method=import_method)
 
     def file_dialog_command(self, *args):
         """

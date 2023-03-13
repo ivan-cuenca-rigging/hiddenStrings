@@ -8,8 +8,7 @@ from maya import cmds
 
 # Project imports
 import hiddenStrings
-from hiddenStrings.libs import guideLib, blendShapeLib, connectionLib, skinLib
-from hiddenStrings.tools import saveLoadSelection, showHideLocalRotationAxis
+from hiddenStrings.libs import guideLib, blendShapeLib, connectionLib, skinLib, importExportLib
 from hiddenStrings.ui.blendShapesWindows import importBlendShapeWindow, exportBlendShapeWindow
 from hiddenStrings.ui.connectionWindows import (connectOffsetParentMatrixWindow, connectTranslateRotateScaleWindow,
                                                 connectTranslateWindow, connectRotateWindow, connectScaleWindow)
@@ -76,8 +75,8 @@ class MarkingMenu(object):
         cmds.menuItem(parent=self.menu_name, label='                Tools', enable=False)
         cmds.menuItem(parent=self.menu_name, divider=True)
 
-        cmds.menuItem(parent=self.menu_name, label='Save selection', command=saveLoadSelection.save_selection)
-        cmds.menuItem(parent=self.menu_name, label='Load selection', command=saveLoadSelection.load_selection)
+        cmds.menuItem(parent=self.menu_name, label='Save selection', command=importExportLib.export_selection)
+        cmds.menuItem(parent=self.menu_name, label='Load selection', command=importExportLib.import_selection)
 
         cmds.menuItem(parent=self.menu_name, divider=True)
 
@@ -88,16 +87,16 @@ class MarkingMenu(object):
         local_rotation_axis_hierarchy = cmds.menuItem(parent=self.menu_name, label='Local rotation axis', subMenu=True)
 
         cmds.menuItem(parent=local_rotation_axis_hierarchy, label='Show',
-                      command=showHideLocalRotationAxis.show_local_rotation_axis)
+                      command=self.show_local_rotation_axis)
         cmds.menuItem(parent=local_rotation_axis_hierarchy, label='Show with hierarchy',
-                      command=partial(showHideLocalRotationAxis.show_local_rotation_axis, hierarchy=True))
+                      command=partial(self.show_local_rotation_axis, hierarchy=True))
 
         cmds.menuItem(parent=local_rotation_axis_hierarchy, divider=True)
 
         cmds.menuItem(parent=local_rotation_axis_hierarchy, label='Hide',
-                      command=showHideLocalRotationAxis.hide_local_rotation_axis)
+                      command=self.hide_local_rotation_axis)
         cmds.menuItem(parent=local_rotation_axis_hierarchy, label='Hide with hierarchy',
-                      command=partial(showHideLocalRotationAxis.hide_local_rotation_axis, hierarchy=True))
+                      command=partial(self.hide_local_rotation_axis, hierarchy=True))
 
         cmds.menuItem(parent=self.menu_name, divider=True)
         cmds.menuItem(parent=self.menu_name, label='          Module utils', enable=False)
@@ -196,7 +195,7 @@ class MarkingMenu(object):
                                          subMenu=True)
 
         cmds.menuItem(parent=connections_menu, label='Connection Editor', radialPosition='W',
-                      command=self.connection_editor)
+                      command=cmds.ConnectionEditor)
 
         cmds.menuItem(parent=connections_menu, label='           Connections Utils', enable=False)
 
@@ -384,11 +383,24 @@ class MarkingMenu(object):
         cmds.transferShape()
 
     @staticmethod
-    def connection_editor(*args):
-        """
-        Open the Connection editor
-        """
-        cmds.ConnectionEditor()
+    def show_local_rotation_axis(hierarchy=False, *args):
+        if hierarchy:
+            cmds.select(hierarchy=True)
+        selection_list = cmds.ls(sl=True)
+
+        for node in selection_list:
+            if cmds.attributeQuery('displayLocalAxis', node=node, exists=True):
+                cmds.setAttr('{}.displayLocalAxis'.format(node), True)
+
+    @staticmethod
+    def hide_local_rotation_axis(hierarchy=False, *args):
+        if hierarchy:
+            cmds.select(hierarchy=True)
+        selection_list = cmds.ls(sl=True)
+
+        for node in selection_list:
+            if cmds.attributeQuery('displayLocalAxis', node=node, exists=True):
+                cmds.setAttr('{}.displayLocalAxis'.format(node), False)
 
     # Builder
     def builder_menu(self):

@@ -6,7 +6,7 @@ from maya import cmds
 
 # Project imports
 from hiddenStrings.libs.helpers import windowHelper
-from hiddenStrings.libs import skinLib
+from hiddenStrings.libs import importExportLib
 
 
 class ExportSkinWindow(windowHelper.WindowHelper):
@@ -48,10 +48,10 @@ class ExportSkinWindow(windowHelper.WindowHelper):
         export_path = cmds.textFieldGrp(self.export_path, query=True, text=True)
         if selection_list:
             if all_skin_index:
-                skinLib.export_skin_clusters(node_list=selection_list, path=export_path, skin_index=None)
+                importExportLib.export_skin_clusters(node_list=selection_list, path=export_path, skin_index=None)
             else:
                 skin_index = cmds.intFieldGrp(self.skin_index, query=True, value1=True)
-                skinLib.export_skin_clusters(node_list=selection_list, path=export_path, skin_index=skin_index)
+                importExportLib.export_skin_clusters(node_list=selection_list, path=export_path, skin_index=skin_index)
 
     def file_dialog_command(self, *args):
         """
