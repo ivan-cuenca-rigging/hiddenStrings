@@ -11,7 +11,8 @@ import hiddenStrings
 from hiddenStrings.libs import guideLib, blendShapeLib, connectionLib, skinLib, importExportLib
 from hiddenStrings.ui.blendShapesWindows import importBlendShapeWindow, exportBlendShapeWindow
 from hiddenStrings.ui.connectionWindows import (connectOffsetParentMatrixWindow, connectTranslateRotateScaleWindow,
-                                                connectTranslateWindow, connectRotateWindow, connectScaleWindow)
+                                                connectTranslateWindow, connectRotateWindow, connectScaleWindow,
+                                                importNodesAndConnectionsWindow, exportNodesAndConnectionsWindow)
 from hiddenStrings.ui.skinsWindows import importSkinWindow, exportSkinWindow, transferSkinWindow
 from hiddenStrings.ui.toolsWindows import shapeManagerWindow, renamerWindow
 
@@ -119,7 +120,7 @@ class MarkingMenu(object):
         cmds.menuItem(parent=blend_shape_menu, label='Shape Editor', radialPosition='N',
                       command=cmds.ShapeEditor)
 
-        cmds.menuItem(parent=blend_shape_menu, label='             blendShapes Utils', enable=False)
+        cmds.menuItem(parent=blend_shape_menu, label='           blendShapes Utils', enable=False)
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 
         cmds.menuItem(parent=blend_shape_menu, label='Edit Blendshape / In-Between',
@@ -140,16 +141,13 @@ class MarkingMenu(object):
                       command=blendShapeLib.copy_target_connection)
 
         cmds.menuItem(parent=blend_shape_menu, divider=True)
+        cmds.menuItem(parent=blend_shape_menu, label='              Import/Export', enable=False)
+        cmds.menuItem(parent=blend_shape_menu, divider=True)
 
         cmds.menuItem(parent=blend_shape_menu, label='Import BlendShapes',
                       command=importBlendShapeWindow.ImportBlendShapeWindow)
         cmds.menuItem(parent=blend_shape_menu, label='Export BlendShapes',
                       command=exportBlendShapeWindow.ExportBlendShapeWindow)
-
-        cmds.menuItem(parent=blend_shape_menu, divider=True)
-
-        cmds.menuItem(parent=blend_shape_menu, label='Import BlendShapes connections', enable=False)
-        cmds.menuItem(parent=blend_shape_menu, label='Export BlendShapes connections', enable=False)
 
     def skins_menu(self, menu_parent, radial_position):
         """
@@ -161,7 +159,7 @@ class MarkingMenu(object):
         cmds.menuItem(parent=skin_menu, label='Paint Skin Weights', radialPosition='NW',
                       command=cmds.ArtPaintSkinWeightsToolOptions)
 
-        cmds.menuItem(parent=skin_menu, label='             Skins Utils             ', enable=False)
+        cmds.menuItem(parent=skin_menu, label='             Skins Utils', enable=False)
         cmds.menuItem(parent=skin_menu, divider=True)
 
         cmds.menuItem(parent=skin_menu, label='Set Labels',
@@ -183,6 +181,8 @@ class MarkingMenu(object):
                       command=transferSkinWindow.TransferSkinWindow)
 
         cmds.menuItem(parent=skin_menu, divider=True)
+        cmds.menuItem(parent=skin_menu, label='          Import/Export', enable=False)
+        cmds.menuItem(parent=skin_menu, divider=True)
 
         cmds.menuItem(parent=skin_menu, label='Import Skins', command=importSkinWindow.ImportSkinWindow)
         cmds.menuItem(parent=skin_menu, label='Export Skins', command=exportSkinWindow.ExportSkinWindow)
@@ -197,7 +197,7 @@ class MarkingMenu(object):
         cmds.menuItem(parent=connections_menu, label='Connection Editor', radialPosition='W',
                       command=cmds.ConnectionEditor)
 
-        cmds.menuItem(parent=connections_menu, label='           Connections Utils', enable=False)
+        cmds.menuItem(parent=connections_menu, label='             Connections Utils', enable=False)
 
         cmds.menuItem(parent=connections_menu, divider=True)
 
@@ -222,7 +222,7 @@ class MarkingMenu(object):
                       command=connectScaleWindow.ConnectScaleWindow)
 
         cmds.menuItem(parent=connections_menu, divider=True)
-        cmds.menuItem(parent=connections_menu, label='                   Matrices', enable=False)
+        cmds.menuItem(parent=connections_menu, label='                    Matrices', enable=False)
         cmds.menuItem(parent=connections_menu, divider=True)
 
         cmds.menuItem(parent=connections_menu, label='Connect OffsetParentMatrix',
@@ -235,6 +235,15 @@ class MarkingMenu(object):
 
         cmds.menuItem(parent=connections_menu, label='offsetParentMatrix to transform',
                       command=connectionLib.offset_parent_matrix_to_transform)
+
+        cmds.menuItem(parent=connections_menu, divider=True)
+        cmds.menuItem(parent=connections_menu, label='                Import/Export', enable=False)
+        cmds.menuItem(parent=connections_menu, divider=True)
+
+        cmds.menuItem(parent=connections_menu, label='Import nodes and connections',
+                      command=importNodesAndConnectionsWindow.ImportNodesAndConnectionsWindow)
+        cmds.menuItem(parent=connections_menu, label='Export nodes and connections',
+                      command=exportNodesAndConnectionsWindow.ExportNodesAndConnectionsWindow)
 
     @staticmethod
     def maya_editors_menu(menu_parent, radial_position):

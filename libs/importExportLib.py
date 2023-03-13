@@ -43,12 +43,14 @@ def import_selection(*args,
     return store_selection_data
 
 
-def export_nodes_and_connections(file_name, path, export_edges=False):
+def export_nodes_and_connections(file_name, path, export_nodes=True, export_edges=False, export_connections=True):
     """
     Export nodes and connections to .ma file
     :param file_name: str
     :param path: str
+    :param export_nodes: bool
     :param export_edges: bool
+    :param export_connections: bool
     """
     node_list = cmds.ls(sl=True)
 
@@ -95,30 +97,35 @@ def export_nodes_and_connections(file_name, path, export_edges=False):
 
         # ----- Write file -----
         # write createNode lines
-        create_node_line_list = [index for index, value in enumerate(lines) if value.startswith('createNode')]
-        for create_node_line_index in create_node_line_list:
-            node_name = lines[create_node_line_index].split('"')[1]
-            if 'unitConversion' not in lines[create_node_line_index]:
-                if node_name not in skip_node_list:
-                    connections_file.writelines(lines[create_node_line_index])
-                    for line_index, line_value in enumerate(lines[create_node_line_index + 1::]):
-                        if line_value.startswith('\t'):
-                            if 'rename' not in line_value:
-                                connections_file.writelines(lines[create_node_line_index + line_index + 1])
-                        else:
-                            break
+        if export_nodes:
+            create_node_line_list = [index for index, value in enumerate(lines) if value.startswith('createNode')]
+            for create_node_line_index in create_node_line_list:
+                node_name = lines[create_node_line_index].split('"')[1]
+                if 'unitConversion' not in lines[create_node_line_index]:
+                    if node_name not in skip_node_list:
+                        connections_file.writelines(lines[create_node_line_index])
+                        for line_index, line_value in enumerate(lines[create_node_line_index + 1::]):
+                            if line_value.startswith('\t'):
+                                if 'rename' not in line_value:
+                                    connections_file.writelines(lines[create_node_line_index + line_index + 1])
+                            else:
+                                break
 
         # Write connections lines
-        if len(connections_string) != 0:
-            connections_file.writelines(connections_string)
+        if export_connections:
+            if len(connections_string) != 0:
+                connections_file.writelines(connections_string)
 
     print(end='\n')
     print(end=r'{}/{}.ma has been exported'.format(path, file_name))
 
 
-def import_nodes_and_connections(path):
+def import_nodes_and_connections(path, import_nodes=True, import_connections=True):
     """
     Import connections from mel file
+    :param path: str
+    :param import_nodes: bool
+    :param import_connections: bool
     """
     file_name = os.path.basename(path).split('.ma')[0]
     path = os.path.dirname(path)
@@ -126,32 +133,34 @@ def import_nodes_and_connections(path):
     with open(r'{}\{}.ma'.format(path, file_name), 'r') as connections_file:
         lines = connections_file.readlines()
 
-        main_line_list = [index for index, value in enumerate(lines) if
-                          value.startswith('createNode') or value.startswith('connectAttr')]
+        if import_nodes:
+            main_line_list = [index for index, value in enumerate(lines) if
+                              value.startswith('createNode') or value.startswith('connectAttr')]
 
-        component_range_list = [(value, main_line_list[index + 1]) for index, value in enumerate(main_line_list) if
-                                main_line_list[index] != main_line_list[-1]]
+            component_range_list = [(value, main_line_list[index + 1]) for index, value in enumerate(main_line_list) if
+                                    main_line_list[index] != main_line_list[-1]]
 
-        # Create a temporary mel file to import only the nodes that do not exist in the scene
-        with open(r'{}\{}_TEMP.mel'.format(path, file_name), 'w') as connections_file_temp:
-            for file_component in component_range_list:
-                if 'createNode' in lines[file_component[0]]:
-                    node_name = lines[file_component[0]].split('"')[1]
-                    if not cmds.objExists(node_name):
-                        for index in range(file_component[0], file_component[1]):
-                            print(lines[index])
-                            connections_file_temp.write(lines[index])
-        # import nodes
-        cmds.file(r'{}\{}_TEMP.mel'.format(path, file_name), i=True, force=True)  # i = import
-        os.remove(r'{}\{}_TEMP.mel'.format(path, file_name))
+            # Create a temporary mel file to import only the nodes that do not exist in the scene
+            with open(r'{}\{}_TEMP.mel'.format(path, file_name), 'w') as connections_file_temp:
+                for file_component in component_range_list:
+                    if 'createNode' in lines[file_component[0]]:
+                        node_name = lines[file_component[0]].split('"')[1]
+                        if not cmds.objExists(node_name):
+                            for index in range(file_component[0], file_component[1]):
+                                print(lines[index])
+                                connections_file_temp.write(lines[index])
+            # Import nodes
+            cmds.file(r'{}\{}_TEMP.mel'.format(path, file_name), i=True, force=True)  # i = import
+            os.remove(r'{}\{}_TEMP.mel'.format(path, file_name))
 
-        # Connect attributes from file, check if the connection exists and force it if false
-        for line in lines:
-            if line.startswith('connectAttr'):
-                input_value = line.split('"')[1]
-                output_value = line.split('"')[-2]
-                if not cmds.isConnected(input_value, output_value):
-                    cmds.connectAttr(input_value, output_value, force=True)
+        if import_connections:
+            # Connect attributes from file, check if the connection exists and force it if false
+            for line in lines:
+                if line.startswith('connectAttr'):
+                    input_value = line.split('"')[1]
+                    output_value = line.split('"')[-2]
+                    if not cmds.isConnected(input_value, output_value):
+                        cmds.connectAttr(input_value, output_value, force=True)
 
     print(end='\n')
     print(end=r'{}\{}.ma has been imported'.format(path, file_name))
