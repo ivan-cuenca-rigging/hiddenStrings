@@ -1,8 +1,8 @@
 # Maya imports
 from maya import cmds
 
-from hiddenStrings.libs import mathLib, sideLib, jsonLib, usageLib
 # Project imports
+from hiddenStrings.libs import mathLib, sideLib, jsonLib, usageLib
 from hiddenStrings.libs.helpers import nodeHelper
 
 
