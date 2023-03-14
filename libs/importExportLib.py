@@ -20,6 +20,9 @@ def export_selection(*args,
     :param file_name: str
     :param path: str
     """
+    if not os.path.exists(path):
+        os.makedirs(path)
+
     selection_data = cmds.ls(selection=True)
 
     jsonLib.export_data_to_json(data=selection_data,
