@@ -16,7 +16,7 @@ from hiddenStrings.ui.connectionWindows import (connectOffsetParentMatrixWindow,
 from hiddenStrings.ui.skinsWindows import importSkinWindow, exportSkinWindow, transferSkinWindow
 from hiddenStrings.ui.toolsWindows import shapeManagerWindow, renamerWindow
 
-builder_exists = os.path.exists(r'{}\builder'.format(os.path.dirname(os.path.dirname(__file__))))
+builder_exists = os.path.exists(r'{}/builder'.format(os.path.dirname(os.path.dirname(__file__))))
 
 if builder_exists:
     from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
@@ -534,7 +534,7 @@ class MarkingMenu(object):
             side = guide_group.split('_')[1]
 
             module_name = cmds.getAttr('{}.moduleName'.format(guide_group))
-            root_path = r'{}\builder\modules'.format(hiddenStrings.hidden_strings_path)
+            root_path = r'{}/builder/modules'.format(hiddenStrings.hidden_strings_path)
 
             for i in os.scandir(root_path):
                 if i.is_dir():

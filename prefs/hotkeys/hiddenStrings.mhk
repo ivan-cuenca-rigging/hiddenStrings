@@ -62,7 +62,7 @@ runTimeCommand
 	-helpUrl ""
 	-hotkeyCtx ""
 	-commandLanguage "python"
-	-command ("from maya import cmds\n\nprint(end=str(cmds.ls(sl=True, flatten=True)))")
+	-command ("import logging\nfrom maya import cmds\n\nlogging.info(cmds.ls(sl=True, flatten=True))")
 	printSelection;
 
 runTimeCommand

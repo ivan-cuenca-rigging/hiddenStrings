@@ -55,13 +55,13 @@ Python 3
 2. Rename main folder to `hiddenStrings`
 
 3. Save the main folder in your maya folder:
-   "C:\Users\userName\Documents\maya\2023\scripts"
+   "C:/Users/userName/Documents/maya/2023/scripts"
 
 4. Run this code in maya as python:
 
        import hiddenStrings
 
-   This import will check if there is a userSetup.py in "C:\Users\userName\Documents\maya\2023\"
+   This import will check if there is a userSetup.py in "C:/Users/userName/Documents/maya/2023/"
 
    If it exists it will edit the file and add the hiddenStrings imports.
 

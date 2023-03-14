@@ -1,5 +1,5 @@
 # Imports
-from pathlib import Path
+import logging
 import types
 import sys
 import os
@@ -23,6 +23,7 @@ load_plugins_bool = True
 
 hidden_strings_name = 'hiddenStrings'
 hidden_strings_path = os.path.dirname(__file__)
+logging = logging.getLogger(hidden_strings_name)  # Show module name when using the logging
 
 
 def reload(*args):
@@ -41,14 +42,13 @@ def reload(*args):
     # Load each of the modules again
     # Make old modules share state with new modules
     for key in loaded_modules:
-        print('re-loading {}'.format(key))
         new_module = __import__(key)
         old_module = loaded_modules[key]
         old_module.__dict__.clear()
         old_module.__dict__.update(new_module.__dict__)
 
     # Print in the command line
-    print(end='hiddenStrings reloaded\n')
+    logging.info('Module reloaded')
 
 
 def set_user_setup():
@@ -56,40 +56,47 @@ def set_user_setup():
     create and set the userSetup.py
     """
     scripts_path = os.path.dirname(os.path.dirname(__file__))
-    user_setup_file_path = Path(r'{}\userSetup.py'.format(scripts_path))
-
-    # ---------- Check if module is in userSetup.py ----------
-    module_in_user_setup = False
-    if user_setup_file_path.is_file():
-        user_setup_file = open(user_setup_file_path, 'r')
-        if hidden_strings_name in user_setup_file.read():
-            module_in_user_setup = True
-        user_setup_file.close()
+    user_setup_file_path = r'{}/userSetup.py'.format(scripts_path)
+    # Check if the userSetup.py exists
+    if not os.path.exists(user_setup_file_path):
+        with open(user_setup_file_path, 'w'):
+            pass
 
     # ---------- Edit userSetup.py ----------
-    if not module_in_user_setup:
-        user_setup_file = open(user_setup_file_path, 'a')
+    with open(user_setup_file_path, 'r+') as user_setup_file:
+        content = user_setup_file.read()
+        # Move file pointer to the beginning of a file
+        user_setup_file.seek(0)
+        # Empty the file
+        user_setup_file.truncate()
 
-        user_setup_file.write('\n')
-        user_setup_file.write('from maya import cmds\n')
-        user_setup_file.write('\n')
-        user_setup_file.write('\n')
-        user_setup_file.write('cmds.evalDeferred("import hiddenStrings")\n')
+        # Maya import
+        if 'maya' not in content or 'cmds' not in content:
+            user_setup_file.write('from maya import cmds\n')
+            user_setup_file.write('\n')
 
-        user_setup_file.close()
+        # File content
+        if content:
+            user_setup_file.write(content)
+
+        # hiddenStrings import
+        if hidden_strings_name not in content:
+            user_setup_file.write('\n')
+            user_setup_file.write('# hiddenStrings import\n')
+            user_setup_file.write('cmds.evalDeferred("import hiddenStrings")\n')
 
 
 def load_hotkeys():
     """
     Load the hotkeys
     """
-    hotkeys_path = r'{}\prefs\hotkeys\hiddenStrings.mhk'.format(os.path.dirname(__file__))
+    hotkeys_path = r'{}/prefs/hotkeys/hiddenStrings.mhk'.format(os.path.dirname(__file__))
 
     hotkeys_set_list = cmds.hotkeySet(query=True, hotkeySetArray=True)
     if hidden_strings_name not in hotkeys_set_list:
         cmds.hotkeySet(edit=True, ip=hotkeys_path)  # ip == import
     else:
-        cmds.warning('{} hotkeys are already loaded'.format(hidden_strings_name))
+        logging.warning('Hotkeys are already loaded')
 
 
 def unload_hotkeys():
@@ -100,7 +107,7 @@ def unload_hotkeys():
     if hidden_strings_name in hotkeys_set_list:
         cmds.hotkeySet(hidden_strings_name, edit=True, delete=True)
     else:
-        cmds.warning('{} hotkeys are not loaded'.format(hidden_strings_name))
+        logging.warning('Hotkeys are not loaded')
 
 
 def load_markingMenu():
@@ -121,23 +128,23 @@ def load_plugins():
     """
     Load all project's plugins
     """
-    plugins_path = r'{}\plugins'.format(os.path.dirname(__file__))
+    plugins_path = r'{}/plugins'.format(os.path.dirname(__file__))
 
     plugins_list = os.listdir(plugins_path)
     plugins_list.remove('__init__.py')
     for plugin_name in plugins_list:
 
         if not cmds.pluginInfo(plugin_name, query=True, loaded=True):
-            cmds.loadPlugin(r'{}\{}'.format(plugins_path, plugin_name))
+            cmds.loadPlugin(r'{}/{}'.format(plugins_path, plugin_name))
         else:
-            cmds.warning('{} is already loaded'.format(plugin_name))
+            logging.warning('{} is already loaded'.format(plugin_name))
 
 
 def unload_plugins():
     """
     unload all project's plugins
     """
-    plugins_path = r'{}\plugins'.format(os.path.dirname(__file__))
+    plugins_path = r'{}/plugins'.format(os.path.dirname(__file__))
 
     plugins_list = os.listdir(plugins_path)
 
@@ -145,7 +152,7 @@ def unload_plugins():
         if cmds.pluginInfo(plugin_name, query=True, loaded=True):
             cmds.unloadPlugin(plugin_name)
         else:
-            cmds.warning('{} is not loaded'.format(plugin_name))
+            logging.warning('{} is not loaded'.format(plugin_name))
 
 
 # ----------------------------------------------------------------------------------------------------------------------

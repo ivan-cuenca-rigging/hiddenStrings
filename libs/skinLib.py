@@ -1,8 +1,14 @@
+# Imports
+import logging
+
 # Maya imports
 from maya import cmds
 
 # Project imports
 from hiddenStrings.libs import sideLib, usageLib, jsonLib
+
+
+logging = logging.getLogger('hiddenStrings')  # Show module name when using the logging
 
 
 def set_labels():
@@ -23,7 +29,7 @@ def set_labels():
             cmds.setAttr('{}.type'.format(jnt), 18)
             cmds.setAttr('{}.otherType'.format(jnt), '{}{}'.format(desc, usage_capitalize), type='string')
 
-            print(end='labels has been set')
+            logging.info('labels has been set')
         else:
             cmds.setAttr('{}.type'.format(jnt), 18)
             cmds.setAttr('{}.otherType'.format(jnt), jnt, type='string')

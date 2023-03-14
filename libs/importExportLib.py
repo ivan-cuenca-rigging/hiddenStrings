@@ -1,4 +1,5 @@
 # Imports
+import logging
 import os
 
 # Maya imports
@@ -8,9 +9,12 @@ from maya import cmds
 from hiddenStrings.libs import jsonLib, skinLib, blendShapeLib
 
 
+logging = logging.getLogger('hiddenStrings')  # Show module name when using the logging
+
+
 def export_selection(*args,
                      file_name='storeSelection_data',
-                     path=r'{}\temp'.format(os.path.dirname(os.path.dirname(__file__)))):
+                     path=r'{}/temp'.format(os.path.dirname(os.path.dirname(__file__)))):
     """
     Export selection to json
     :param file_name: str
@@ -23,11 +27,12 @@ def export_selection(*args,
                                 file_path=path,
                                 relative_path=False)
 
+    logging.info(selection_data)
     return selection_data
 
 
 def import_selection(*args,
-                     path=r'{}\temp\storeSelection_data.json'.format(os.path.dirname(os.path.dirname(__file__)))):
+                     path=r'{}/temp/storeSelection_data.json'.format(os.path.dirname(os.path.dirname(__file__)))):
     """
     import selection to json
     :param path: str
@@ -35,12 +40,13 @@ def import_selection(*args,
     file_name = os.path.basename(path).split('.json')[0]
     path = os.path.dirname(path)
 
-    store_selection_data = jsonLib.import_data_from_json(file_name=file_name,
-                                                         file_path=path,
-                                                         relative_path=False)
-    cmds.select(store_selection_data)
+    selection_data = jsonLib.import_data_from_json(file_name=file_name,
+                                                   file_path=path,
+                                                   relative_path=False)
+    cmds.select(selection_data)
+    logging.info(selection_data)
 
-    return store_selection_data
+    return selection_data
 
 
 def export_nodes_and_connections(file_name, path, export_nodes=True, export_edges=False, export_connections=True):
@@ -54,16 +60,16 @@ def export_nodes_and_connections(file_name, path, export_nodes=True, export_edge
     """
     node_list = cmds.ls(sl=True)
 
-    cmds.file(r'{}\{}.ma'.format(path, file_name), type='mayaAscii', exportSelectedStrict=True, force=True)
+    cmds.file(r'{}/{}.ma'.format(path, file_name), type='mayaAscii', exportSelectedStrict=True, force=True)
 
-    with open(r'{}\{}.ma'.format(path, file_name), 'r+') as connections_file:
+    with open(r'{}/{}.ma'.format(path, file_name), 'r+') as connections_file:
         # Read and store all lines into list
         lines = connections_file.readlines()
 
         # Move file pointer to the beginning of a file
         connections_file.seek(0)
 
-        # empty the file
+        # Empty the file
         connections_file.truncate()
 
         # Get connections and edge nodes
@@ -116,8 +122,7 @@ def export_nodes_and_connections(file_name, path, export_nodes=True, export_edge
             if len(connections_string) != 0:
                 connections_file.writelines(connections_string)
 
-    print(end='\n')
-    print(end=r'{}/{}.ma has been exported'.format(path, file_name))
+    logging.info(r'{}/{}.ma has been exported'.format(path, file_name))
 
 
 def import_nodes_and_connections(path, import_nodes=True, import_connections=True):
@@ -130,7 +135,7 @@ def import_nodes_and_connections(path, import_nodes=True, import_connections=Tru
     file_name = os.path.basename(path).split('.ma')[0]
     path = os.path.dirname(path)
 
-    with open(r'{}\{}.ma'.format(path, file_name), 'r') as connections_file:
+    with open(r'{}/{}.ma'.format(path, file_name), 'r') as connections_file:
         lines = connections_file.readlines()
 
         if import_nodes:
@@ -141,17 +146,16 @@ def import_nodes_and_connections(path, import_nodes=True, import_connections=Tru
                                     main_line_list[index] != main_line_list[-1]]
 
             # Create a temporary mel file to import only the nodes that do not exist in the scene
-            with open(r'{}\{}_TEMP.mel'.format(path, file_name), 'w') as connections_file_temp:
+            with open(r'{}/{}_TEMP.mel'.format(path, file_name), 'w') as connections_file_temp:
                 for file_component in component_range_list:
                     if 'createNode' in lines[file_component[0]]:
                         node_name = lines[file_component[0]].split('"')[1]
                         if not cmds.objExists(node_name):
                             for index in range(file_component[0], file_component[1]):
-                                print(lines[index])
                                 connections_file_temp.write(lines[index])
             # Import nodes
-            cmds.file(r'{}\{}_TEMP.mel'.format(path, file_name), i=True, force=True)  # i = import
-            os.remove(r'{}\{}_TEMP.mel'.format(path, file_name))
+            cmds.file(r'{}/{}_TEMP.mel'.format(path, file_name), i=True, force=True)  # i = import
+            os.remove(r'{}/{}_TEMP.mel'.format(path, file_name))
 
         if import_connections:
             # Connect attributes from file, check if the connection exists and force it if false
@@ -162,8 +166,7 @@ def import_nodes_and_connections(path, import_nodes=True, import_connections=Tru
                     if not cmds.isConnected(input_value, output_value):
                         cmds.connectAttr(input_value, output_value, force=True)
 
-    print(end='\n')
-    print(end=r'{}\{}.ma has been imported'.format(path, file_name))
+    logging.info(r'{}/{}.ma has been imported'.format(path, file_name))
 
 
 def export_blend_shape(node, path):
@@ -182,8 +185,7 @@ def export_blend_shape(node, path):
     jsonLib.export_data_to_json(data=blend_shape_data, file_name=blend_shape_name, file_path=path, relative_path=False,
                                 compact=True)
 
-    print(end='\n')
-    print(end=r'{}/{}.json has been exported'.format(path, blend_shape_name))
+    logging.info(r'{}/{}.json has been exported'.format(path, blend_shape_name))
 
 
 def export_blend_shapes(node_list, path):
@@ -255,8 +257,8 @@ def import_blend_shape(node, path):
                              '{}_{}'.format(target, pretty_target_value),
                              type='string')
             cmds.setAttr('{}.{}'.format(blend_shape, target), blend_shape_data['targets'][target]['envelope'])
-    print(end='\n')
-    print(end=r'{}\{}.json has been imported'.format(path, file_name))
+
+    logging.info(r'{}/{}.json has been imported'.format(path, file_name))
 
 
 def import_blend_shapes(path):
@@ -271,7 +273,7 @@ def import_blend_shapes(path):
                                                          file_path=path,
                                                          relative_path=False)
 
-        import_blend_shape(node=blend_shape_data['node'], path=r'{}\{}'.format(path, blend_shape_file))
+        import_blend_shape(node=blend_shape_data['node'], path=r'{}/{}'.format(path, blend_shape_file))
     pass
 
 
@@ -284,7 +286,7 @@ def export_skin_cluster(node, path, skin_index=1):
     """
     if skin_index:
         skin_cluster = skinLib.rename_skin_cluster(skinLib.get_skin_cluster_index(node, skin_index))
-        skin_path = r'{}\{}.json'.format(path, skin_cluster)
+        skin_path = r'{}/{}.json'.format(path, skin_cluster)
         # Check if the file exists and is writable
         if os.path.exists(skin_path) and not os.access(skin_path, os.W_OK):
             cmds.warning('{} is not writeable. Check Permissions'.format(skin_path))
@@ -296,7 +298,7 @@ def export_skin_cluster(node, path, skin_index=1):
         skin_cluster_list = skinLib.get_skin_cluster_list(node)
         for skin_cluster in skin_cluster_list:
             skin_cluster = skinLib.rename_skin_cluster(skin_cluster)
-            skin_path = r'{}\{}.json'.format(path, skin_cluster)
+            skin_path = r'{}/{}.json'.format(path, skin_cluster)
             # Check if the file exists and is writable
             if os.path.exists(skin_path) and not os.access(skin_path, os.W_OK):
                 cmds.warning('{} is not writeable. Check Permissions'.format(skin_path))
@@ -362,8 +364,7 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index'):
     cmds.deformerWeights(file_name, path=path, deformer=skin_cluster,
                          im=True, edit=True, method=import_method)
 
-    print(end='\n')
-    print(end='{} has been imported'.format(file_name))
+    logging.info('{} has been imported'.format(file_name))
 
 
 def import_skin_clusters(path, import_method='index'):
@@ -383,5 +384,5 @@ def import_skin_clusters(path, import_method='index'):
         skin_cluster = skin_data['deformerWeight']['weights'][0]['deformer']
         skin_index = int(skin_cluster.split('_')[0][-2:])
 
-        import_skin_cluster(node=node, path=r'{}\{}'.format(path, skin_file),
+        import_skin_cluster(node=node, path=r'{}/{}'.format(path, skin_file),
                             skin_index=skin_index, import_method=import_method)

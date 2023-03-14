@@ -20,7 +20,7 @@ class ShapeManagerWindow(windowHelper.WindowHelper):
         """
         super().__init__(title='Shape Manager', size=(450, 500))
 
-        self.shapes_path = r'{}\libs\shapes'.format(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        self.shapes_path = r'{}/libs/shapes'.format(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
         # Shapes layout
         self.shape_name = cmds.textFieldGrp(label='Shape name:')
@@ -72,7 +72,7 @@ class ShapeManagerWindow(windowHelper.WindowHelper):
         items_layout = cmds.rowColumnLayout(numberOfColumns=5)
         for shape in file_list:
             cmds.rowColumnLayout(numberOfRows=2)
-            shape_path = r'{}\images\{}'.format(self.shapes_path, shape.replace('.json', '.png'))
+            shape_path = r'{}/images/{}'.format(self.shapes_path, shape.replace('.json', '.png'))
             cmds.iconTextButton(style='iconOnly',
                                 image=shape_path,
                                 width=69, height=69,
@@ -134,12 +134,12 @@ class ShapeManagerWindow(windowHelper.WindowHelper):
         self.is_shape_overwrite_locked(shape_name)
 
         # Delete shape data
-        if os.path.exists(r'{}\{}.json'.format(self.shapes_path, shape_name)):
-            os.remove(r'{}\{}.json'.format(self.shapes_path, shape_name))
+        if os.path.exists(r'{}/{}.json'.format(self.shapes_path, shape_name)):
+            os.remove(r'{}/{}.json'.format(self.shapes_path, shape_name))
 
         # Delete shape image
-        if os.path.exists(r'{}\images\{}.png'.format(self.shapes_path, shape_name)):
-            os.remove(r'{}\images\{}.png'.format(self.shapes_path, shape_name))
+        if os.path.exists(r'{}/images/{}.png'.format(self.shapes_path, shape_name)):
+            os.remove(r'{}/images/{}.png'.format(self.shapes_path, shape_name))
 
         self.refresh_shapes()
 
@@ -160,7 +160,7 @@ class ShapeManagerWindow(windowHelper.WindowHelper):
         cmds.select(node)
 
     def save_screenshot(self, *args):
-        path = r'{}\libs\shapes\images'.format(hiddenStrings.hidden_strings_path)
+        path = r'{}/libs/shapes\images'.format(hiddenStrings.hidden_strings_path)
         shape_name = cmds.textFieldGrp(self.shape_name, query=True, text=True)
 
         path_with_file = r'{}\{}.png'.format(path, shape_name)
