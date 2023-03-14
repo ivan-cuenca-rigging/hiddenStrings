@@ -542,9 +542,8 @@ class MarkingMenu(object):
                         if file == '{}.py'.format(module_name.lower()):
                             file = file.split('.py')[0]
                             file_capitalize = file.capitalize()
-
                             file_path = i.path.split(hiddenStrings.hidden_strings_name)[-1]  # Get relative path
-                            file_path = file_path.split(os.sep)  # split path
+                            file_path = os.path.normpath(file_path).split(os.sep)  # split path
 
                             rig_module = importlib.import_module('{}{}.{}'.format(hiddenStrings.hidden_strings_name,
                                                                                   '.'.join(file_path),
@@ -553,7 +552,6 @@ class MarkingMenu(object):
                             rig_module = rig_module(descriptor=descriptor, side=side)
 
                             rig_module.run()
-
         cmds.delete(guides_grp)
 
     def create_biped_guides(self, *args):
