@@ -96,7 +96,12 @@ def push_joint(parent_node, driven_node,
     :param rotation_axis: str; x, xM, y, yM, z or zM
     :param structural_parent: str
     """
-    descriptor, side, usage = driven_node.split('_')
+    if len(driven_node.split('_')) == 3:
+        descriptor, side, usage = driven_node.split('_')
+    else:
+        descriptor = driven_node
+        side = sideLib.center
+        usage = usageLib.test
 
     push_attribute = 'pushValue'
 
