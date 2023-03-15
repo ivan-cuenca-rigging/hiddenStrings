@@ -37,7 +37,7 @@ colors_dict = {'default': 0,
                'lightYellow': 22,
                'green2': 23,
                'brown2': 24,
-               'pistache': 25,
+               'pistachio': 25,
                'green3': 26,
                'green4': 27,
                'turquoise': 28,
@@ -90,7 +90,8 @@ def create_spl_from_data(spl_name, spl_data, spl_scale=1):
     """
     spl = cmds.createNode('transform', name=spl_name)
     for crv in spl_data:
-        crv = cmds.curve(**spl_data[crv])
+        crv = cmds.curve(**spl_data[crv])  # ** to pass dictionary key-values as arguments
+
         crv_shapes = cmds.listRelatives(crv, shapes=True)[0]
         cmds.parent(crv_shapes, spl, relative=True, shape=True)
         cmds.delete(crv)
