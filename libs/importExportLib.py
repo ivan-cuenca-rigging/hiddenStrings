@@ -319,23 +319,42 @@ def export_skin_clusters(node_list, path, skin_index=1):
         export_skin_cluster(node=node, path=path, skin_index=skin_index)
 
 
-def import_skin_cluster(node, path, skin_index=1, import_method='index'):
+def import_skin_cluster(node, path, skin_index=1, import_method='index', search_for=None, replace_with=None):
     """
     Import skinCluster from path
     :param node: str
     :param path: str
     :param skin_index: int. -1 (last), 1, 2, 3
     :param import_method: index or nearest
+    :param search_for: str; use , for more than once
+    :param replace_with: str; use , for more than once
     :return:
     """
     skin_cluster = skinLib.get_skin_cluster_index(node, skin_index)
     file_name = os.path.basename(path)
     path = os.path.dirname(path)
 
+    if search_for:
+        search_for = search_for.split(',')
+        replace_with = replace_with.split(',')
+
+        if len(search_for) != len(replace_with):
+            cmds.error('Search for and replace with must have same number of words (split with commas)')
+
+        with open(r'{}/{}'.format(path, file_name), 'r+') as skin_file:
+            lines = skin_file.readlines()
+            skin_file.seek(0)
+            skin_file.truncate()
+            for line in lines:
+                for index, value in enumerate(search_for):
+                    line = line.replace(value, replace_with[index])
+                skin_file.writelines(line)
+
     # Get json file joints
     skin_data = jsonLib.import_data_from_json(file_name=file_name.split('.')[0],
                                               file_path=path,
                                               relative_path=False)
+
     file_skin_joints = list()
     for value in skin_data['deformerWeight']['weights']:
         file_skin_joints.append(value['source'])
@@ -363,6 +382,17 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index'):
     # Import skinCluster JSON
     cmds.deformerWeights(file_name, path=path, deformer=skin_cluster,
                          im=True, edit=True, method=import_method)
+    cmds.skinCluster(skin_cluster, edit=True, forceNormalizeWeights=True)
+
+    if search_for:
+        with open(r'{}/{}'.format(path, file_name), 'r+') as skin_file:
+            lines = skin_file.readlines()
+            skin_file.seek(0)
+            skin_file.truncate()
+            for line in lines:
+                for index, value in enumerate(search_for):
+                    line = line.replace(replace_with[index], value)
+                skin_file.writelines(line)
 
     logging.info('{} has been imported'.format(file_name))
 
