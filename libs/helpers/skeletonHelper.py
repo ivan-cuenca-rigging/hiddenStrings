@@ -11,7 +11,7 @@ class SkeletonHelper(nodeHelper.NodeHelper):
         """
         :param name: str
         """
-        super().__init__(name)
+        super(SkeletonHelper, self).__init__(name)
         self.name = name
         self.check_usage()
         self.check_side()

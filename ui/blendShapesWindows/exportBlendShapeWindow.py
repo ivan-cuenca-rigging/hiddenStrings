@@ -16,7 +16,7 @@ class ExportBlendShapeWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='Export blendShape Options', size=(450, 130))
+        super(ExportBlendShapeWindow, self).__init__(title='Export blendShape Options', size=(450, 130))
 
         export_path = os.path.dirname(cmds.file(query=True, sceneName=True))
         self.export_path = cmds.textFieldGrp(label='Path: ', text=export_path)

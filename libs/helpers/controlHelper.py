@@ -11,7 +11,7 @@ class ControlHelper(nodeHelper.NodeHelper, attributeHelper.AttributeHelper):
         """
         :param name: str
         """
-        super().__init__(name)
+        super(ControlHelper, self).__init__(name)
 
         self.name = name
         self.check_usage()

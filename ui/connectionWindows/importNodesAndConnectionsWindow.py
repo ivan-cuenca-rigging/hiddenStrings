@@ -16,7 +16,8 @@ class ImportNodesAndConnectionsWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='Import nodes and connections Options', size=(450, 130))
+        super(ImportNodesAndConnectionsWindow, self).__init__(title='Import nodes and connections Options',
+                                                              size=(450, 130))
 
         self.import_nodes = cmds.checkBoxGrp(label='Import nodes: ', value1=True)
         self.import_connections = cmds.checkBoxGrp(label='Import connections: ', value1=True)

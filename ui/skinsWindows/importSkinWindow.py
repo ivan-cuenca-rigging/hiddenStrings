@@ -13,7 +13,7 @@ class ImportSkinWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='Import Skin Options', size=(450, 175))
+        super(ImportSkinWindow, self).__init__(title='Import Skin Options', size=(450, 175))
 
         self.skin_index = cmds.intFieldGrp(label='Skin index: ', value1=1)
         self.import_folder = cmds.checkBoxGrp(label='Import folder: ', value1=False,

@@ -13,7 +13,7 @@ class ImportBlendShapeWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='Import blendShape Options', size=(450, 150))
+        super(ImportBlendShapeWindow, self).__init__(title='Import blendShape Options', size=(450, 150))
 
         self.import_folder = cmds.checkBoxGrp(label='Import folder: ', value1=False)
 

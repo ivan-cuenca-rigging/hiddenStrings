@@ -11,7 +11,7 @@ class GuideHelper(nodeHelper.NodeHelper):
         """
         :param name: str
         """
-        super().__init__(name)
+        super(GuideHelper, self).__init__(name)
         self.name = name
         self.check_usage()
 

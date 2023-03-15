@@ -13,7 +13,7 @@ class NodeHelper(attributeHelper.AttributeHelper):
         """
         :param name: str
         """
-        super().__init__(name)
+        super(NodeHelper, self).__init__(name)
         self.name = name
         self.name_tokens = self.name.split('_')
         self.descriptor, self.side, self.usage = self.name_tokens

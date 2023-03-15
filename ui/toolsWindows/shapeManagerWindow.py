@@ -18,7 +18,7 @@ class ShapeManagerWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='Shape Manager', size=(450, 500))
+        super(ShapeManagerWindow, self).__init__(title='Shape Manager', size=(450, 500))
 
         self.shapes_path = r'{}/libs/shapes'.format(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 

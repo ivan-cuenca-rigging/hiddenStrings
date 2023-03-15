@@ -12,7 +12,7 @@ class RenamerWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='Renamer', size=(300, 210))
+        super(RenamerWindow, self).__init__(title='Renamer', size=(300, 210))
 
         # Search and replace
         self.search_for = cmds.textFieldGrp(label='Search for: ', columnWidth=[(1, 70), (2, 217)],

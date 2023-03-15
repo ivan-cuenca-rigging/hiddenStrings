@@ -13,7 +13,7 @@ class SpineWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='Spine Guides Options', size=(450, 450))
+        super(SpineWindow, self).__init__(title='Spine Guides Options', size=(450, 450))
 
         # Name
         self.name = cmds.textFieldGrp(label='Name: ', text='spine')

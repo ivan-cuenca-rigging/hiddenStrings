@@ -12,7 +12,8 @@ class ConnectTranslateRotateScaleWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='connect translate rotate scale Options', size=(450, 200))
+        super(ConnectTranslateRotateScaleWindow, self).__init__(title='connect translate rotate scale Options',
+                                                                size=(450, 200))
 
         self.translate = cmds.checkBoxGrp(label='Translate: ', label1='All', value1=True,
                                           onCommand=self.set_translate_axis_enable,

@@ -12,7 +12,7 @@ class ConnectScaleWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='connect scale Options', size=(450, 125))
+        super(ConnectScaleWindow, self).__init__(title='connect scale Options', size=(450, 125))
 
         self.scale = cmds.checkBoxGrp(label='Scale: ', value1=True,
                                       onCommand=self.set_scale_axis_enable,

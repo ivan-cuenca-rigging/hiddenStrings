@@ -13,7 +13,8 @@ class ConnectOffsetParentMatrixWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='connect offset parent matrix Options', size=(450, 150))
+        super(ConnectOffsetParentMatrixWindow, self).__init__(title='connect offset parent matrix Options',
+                                                              size=(450, 150))
 
         self.translate = cmds.checkBoxGrp(label='Translate: ', value1=True)
         self.rotate = cmds.checkBoxGrp(label='Rotate: ', value1=True)

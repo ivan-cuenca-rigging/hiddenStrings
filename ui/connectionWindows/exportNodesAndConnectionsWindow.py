@@ -16,7 +16,8 @@ class ExportNodesAndConnectionsWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='Export nodes and connections Options', size=(450, 130))
+        super(ExportNodesAndConnectionsWindow, self).__init__(title='Export nodes and connections Options',
+                                                              size=(450, 130))
 
         self.export_nodes = cmds.checkBoxGrp(label='Export nodes: ', value1=True)
         self.export_edges = cmds.checkBoxGrp(label='Export edges: ', value1=False)

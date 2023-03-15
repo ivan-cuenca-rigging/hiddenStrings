@@ -16,7 +16,7 @@ class ExportSkinWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='Export Skin Options', size=(450, 130))
+        super(ExportSkinWindow, self).__init__(title='Export Skin Options', size=(450, 130))
 
         self.skin_index = cmds.intFieldGrp(label='Skin index: ', value1=1)
         self.all_skin_index = cmds.checkBoxGrp(label='All: ', value1=False,

@@ -13,7 +13,7 @@ class RootWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='Root Guides Options', size=(450, 100))
+        super(RootWindow, self).__init__(title='Root Guides Options', size=(450, 100))
 
         self.system_orientation = cmds.optionMenu(label='System Orientation')
         cmds.menuItem(self.system_orientation, label='Horizontal')

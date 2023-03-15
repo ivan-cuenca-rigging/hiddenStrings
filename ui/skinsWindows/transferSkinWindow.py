@@ -13,7 +13,7 @@ class TransferSkinWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='Import Skin Options', size=(450, 150))
+        super(TransferSkinWindow, self).__init__(title='Import Skin Options', size=(450, 150))
 
         self.source_skin_index = cmds.intFieldGrp(label='Source skin index: ', value1=1)
         self.target_skin_index = cmds.intFieldGrp(label='Target skin index: ', value1=1)

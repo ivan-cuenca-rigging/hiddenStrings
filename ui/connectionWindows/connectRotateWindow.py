@@ -12,7 +12,7 @@ class ConnectRotateWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='connect scale Options', size=(450, 125))
+        super(ConnectRotateWindow, self).__init__(title='connect scale Options', size=(450, 125))
 
         self.rotate = cmds.checkBoxGrp(label='Rotate: ', value1=True,
                                        onCommand=self.set_rotate_axis_enable,

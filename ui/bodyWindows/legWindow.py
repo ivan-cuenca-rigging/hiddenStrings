@@ -13,7 +13,7 @@ class LegWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super().__init__(title='Leg Guides Options', size=(450, 450))
+        super(LegWindow, self).__init__(title='Leg Guides Options', size=(450, 450))
 
         # Name
         self.name = cmds.textFieldGrp(label='Name: ', text='leg')
