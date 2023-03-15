@@ -13,7 +13,7 @@ class PushJointWindow(windowHelper.WindowHelper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super(PushJointWindow, self).__init__(title='Push Joint', size=(450, 210))
+        super(PushJointWindow, self).__init__(title='Push Joint', size=(450, 215))
 
         # Search and replace
         self.parent_node = cmds.textFieldGrp(label='Parent: ')
@@ -37,7 +37,7 @@ class PushJointWindow(windowHelper.WindowHelper):
 
         # --------------------------------------------------------------------------------------------------------------
         cmds.formLayout(self.main_layout, edit=True,
-                        attachForm=[(self.parent_node, 'top', 5),
+                        attachForm=[(self.parent_node, 'top', 10),
                                     (self.rotation_axis, 'left', 70)],
 
                         attachControl=[(self.driver_node, 'top', 5, self.parent_node),
