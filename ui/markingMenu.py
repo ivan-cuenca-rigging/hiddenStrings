@@ -13,7 +13,7 @@ from hiddenStrings.ui.blendShapesWindows import importBlendShapeWindow, exportBl
 from hiddenStrings.ui.connectionWindows import (connectOffsetParentMatrixWindow, connectTranslateRotateScaleWindow,
                                                 connectTranslateWindow, connectRotateWindow, connectScaleWindow,
                                                 importNodesAndConnectionsWindow, exportNodesAndConnectionsWindow)
-from hiddenStrings.ui.skinsWindows import importSkinWindow, exportSkinWindow, transferSkinWindow
+from hiddenStrings.ui.skinsWindows import importSkinWindow, exportSkinWindow, transferSkinWindow, pushJointWindow
 from hiddenStrings.ui.toolsWindows import shapeManagerWindow, renamerWindow
 
 builder_exists = os.path.exists(r'{}/builder'.format(os.path.dirname(os.path.dirname(__file__))))
@@ -178,7 +178,7 @@ class MarkingMenu(object):
         cmds.menuItem(parent=skin_menu, divider=True)
 
         cmds.menuItem(parent=skin_menu, label='Push joint',
-                      enable=False)
+                      command=pushJointWindow.PushJointWindow)
 
         cmds.menuItem(parent=skin_menu, divider=True)
 

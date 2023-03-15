@@ -93,7 +93,7 @@ def push_joint(parent_node, driven_node,
     :param driven_node: str
     :param suffix: str
     :param forbidden_word: str
-    :param rotation_axis: str; x, xM, y, yM, z or zM
+    :param rotation_axis: str; X, -X, Y, -Y, Z or -Z
     :param structural_parent: str
     """
     if len(driven_node.split('_')) == 3:
@@ -101,12 +101,15 @@ def push_joint(parent_node, driven_node,
     else:
         descriptor = driven_node
         side = sideLib.center
-        usage = usageLib.test
 
     push_attribute = 'pushValue'
 
     if forbidden_word:
         descriptor = ''.join(descriptor.split(forbidden_word))
+
+    rotation_axis = rotation_axis.lower()
+    if '-' in rotation_axis:
+        rotation_axis = '{}M'.format(rotation_axis[-1])
 
     # BlendMatrix to get the position of the driver and half rotation from each
     blend_matrix = cmds.createNode('blendMatrix', name='{}R{}Push{}_{}_{}'.format(descriptor,
