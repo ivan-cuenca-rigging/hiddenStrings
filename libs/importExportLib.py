@@ -12,9 +12,7 @@ from hiddenStrings.libs import jsonLib, skinLib, blendShapeLib
 logging = logging.getLogger('hiddenStrings')  # Show module name when using the logging
 
 
-def export_selection(*args,
-                     file_name='storeSelection_data',
-                     path=r'{}/temp'.format(os.path.dirname(os.path.dirname(__file__)))):
+def export_selection(*args, file_name, path):
     """
     Export selection to json
     :param file_name: str
@@ -34,8 +32,7 @@ def export_selection(*args,
     return selection_data
 
 
-def import_selection(*args,
-                     path=r'{}/temp/storeSelection_data.json'.format(os.path.dirname(os.path.dirname(__file__)))):
+def import_selection(*args, path):
     """
     import selection to json
     :param path: str

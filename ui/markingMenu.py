@@ -76,8 +76,15 @@ class MarkingMenu(object):
         cmds.menuItem(parent=self.menu_name, label='                Tools', enable=False)
         cmds.menuItem(parent=self.menu_name, divider=True)
 
-        cmds.menuItem(parent=self.menu_name, label='Save selection', command=importExportLib.export_selection)
-        cmds.menuItem(parent=self.menu_name, label='Load selection', command=importExportLib.import_selection)
+        cmds.menuItem(parent=self.menu_name, label='Save selection',
+                      command=partial(importExportLib.export_selection,
+                                      file_name='selection_data',
+                                      path=r'{}/temp'.format(os.path.dirname(os.path.dirname(__file__)))))
+
+        cmds.menuItem(parent=self.menu_name, label='Load selection',
+                      command=partial(importExportLib.import_selection,
+                                      path=r'{}/temp/selection_data.json'.format(
+                                                                        os.path.dirname(os.path.dirname(__file__)))))
 
         cmds.menuItem(parent=self.menu_name, divider=True)
 
