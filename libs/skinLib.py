@@ -8,7 +8,7 @@ from maya import cmds
 from hiddenStrings.libs import sideLib, usageLib, jsonLib
 
 
-logging = logging.getLogger('hiddenStrings')  # Show module name when using the logging
+logging = logging.getLogger(__name__)
 
 
 def set_labels():
