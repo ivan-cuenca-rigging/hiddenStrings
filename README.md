@@ -82,7 +82,9 @@ Hold <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>Right click</kbd> to open the mark
 
 <kbd>&larr;</kbd> Connections utils
 
-<kbd>&darr;</kbd> Tools
+<kbd>&darr;</kbd> Maya windows
+
+<kbd>&darr;</kbd> <kbd>&darr;</kbd> Tools
 
 ### Private features: ###
 

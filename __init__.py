@@ -1,15 +1,16 @@
 # Imports
-import logging
-import types
-import sys
 import os
+import logging
 
 # Maya imports
 from maya import cmds
 
 # Project imports
-from hiddenStrings.ui import markingMenu
+from hiddenStrings import module_utils
+from hiddenStrings.ui import marking_menu
 
+
+# -------------------- Settings --------------------
 
 create_userSetup_bool = True
 
@@ -20,36 +21,9 @@ load_hotkeys_bool = True
 
 load_plugins_bool = True
 
+# --------------------------------------------------
 
-hidden_strings_name = 'hiddenStrings'
-hidden_strings_path = os.path.dirname(__file__)
-
-logging = logging.getLogger(__name__)  # Show module name when using the logging
-
-
-def reload(*args):
-    """
-    Reload the given module and all children
-    """
-    # Get a reference to each loaded module
-    loaded_modules = dict([(key, value) for key, value in sys.modules.items()
-                           if key.startswith(hidden_strings_name) and
-                           isinstance(value, types.ModuleType)])
-
-    # Delete references to these loaded modules from sys.modules
-    for key in loaded_modules:
-        del sys.modules[key]
-
-    # Load each of the modules again
-    # Make old modules share state with new modules
-    for key in loaded_modules:
-        new_module = __import__(key)
-        old_module = loaded_modules[key]
-        old_module.__dict__.clear()
-        old_module.__dict__.update(new_module.__dict__)
-
-    # Print in the command line
-    logging.info('Module reloaded')
+logging = logging.getLogger(__name__)
 
 
 def set_user_setup():
@@ -81,7 +55,7 @@ def set_user_setup():
             user_setup_file.write(content)
 
         # hiddenStrings import
-        if hidden_strings_name not in content:
+        if module_utils.hidden_strings_name not in content:
             user_setup_file.write('\n')
             user_setup_file.write('# hiddenStrings import\n')
             user_setup_file.write('cmds.evalDeferred("import hiddenStrings")\n')
@@ -91,10 +65,10 @@ def load_hotkeys():
     """
     Load the hotkeys
     """
-    hotkeys_path = r'{}/prefs/hotkeys/hiddenStrings.mhk'.format(os.path.dirname(__file__))
+    hotkeys_path = r'{}/prefs/hotkeys/hiddenStrings.mhk'.format(module_utils.hidden_strings_path)
 
     hotkeys_set_list = cmds.hotkeySet(query=True, hotkeySetArray=True)
-    if hidden_strings_name not in hotkeys_set_list:
+    if module_utils.hidden_strings_name not in hotkeys_set_list:
         cmds.hotkeySet(edit=True, ip=hotkeys_path)  # ip == import
     else:
         logging.warning('Hotkeys are already loaded')
@@ -105,8 +79,8 @@ def unload_hotkeys():
     Unload the hotkeys
     """
     hotkeys_set_list = cmds.hotkeySet(query=True, hotkeySetArray=True)
-    if hidden_strings_name in hotkeys_set_list:
-        cmds.hotkeySet(hidden_strings_name, edit=True, delete=True)
+    if module_utils.hidden_strings_name in hotkeys_set_list:
+        cmds.hotkeySet(module_utils.hidden_strings_name, edit=True, delete=True)
     else:
         logging.warning('Hotkeys are not loaded')
 
@@ -115,21 +89,21 @@ def load_markingMenu():
     """
     load marking menu
     """
-    markingMenu.MarkingMenu(markingMenu_click_input)
+    marking_menu.MarkingMenu(markingMenu_click_input)
 
 
 def unload_markingMenu():
     """
     Unload marking menu
     """
-    markingMenu.MarkingMenu(markingMenu_click_input).delete()
+    marking_menu.MarkingMenu(markingMenu_click_input).delete()
 
 
 def load_plugins():
     """
     Load all project's plugins
     """
-    plugins_path = r'{}/plugins'.format(os.path.dirname(__file__))
+    plugins_path = r'{}/plugins'.format(module_utils.hidden_strings_path)
 
     plugins_list = os.listdir(plugins_path)
     plugins_list.remove('__init__.py')
@@ -145,7 +119,7 @@ def unload_plugins():
     """
     unload all project's plugins
     """
-    plugins_path = r'{}/plugins'.format(os.path.dirname(__file__))
+    plugins_path = r'{}/plugins'.format(module_utils.hidden_strings_path)
 
     plugins_list = os.listdir(plugins_path)
 
