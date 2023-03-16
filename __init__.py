@@ -23,7 +23,8 @@ load_plugins_bool = True
 
 hidden_strings_name = 'hiddenStrings'
 hidden_strings_path = os.path.dirname(__file__)
-logging = logging.getLogger(hidden_strings_name)  # Show module name when using the logging
+
+logging = logging.getLogger(__name__)  # Show module name when using the logging
 
 
 def reload(*args):
