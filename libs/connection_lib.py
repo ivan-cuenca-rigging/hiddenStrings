@@ -398,7 +398,6 @@ def create_uvpin(nurbs,
 
     uvpin_node = cmds.createNode('uvPin', name='{}_{}_{}'.format(descriptor, side, usage_lib.uvpin))
 
-    # TODO: clean the normal and tangent axis set
     cmds.setAttr('{}.normalAxis'.format(uvpin_node), 1)
     cmds.setAttr('{}.tangentAxis'.format(uvpin_node), 0)
     cmds.setAttr('{}.normalAxis'.format(uvpin_node), 2)

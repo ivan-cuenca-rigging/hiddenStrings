@@ -69,15 +69,9 @@ class MarkingMenu(object):
         cmds.menuItem(parent=self.menu_name, label='                Tools', enable=False)
         cmds.menuItem(parent=self.menu_name, divider=True)
 
-        cmds.menuItem(parent=self.menu_name, label='Save selection',
-                      command=partial(import_export_lib.export_selection,
-                                      file_name='selection_data',
-                                      path=r'{}/temp'.format(module_utils.hidden_strings_path)))
+        cmds.menuItem(parent=self.menu_name, label='Save selection', command=self.export_selection)
 
-        cmds.menuItem(parent=self.menu_name, label='Load selection',
-                      command=partial(import_export_lib.import_selection,
-                                      path=r'{}/temp/selection_data.json'.format(
-                                          os.path.dirname(os.path.dirname(__file__)))))
+        cmds.menuItem(parent=self.menu_name, label='Load selection', command=self.import_selection)
 
         cmds.menuItem(parent=self.menu_name, divider=True)
 
@@ -409,6 +403,15 @@ class MarkingMenu(object):
         Transfer shape command plugin command
         """
         cmds.transferShape()
+
+    @staticmethod
+    def export_selection(*args):
+        import_export_lib.export_selection(file_name='selection_data',
+                                           path=r'{}/temp'.format(module_utils.hidden_strings_path))
+
+    @staticmethod
+    def import_selection(*args):
+        import_export_lib.import_selection(path=r'{}/temp/selection_data.json'.format(module_utils.hidden_strings_path))
 
     @staticmethod
     def show_local_rotation_axis(hierarchy=False, *args):

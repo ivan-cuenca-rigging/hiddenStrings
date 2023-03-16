@@ -12,7 +12,7 @@ from hiddenStrings.libs import skin_lib, blend_shape_lib
 logging = logging.getLogger(__name__)
 
 
-def export_selection(file_name, path, *args):
+def export_selection(file_name, path):
     """
     Export selection to json
     :param file_name: str
@@ -32,7 +32,7 @@ def export_selection(file_name, path, *args):
     return selection_data
 
 
-def import_selection(path, *args):
+def import_selection(path):
     """
     import selection to json
     :param path: str
@@ -227,12 +227,12 @@ def import_blend_shape(node, path):
             target_value = int(float(target_value) * 1000 + 5000)
 
             if target_value != 6000 and not blend_shape_lib.check_in_between(blend_shape=blend_shape,
-                                                                            target=target,
-                                                                            value=target_value):
+                                                                             target=target,
+                                                                             value=target_value):
                 blend_shape_lib.add_in_between(blend_shape=blend_shape,
-                                              existing_target=target,
-                                              in_between_target='{}_{}'.format(target, pretty_target_value),
-                                              value=pretty_target_value)
+                                               existing_target=target,
+                                               in_between_target='{}_{}'.format(target, pretty_target_value),
+                                               value=pretty_target_value)
 
             if points_target and components_target:
                 cmds.setAttr('{}.inputTarget[0].inputTargetGroup[{}].inputTargetItem[{}].inputPointsTarget'.format(
@@ -437,7 +437,6 @@ def export_data_to_json(data, file_name, file_path, relative_path=True, use_inde
 
     if compact:
         with open(file_path_name_with_extension, 'w') as write_file:
-            indent_value = 4 if use_indent else 0
             json.dump(data, write_file)
     else:
         with open(file_path_name_with_extension, 'w') as write_file:
