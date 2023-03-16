@@ -158,41 +158,49 @@ class ShapeManagerWindow(window_lib.Helper):
         :param title: str, title of the window
         :param size: list, width and height
         """
-        super(ShapeManagerWindow, self).__init__(title='Shape Manager', size=(450, 500))
+        super(ShapeManagerWindow, self).__init__(title='Shape Manager', size=(450, 510))
 
         self.shapes_path = r'{}/libs/spline_shapes'.format(module_utils.hidden_strings_path)
 
         # Shapes layout
-        self.shape_name = cmds.textFieldGrp(label='Shape name:')
+        self.export_name = cmds.textFieldGrp(label='Export name: ', columnWidth=[(1, 70), (2, 170)])
+
+        self.delete_button = cmds.button(label='Delete', width=100, command=self.delete_shape_command)
+
+        self.export_button = cmds.button(label='Export', width=100, command=self.export_shape_command)
 
         self.shapes_layout = cmds.scrollLayout(width=375, height=250, backgroundColor=(0.2, 0.2, 0.2))
         self.shapes_items_layout()
 
-        self.delete_button = cmds.button(label='Delete', width=100, command=self.delete_shape_command)
         self.merge_button = cmds.button(label='Merge', width=100, command=self.merge_shape_command)
-        self.export_button = cmds.button(label='Export', width=100, command=self.export_shape_command)
+
+        self.transfer_button = cmds.button(label='Transfer', width=100, command=self.transfer_spline_command)
 
         # Color override layout
         self.color_override_layout = self.color_override_items_layout()
         self.default_color = cmds.button(label='Default', width=375,
-                                         command=partial(spline_lib.override_color, color_key='default'))
+                                         command=partial(spline_lib.set_override_color, color_key='default'))
 
         # --------------------------------------------------------------------------------------------------------------
         cmds.formLayout(self.main_layout, edit=True,
-                        attachForm=[(self.shape_name, 'top', 20),
-                                    (self.shapes_layout, 'left', 37.5),
-                                    (self.delete_button, 'left', 39),
+                        attachForm=[(self.export_name, 'top', 20),
+                                    (self.export_name, 'left', 37.5),
+                                    (self.export_button, 'top', 10),
                                     (self.export_button, 'right', 39),
+                                    (self.delete_button, 'right', 39),
+                                    (self.shapes_layout, 'left', 37.5),
+                                    (self.merge_button, 'left', 39),
+                                    (self.transfer_button, 'right', 39),
                                     (self.color_override_layout, 'left', 39),
                                     (self.default_color, 'left', 37.5)],
 
-                        attachControl=[(self.shapes_layout, 'top', 10, self.shape_name),
-                                       (self.delete_button, 'top', 2.5, self.shapes_layout),
-                                       (self.merge_button, 'top', 2.5, self.shapes_layout),
-                                       (self.merge_button, 'left', 30, self.delete_button),
-                                       (self.merge_button, 'right', 30, self.export_button),
-                                       (self.export_button, 'top', 2.5, self.shapes_layout),
-                                       (self.color_override_layout, 'top', 10, self.export_button),
+                        attachControl=[(self.export_button, 'left', 10, self.export_name),
+                                       (self.delete_button, 'top', 5, self.export_button),
+                                       (self.delete_button, 'left', 10, self.export_name),
+                                       (self.shapes_layout, 'top', 25, self.export_name),
+                                       (self.merge_button, 'top', 7.5, self.shapes_layout),
+                                       (self.transfer_button, 'top', 7.5, self.shapes_layout),
+                                       (self.color_override_layout, 'top', 10, self.merge_button),
                                        (self.default_color, 'top', 10, self.color_override_layout)])
 
     def bottom_layout(self, *args):
@@ -234,23 +242,23 @@ class ShapeManagerWindow(window_lib.Helper):
 
             cmds.button(label='',
                         backgroundColor=(color_component[0], color_component[1], color_component[2]),
-                        command=partial(spline_lib.override_color, color_key=index))
+                        command=partial(spline_lib.set_override_color, color_key=index))
 
         cmds.setParent('..')
 
         return color_override_layout
 
-    def import_shape(self, shape_name):
+    def import_shape(self, export_name):
         """
         If there is not a selection import the shape
         If there is a selection replace the shape
-        :param shape_name: str
+        :param export_name: str
         """
         node = cmds.ls(selection=True)
-        shape_data = import_export_lib.import_data_from_json(file_name=shape_name,
+        shape_data = import_export_lib.import_data_from_json(file_name=export_name,
                                                              file_path=self.shapes_path,
                                                              relative_path=False)
-        shape_imported = spline_lib.create_spl_from_data(spl_name=shape_name, spl_data=shape_data)
+        shape_imported = spline_lib.create_spl_from_data(spl_name=export_name, spl_data=shape_data)
         if len(node) == 0:
             cmds.select(shape_imported)
         else:
@@ -258,29 +266,28 @@ class ShapeManagerWindow(window_lib.Helper):
             cmds.xform(shape_imported, worldSpace=True,
                        matrix=cmds.xform(node, query=True, worldSpace=True, matrix=True))
 
-            node_temporal_name = cmds.rename(node, '{}_{}_{}'.format(shape_name, side_lib.center, usage_lib.spline))
+            node_temporal_name = cmds.rename(node, '{}_{}_{}'.format(export_name, side_lib.center, usage_lib.spline))
             spline_lib.replace_shape(node=node_temporal_name,
                                      shape_transform=shape_imported)
             cmds.rename(node_temporal_name, node)
             cmds.select(node)
 
-        cmds.textFieldGrp(self.shape_name, edit=True, text=shape_name)
-
     def delete_shape_command(self, *args):
         """
         Delete shape name from folder (data and image)
         """
-        shape_name = cmds.textFieldGrp(self.shape_name, query=True, text=True)
+        export_name = cmds.textFieldGrp(self.export_name, query=True, text=True)
 
-        self.is_shape_overwrite_locked(shape_name)
+        self.is_shape_overwrite_locked(export_name)
 
         # Delete shape data
-        if os.path.exists(r'{}/{}.json'.format(self.shapes_path, shape_name)):
-            os.remove(r'{}/{}.json'.format(self.shapes_path, shape_name))
-
-        # Delete shape image
-        if os.path.exists(r'{}/images/{}.png'.format(self.shapes_path, shape_name)):
-            os.remove(r'{}/images/{}.png'.format(self.shapes_path, shape_name))
+        if os.path.exists(r'{}/{}.json'.format(self.shapes_path, export_name)):
+            os.remove(r'{}/{}.json'.format(self.shapes_path, export_name))
+            # Delete shape image
+            if os.path.exists(r'{}/images/{}.png'.format(self.shapes_path, export_name)):
+                os.remove(r'{}/images/{}.png'.format(self.shapes_path, export_name))
+        else:
+            cmds.error('{} does not exists in the library'.format(export_name))
 
         self.refresh_shapes()
 
@@ -300,11 +307,17 @@ class ShapeManagerWindow(window_lib.Helper):
             node = cmds.rename(node_temporal_name, node)
         cmds.select(node)
 
+    @staticmethod
+    def transfer_spline_command(*args):
+        selection_list = cmds.ls(selection=True)
+
+        spline_lib.transfer_shape(source=selection_list[0], target=selection_list[1])
+
     def save_screenshot(self, *args):
         path = r'{}/images'.format(self.shapes_path)
-        shape_name = cmds.textFieldGrp(self.shape_name, query=True, text=True)
+        export_name = cmds.textFieldGrp(self.export_name, query=True, text=True)
 
-        path_with_file = r'{}/{}.png'.format(path, shape_name)
+        path_with_file = r'{}/{}.png'.format(path, export_name)
 
         cmds.viewFit()
         cmds.setAttr('defaultRenderGlobals.imageFormat', 8)
@@ -316,19 +329,19 @@ class ShapeManagerWindow(window_lib.Helper):
         """
         Export selected spline data to a JSON
         """
-        shape_name = cmds.textFieldGrp(self.shape_name, query=True, text=True)
-        self.is_shape_overwrite_locked(shape_name)
+        export_name = cmds.textFieldGrp(self.export_name, query=True, text=True)
+        self.is_shape_overwrite_locked(export_name)
         shape_data = spline_lib.get_spl_data(spl=cmds.ls(selection=True)[0])
 
         spline_name = cmds.ls(selection=True)[0]
-        cmds.rename(spline_name, '{}_{}_{}'.format(shape_name, side_lib.center, usage_lib.spline))
+        cmds.rename(spline_name, '{}_{}_{}'.format(export_name, side_lib.center, usage_lib.spline))
 
         import_export_lib.export_data_to_json(data=shape_data,
-                                              file_name=shape_name,
+                                              file_name=export_name,
                                               file_path=self.shapes_path,
                                               relative_path=False)
         self.save_screenshot()
-        cmds.rename('{}_{}_{}'.format(shape_name, side_lib.center, usage_lib.spline), spline_name)
+        cmds.rename('{}_{}_{}'.format(export_name, side_lib.center, usage_lib.spline), spline_name)
         self.refresh_shapes()
 
     def refresh_shapes(self, *args):
@@ -343,10 +356,10 @@ class ShapeManagerWindow(window_lib.Helper):
         self.shapes_items_layout()
 
     @staticmethod
-    def is_shape_overwrite_locked(shape_name, *args):
+    def is_shape_overwrite_locked(export_name, *args):
         """
         Check if the spline shape can be overwritten or not, builder splines are locked
-        :param shape_name: str
+        :param export_name: str
         """
         shapes_locked_list = ['circle',
                               'cube',
@@ -356,5 +369,5 @@ class ShapeManagerWindow(window_lib.Helper):
                               'lollipop02',
                               'sphere']
 
-        if shape_name in shapes_locked_list:
+        if export_name in shapes_locked_list:
             cmds.error('This shape cannot be overwritten or deleted.')

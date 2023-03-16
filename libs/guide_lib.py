@@ -32,7 +32,7 @@ class Helper(node_lib.Helper):
         Override control's color
         :param color_key: str, check valid colors in the lib
         """
-        spline_lib.override_color([self.name], color_key=color_key)
+        spline_lib.set_override_color([self.name], color_key=color_key)
 
     def set_shape(self, shape_name='sphere', shape_scale=0.25):
         """
