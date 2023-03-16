@@ -9,10 +9,10 @@ from maya import cmds
 from hiddenStrings.libs import jsonLib, skinLib, blendShapeLib
 
 
-logging = logging.getLogger('hiddenStrings')  # Show module name when using the logging
+logging = logging.getLogger(__name__)
 
 
-def export_selection(*args, file_name, path):
+def export_selection(file_name, path, *args):
     """
     Export selection to json
     :param file_name: str
@@ -32,7 +32,7 @@ def export_selection(*args, file_name, path):
     return selection_data
 
 
-def import_selection(*args, path):
+def import_selection(path, *args):
     """
     import selection to json
     :param path: str
