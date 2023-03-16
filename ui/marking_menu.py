@@ -382,11 +382,17 @@ class MarkingMenu(object):
 
     @staticmethod
     def transform_to_offset_parent_matrix(*args):
+        """
+        set matrix in the offsetParentMatrix and set transform to default
+        """
         for node in cmds.ls(sl=True):
             connection_lib.transform_to_offset_parent_matrix(node=node)
 
     @staticmethod
     def offset_parent_matrix_to_transform(*args):
+        """
+        set matrix in the transform and set offsetParentMatrix to default
+        """
         for node in cmds.ls(sl=True):
             connection_lib.offset_parent_matrix_to_transform(node=node)
 
@@ -406,6 +412,10 @@ class MarkingMenu(object):
 
     @staticmethod
     def show_local_rotation_axis(hierarchy=False, *args):
+        """
+        Show the local rotation axis of the selection
+        :param hierarchy: use hierarchy
+        """
         if hierarchy:
             cmds.select(hierarchy=True)
         selection_list = cmds.ls(sl=True)
@@ -416,6 +426,10 @@ class MarkingMenu(object):
 
     @staticmethod
     def hide_local_rotation_axis(hierarchy=False, *args):
+        """
+        Hide the local rotation axis of the selection
+        :param hierarchy: use hierarchy
+        """
         if hierarchy:
             cmds.select(hierarchy=True)
         selection_list = cmds.ls(sl=True)
@@ -426,6 +440,9 @@ class MarkingMenu(object):
 
     # Builder
     def builder_menu(self):
+        """
+        Create builder menu items
+        """
         builder_menu = cmds.menuItem(parent=self.menu_name, label='Builder', radialPosition='E', subMenu=True)
 
         # ----- Build  -----
