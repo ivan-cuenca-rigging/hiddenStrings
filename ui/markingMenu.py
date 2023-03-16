@@ -136,6 +136,9 @@ class MarkingMenu(object):
         cmds.menuItem(parent=blend_shape_menu, label='Sculpt tool',
                       command=self.set_mesh_bulge_tool)
 
+        cmds.menuItem(parent=blend_shape_menu, label='Transfer shape',
+                      command=self.transfer_shape_command)
+
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 
         cmds.menuItem(parent=blend_shape_menu, label='Rename all blendShapes',
@@ -238,10 +241,10 @@ class MarkingMenu(object):
                       command=connectOffsetParentMatrixWindow.ConnectOffsetParentMatrixWindow)
 
         cmds.menuItem(parent=connections_menu, label='Transform to offsetParentMatrix',
-                      command=connectionLib.transform_to_offset_parent_matrix)
+                      command=self.transform_to_offset_parent_matrix)
 
-        cmds.menuItem(parent=connections_menu, label='offsetParentMatrix to transform',
-                      command=connectionLib.offset_parent_matrix_to_transform)
+        cmds.menuItem(parent=connections_menu, label='OffsetParentMatrix to transform',
+                      command=self.offset_parent_matrix_to_transform)
 
         cmds.menuItem(parent=connections_menu, divider=True)
         cmds.menuItem(parent=connections_menu, label='                Import/Export', enable=False)
@@ -383,6 +386,16 @@ class MarkingMenu(object):
                                                    driven=sel[1])
 
         cmds.select(sel)
+
+    @staticmethod
+    def transform_to_offset_parent_matrix(*args):
+        for node in cmds.ls(sl=True):
+            connectionLib.transform_to_offset_parent_matrix(node=node)
+
+    @staticmethod
+    def offset_parent_matrix_to_transform(*args):
+        for node in cmds.ls(sl=True):
+            connectionLib.offset_parent_matrix_to_transform(node=node)
 
     @staticmethod
     def set_mesh_bulge_tool(*args):
