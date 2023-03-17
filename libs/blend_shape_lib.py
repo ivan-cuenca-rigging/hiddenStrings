@@ -495,55 +495,48 @@ def mirror_target(blend_shape, target):
         cmds.symmetricModelling(symmetry=False)
 
     # If it is a nurbs
-    if cmds.nodeType(cmds.listRelatives(get_blend_shape_node(blend_shape=blend_shape),
-                                        shapes=True,
-                                        noIntermediate=True)[0]) == 'nurbsSurface':
+    if 'nurbs' in cmds.nodeType(cmds.listRelatives(get_blend_shape_node(blend_shape=blend_shape),
+                                                   shapes=True,
+                                                   noIntermediate=True)[0]):
         for target_value in get_target_values(blend_shape=blend_shape, target=target):
             if target_value == 1:
                 target_rebuild = cmds.sculptTarget(blend_shape,
                                                    edit=True,
                                                    regenerate=True,
                                                    target=get_target_index(blend_shape=blend_shape,
-                                                                           target=target))
+                                                                           target=target))[0]
                 mirror_rebuild = cmds.sculptTarget(blend_shape,
                                                    edit=True,
                                                    regenerate=True,
                                                    target=get_target_index(blend_shape=blend_shape,
-                                                                           target=mirror_target_name))
+                                                                           target=mirror_target_name))[0]
             else:
                 target_rebuild = cmds.sculptTarget(blend_shape,
                                                    edit=True,
                                                    regenerate=True,
                                                    target=get_target_index(blend_shape=blend_shape,
                                                                            target=target),
-                                                   inbetweenWeight=target_value)
+                                                   inbetweenWeight=target_value)[0]
                 mirror_rebuild = cmds.sculptTarget(blend_shape,
                                                    edit=True,
                                                    regenerate=True,
                                                    target=get_target_index(blend_shape=blend_shape,
                                                                            target=mirror_target_name),
-                                                   inbetweenWeight=target_value)
+                                                   inbetweenWeight=target_value)[0]
 
-            target_shape = cmds.listRelatives(target_rebuild, shapes=True)[0]
-            mirror_shape = cmds.listRelatives(mirror_rebuild, shapes=True)[0]
+            target_cv_list = cmds.ls('{}.cv[*]'.format(target_rebuild), flatten=True)
 
-            nurbs_loops = cmds.ls(target_shape + ".cv[*][0]", flatten=True)
+            source_cv_max = int(max(target_cv_list).split('.cv[')[-1].split(']')[0])
+            for cv in target_cv_list:
+                cv_index = int(cv.split('.cv[')[-1].split(']')[0])
+                opposite_cv = list(range(0, source_cv_max + 1))[::-1][cv_index]
 
-            nurbs_mirror_values = dict()
+                cv_position = cmds.xform(cv, query=True, worldSpace=True, translation=True)
 
-            for i in range(0, len(nurbs_loops)):
-                values_list = []
-                cv_in_loops = cmds.ls(target_shape + ".cv[" + str(i) + "][*]", flatten=True)
-
-                for nurbs_cv in cv_in_loops:
-                    values_list.append(cmds.getAttr(nurbs_cv)[0])
-                    nurbs_mirror_values[len(nurbs_loops) - 1 - i] = values_list
-
-            for i in range(0, len(nurbs_loops)):
-                cv_in_loops = cmds.ls(mirror_shape + ".cv[" + str(i) + "][*]", flatten=True)
-                for a, nurbs_cv in enumerate(cv_in_loops):
-                    cmds.setAttr(nurbs_cv, nurbs_mirror_values[i][a][0] * -1, nurbs_mirror_values[i][a][1],
-                                 nurbs_mirror_values[i][a][2])
+                cmds.xform(
+                    cv.replace(target_rebuild, mirror_rebuild).replace('.cv[{}]'.format(cv_index),
+                                                                       '.cv[{}]'.format(opposite_cv)),
+                    worldSpace=True, translation=[cv_position[0] * -1, cv_position[1], cv_position[2]])
 
             cmds.delete(target_rebuild)
             cmds.delete(mirror_rebuild)
