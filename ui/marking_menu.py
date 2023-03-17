@@ -126,8 +126,8 @@ class MarkingMenu(object):
         cmds.menuItem(parent=blend_shape_menu, label='Transfer shape',
                       command=self.transfer_shape_command)
 
-        cmds.menuItem(parent=blend_shape_menu, label='Mirror mesh targets',
-                      command=self.mirror_mesh_targets)
+        cmds.menuItem(parent=blend_shape_menu, label='Mirror targets',
+                      command=self.mirror_targets)
 
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 
@@ -408,7 +408,7 @@ class MarkingMenu(object):
         cmds.transferShape()
 
     @staticmethod
-    def mirror_mesh_targets(*args):
+    def mirror_targets(*args):
         target_list = blend_shape_lib.get_targets_from_shape_editor(as_index=False)
         for target in target_list:
             blend_shape, target = target.split('.')
