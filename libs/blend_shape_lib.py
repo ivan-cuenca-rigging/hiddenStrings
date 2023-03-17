@@ -494,10 +494,17 @@ def mirror_target(blend_shape, target):
     else:
         cmds.symmetricModelling(symmetry=False)
 
-    # If it is a nurbs
-    if 'nurbs' in cmds.nodeType(cmds.listRelatives(get_blend_shape_node(blend_shape=blend_shape),
-                                                   shapes=True,
-                                                   noIntermediate=True)[0]):
+    # If it is not a geometry
+    node_type = cmds.nodeType(cmds.listRelatives(get_blend_shape_node(blend_shape=blend_shape),
+                                                 shapes=True,
+                                                 noIntermediate=True)[0])
+
+    if 'mesh' not in node_type:
+        if 'lattice' in node_type:
+            component_type = 'pt'
+        else:
+            component_type = 'cv'
+
         for target_value in get_target_values(blend_shape=blend_shape, target=target):
             if target_value == 1:
                 target_rebuild = cmds.sculptTarget(blend_shape,
@@ -524,19 +531,19 @@ def mirror_target(blend_shape, target):
                                                                            target=mirror_target_name),
                                                    inbetweenWeight=target_value)[0]
 
-            target_cv_list = cmds.ls('{}.cv[*]'.format(target_rebuild), flatten=True)
+            target_cv_list = cmds.ls('{}.{}[*]'.format(target_rebuild, component_type), flatten=True)
 
-            source_cv_max = int(max(target_cv_list).split('.cv[')[-1].split(']')[0])
+            source_cv_max = int(max(target_cv_list).split('.{}['.format(component_type))[-1].split(']')[0])
             for cv in target_cv_list:
-                cv_index = int(cv.split('.cv[')[-1].split(']')[0])
+                cv_index = int(cv.split('.{}['.format(component_type))[-1].split(']')[0])
                 opposite_cv = list(range(0, source_cv_max + 1))[::-1][cv_index]
 
-                cv_position = cmds.xform(cv, query=True, worldSpace=True, translation=True)
+                cv_position = cmds.xform(cv, query=True, objectSpace=True, translation=True)
 
                 cmds.xform(
-                    cv.replace(target_rebuild, mirror_rebuild).replace('.cv[{}]'.format(cv_index),
-                                                                       '.cv[{}]'.format(opposite_cv)),
-                    worldSpace=True, translation=[cv_position[0] * -1, cv_position[1], cv_position[2]])
+                    cv.replace(target_rebuild, mirror_rebuild).replace('.{}[{}]'.format(component_type, cv_index),
+                                                                       '.{}[{}]'.format(component_type, opposite_cv)),
+                    objectSpace=True, translation=[cv_position[0] * -1, cv_position[1], cv_position[2]])
 
             cmds.delete(target_rebuild)
             cmds.delete(mirror_rebuild)
