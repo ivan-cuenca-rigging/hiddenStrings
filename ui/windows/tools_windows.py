@@ -255,14 +255,20 @@ class ShapeManagerWindow(window_lib.Helper):
         :param export_name: str
         """
         node = cmds.ls(selection=True)
+
         shape_data = import_export_lib.import_data_from_json(file_name=export_name,
                                                              file_path=self.shapes_path,
                                                              relative_path=False)
         shape_imported = spline_lib.create_spl_from_data(spl_name=export_name, spl_data=shape_data)
+
         if len(node) == 0:
             cmds.select(shape_imported)
         else:
             node = node[0]
+
+            # Get spline color
+            spline_color = spline_lib.get_override_color(node)
+
             cmds.xform(shape_imported, worldSpace=True,
                        matrix=cmds.xform(node, query=True, worldSpace=True, matrix=True))
 
@@ -270,6 +276,10 @@ class ShapeManagerWindow(window_lib.Helper):
             spline_lib.replace_shape(node=node_temporal_name,
                                      shape_transform=shape_imported)
             cmds.rename(node_temporal_name, node)
+
+            if spline_color:
+                spline_lib.set_override_color(splines_list=[node], color_key=spline_color)
+
             cmds.select(node)
 
     def delete_shape_command(self, *args):

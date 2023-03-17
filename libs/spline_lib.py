@@ -163,15 +163,18 @@ def replace_shape(node, shape_transform, keep_shapes=False):
 
     shapes_list = cmds.listRelatives(shape_transform, children=True, shapes=True)
 
-    new_shapes_list = list()
     for shp in shapes_list:
         cmds.parent(shp, node, relative=True, shape=True)
-        shp = cmds.rename(shp, '{}Shape'.format(node))
-        new_shapes_list.append(shp)
 
     cmds.delete(shape_transform)
 
-    return new_shapes_list
+    # rename shapes
+    shapes_list = cmds.listRelatives(node, shapes=True, fullPath=True)
+    for index, shape in enumerate(shapes_list):
+        index = '' if shape == shapes_list[0] else index
+        cmds.rename(shape, "{}Shape{}".format(node, index))
+
+    return cmds.listRelatives(node, shapes=True, fullPath=True)
 
 
 def transfer_shape(source, target):
