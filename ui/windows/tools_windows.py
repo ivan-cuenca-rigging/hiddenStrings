@@ -324,7 +324,9 @@ class ShapeManagerWindow(window_lib.Helper):
         """
         selection_list = cmds.ls(selection=True)
 
-        spline_lib.transfer_shape(source=selection_list[0], target=selection_list[1])
+        for node in selection_list:
+            if node != selection_list[0]:
+                spline_lib.transfer_shape(source=selection_list[0], target=node)
 
     def save_screenshot(self, *args):
         path = r'{}/images'.format(self.shapes_path)
