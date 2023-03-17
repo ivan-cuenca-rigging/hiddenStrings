@@ -301,14 +301,17 @@ class ShapeManagerWindow(window_lib.Helper):
             cmds.error('select two or more shapes')
 
         node = selection_list[0]
-        for sel in selection_list[1:]:
-            node_temporal_name = cmds.rename(node, 'temp_{}_{}'.format(side_lib.center, usage_lib.spline))
-            spline_lib.replace_shape(node=node_temporal_name, shape_transform=sel, keep_shapes=True)
-            node = cmds.rename(node_temporal_name, node)
+        for sel in selection_list:
+            if sel != node:
+                spline_lib.replace_shape(node=node, shape_transform=sel, keep_shapes=True)
+
         cmds.select(node)
 
     @staticmethod
     def transfer_spline_command(*args):
+        """
+        Transfer spline from source(selection 0) to target (selection 1)
+        """
         selection_list = cmds.ls(selection=True)
 
         spline_lib.transfer_shape(source=selection_list[0], target=selection_list[1])

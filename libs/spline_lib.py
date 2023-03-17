@@ -146,7 +146,6 @@ def replace_shape(node, shape_transform, keep_shapes=False):
     :param keep_shapes: bool
     :return: new shape
     """
-    control_nh = node_lib.Helper(node)
     if not keep_shapes:
         delete_shapes(node)
 
@@ -158,18 +157,21 @@ def replace_shape(node, shape_transform, keep_shapes=False):
         cns_list = cmds.listRelatives(shape_transform, type=cns_type)
         if cns_list:
             cmds.delete(cns_list)
+
     cmds.makeIdentity(shape_transform, apply=True, translate=True, rotate=True,
                       scale=True, normal=0, preserveNormals=True)
 
     shapes_list = cmds.listRelatives(shape_transform, children=True, shapes=True)
-    new_shape_list = []
+
+    new_shapes_list = list()
     for shp in shapes_list:
         cmds.parent(shp, node, relative=True, shape=True)
-        shp = cmds.rename(shp, '{}Shape'.format(control_nh))
-        new_shape_list.append(shp)
+        shp = cmds.rename(shp, '{}Shape'.format(node))
+        new_shapes_list.append(shp)
 
     cmds.delete(shape_transform)
-    return new_shape_list
+
+    return new_shapes_list
 
 
 def transfer_shape(source, target):
