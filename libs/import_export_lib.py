@@ -219,49 +219,8 @@ def import_blend_shape(node, path):
         blend_shape = blend_shape_lib.create_blend_shape(node=node)
 
     blend_shape_data = import_data_from_json(file_name=file_name, file_path=path, relative_path=False)
-    for target in blend_shape_data['targets']:
-        if not blend_shape_lib.check_target(blend_shape=blend_shape, target=target):
-            blend_shape_lib.add_target(blend_shape=blend_shape, target=target)
 
-        target_index = blend_shape_lib.get_target_index(blend_shape=blend_shape, target=target)
-        for target_value in blend_shape_data['targets'][target]['target_values']:
-            points_target = blend_shape_data['targets'][target]['target_values'][target_value]['inputPointsTarget']
-            components_target = blend_shape_data[
-                'targets'][target]['target_values'][target_value]['inputComponentsTarget']
-            pretty_target_value = target_value
-            target_value = int(float(target_value) * 1000 + 5000)
-
-            if target_value != 6000 and not blend_shape_lib.check_in_between(blend_shape=blend_shape,
-                                                                             target=target,
-                                                                             value=target_value):
-                blend_shape_lib.add_in_between(blend_shape=blend_shape,
-                                               existing_target=target,
-                                               in_between_target='{}_{}'.format(target, pretty_target_value),
-                                               value=pretty_target_value)
-
-            if points_target and components_target:
-                cmds.setAttr('{}.inputTarget[0].inputTargetGroup[{}].inputTargetItem[{}].inputPointsTarget'.format(
-                    blend_shape,
-                    target_index,
-                    target_value),
-                    len(points_target),
-                    *points_target,
-                    type='pointArray')
-                cmds.setAttr('{}.inputTarget[0].inputTargetGroup[{}].inputTargetItem[{}].inputComponentsTarget'.format(
-                    blend_shape,
-                    target_index,
-                    target_value),
-                    len(components_target),
-                    *components_target,
-                    type='componentList')
-
-            if target_value != 6000:
-                cmds.setAttr('{}.inbetweenInfoGroup[{}].inbetweenInfo[{}].inbetweenTargetName'.format(blend_shape,
-                                                                                                      target_index,
-                                                                                                      target_value),
-                             '{}_{}'.format(target, pretty_target_value),
-                             type='string')
-            cmds.setAttr('{}.{}'.format(blend_shape, target), blend_shape_data['targets'][target]['envelope'])
+    blend_shape_lib.set_blendshape_data(blend_shape=blend_shape, blend_shape_data=blend_shape_data)
 
     logging.info(r'{}/{}.json has been imported'.format(path, file_name))
 

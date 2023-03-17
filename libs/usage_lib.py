@@ -34,6 +34,7 @@ constraint_valid_usages = [parent_constraint, orient_constraint, point_constrain
 # Deformers
 skin_cluster = 'skin'
 blend_shape = 'bs'
+corrective = 'crr'
 
 multiply = 'mult'
 divide = 'div'
@@ -77,7 +78,7 @@ test = 'test'
 valid_usages = [control,
                 nurbs,
                 guide,
-                blend_shape,
+                blend_shape, corrective,
                 skin_joint, joint, nurbs_skin_joint, curve_skin_joint,
                 parent_constraint, orient_constraint, point_constraint,
                 scale_constraint, aim_constraint, pole_vector_constraint,

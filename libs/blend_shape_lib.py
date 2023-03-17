@@ -5,7 +5,7 @@ from collections import OrderedDict
 from maya import cmds, mel
 
 # Project imports
-from hiddenStrings.libs import usage_lib
+from hiddenStrings.libs import side_lib, usage_lib
 
 
 def check_blendshape(blend_shape):
@@ -120,6 +120,21 @@ def get_target_name(blend_shape, target_index):
     return cmds.listAttr('{}.weight[{}]'.format(blend_shape, target_index))[0]
 
 
+def get_targets_from_shape_editor(as_index=True):
+    """
+    Get targets from the shape editor
+    :param as_index: bool
+    return target list as_index -> [blendShape1.0, blendShape1.1, ...] not as_index [blendShape1.target, ...]
+    """
+    selection_list = mel.eval('getShapeEditorTreeviewSelection(24)')
+    if not as_index:
+        selection_list = ['{}.{}'.format(x.split('.')[0],
+                                         get_target_name(blend_shape=x.split('.')[0],
+                                                         target_index=x.split('.')[1])) for x in selection_list]
+
+    return selection_list
+
+
 def get_target_values(blend_shape, target):
     """
     Get the values of the in-betweens of a target (include the 1.0 value)
@@ -181,21 +196,6 @@ def get_blend_shapes_from_shape_editor():
     return mel.eval('getShapeEditorTreeviewSelection(11)')
 
 
-def get_targets_from_shape_editor(as_index=True):
-    """
-    Get targets from the shape editor
-    :param as_index: bool
-    return target list as_index -> [blendShape1.0, blendShape1.1, ...] not as_index [blendShape1.target, ...]
-    """
-    selection_list = mel.eval('getShapeEditorTreeviewSelection(24)')
-    if not as_index:
-        selection_list = ['{}.{}'.format(x.split('.')[0],
-                                         get_target_name(blend_shape=x.split('.')[0],
-                                                         target_index=x.split('.')[1])) for x in selection_list]
-
-    return selection_list
-
-
 def get_in_betweens_from_shape_editor():
     """
     Get in-between targets from the shape editor
@@ -208,6 +208,7 @@ def get_blend_shape_data(blend_shape):
     """
     Get blendshape data, including target in-between values and deltas
     :param blend_shape: str
+    :return: blend_shape_data
     """
     check_blendshape(blend_shape=blend_shape)
 
@@ -221,35 +222,108 @@ def get_blend_shape_data(blend_shape):
     for target_order in targets_order_list:
         target = get_target_name(blend_shape=blend_shape, target_index=target_order)
 
-        blend_shape_data['targets'][target] = dict()
-
-        blend_shape_data['targets'][target]['envelope'] = round(cmds.getAttr('{}.{}'.format(blend_shape, target)), 3)
-
-        blend_shape_data['targets'][target]['target_values'] = dict()
-        target_value_list = get_target_values(blend_shape=blend_shape, target=target)
-        for target_value in target_value_list:
-            target_value = round(target_value, 3)
-            target_value_int = int(target_value * 1000 + 5000)
-            target_value = str(round(target_value, 3))
-            points_target = cmds.getAttr(
-                '{}.inputTarget[0].inputTargetGroup[{}].inputTargetItem[{}].inputPointsTarget'.format(
-                    blend_shape,
-                    get_target_index(blend_shape=blend_shape, target=target),
-                    target_value_int))
-
-            component_target = cmds.getAttr(
-                '{}.inputTarget[0].inputTargetGroup[{}].inputTargetItem[{}].inputComponentsTarget'.format(
-                    blend_shape,
-                    get_target_index(blend_shape=blend_shape, target=target),
-                    target_value_int))
-
-            target_data = dict()
-            target_data['inputPointsTarget'] = points_target
-            target_data['inputComponentsTarget'] = component_target
-
-            blend_shape_data['targets'][target]['target_values'][target_value] = target_data
+        blend_shape_data['targets'][target] = get_target_data(blend_shape=blend_shape, target=target)
 
     return blend_shape_data
+
+
+def get_target_data(blend_shape, target):
+    """
+    Get target data, including in-betweens values and deltas
+    :param blend_shape: str
+    :param target: str
+    :return: target_data
+    """
+    target_dict = dict()
+
+    target_dict['envelope'] = round(cmds.getAttr('{}.{}'.format(blend_shape, target)), 3)
+
+    target_dict['target_values'] = dict()
+    target_value_list = get_target_values(blend_shape=blend_shape, target=target)
+    for target_value in target_value_list:
+        target_value = round(target_value, 3)
+        target_value_int = int(target_value * 1000 + 5000)
+        target_value = str(round(target_value, 3))
+        points_target = cmds.getAttr(
+            '{}.inputTarget[0].inputTargetGroup[{}].inputTargetItem[{}].inputPointsTarget'.format(
+                blend_shape,
+                get_target_index(blend_shape=blend_shape, target=target),
+                target_value_int))
+
+        component_target = cmds.getAttr(
+            '{}.inputTarget[0].inputTargetGroup[{}].inputTargetItem[{}].inputComponentsTarget'.format(
+                blend_shape,
+                get_target_index(blend_shape=blend_shape, target=target),
+                target_value_int))
+
+        target_data = dict()
+        target_data['inputPointsTarget'] = points_target
+        target_data['inputComponentsTarget'] = component_target
+
+        target_dict['target_values'][target_value] = target_data
+
+    return target_dict
+
+
+def set_blendshape_data(blend_shape, blend_shape_data):
+    """
+    set blendShape data including targets, in-betweens values and deltas
+    :param blend_shape: str
+    :param blend_shape_data: dict
+    """
+    for target in blend_shape_data['targets']:
+        set_target_data(blend_shape=blend_shape, target=target, target_data=blend_shape_data['targets'][target])
+
+
+def set_target_data(blend_shape, target, target_data):
+    """
+    set target data including in-betweens values and deltas
+    :param blend_shape: str
+    :param target: str
+    :param target_data: dict
+    """
+    if not check_target(blend_shape=blend_shape, target=target):
+        add_target(blend_shape=blend_shape, target=target)
+
+    target_index = get_target_index(blend_shape=blend_shape, target=target)
+    for target_value in target_data['target_values']:
+        points_target = target_data['target_values'][target_value]['inputPointsTarget']
+        components_target = target_data['target_values'][target_value]['inputComponentsTarget']
+        pretty_target_value = target_value
+        target_value = int(float(target_value) * 1000 + 5000)
+
+        if target_value != 6000 and not check_in_between(blend_shape=blend_shape,
+                                                         target=target,
+                                                         value=target_value):
+            add_in_between(blend_shape=blend_shape,
+                           existing_target=target,
+                           in_between_target='{}_{}'.format(target, pretty_target_value),
+                           value=pretty_target_value)
+
+        if points_target and components_target:
+            cmds.setAttr('{}.inputTarget[0].inputTargetGroup[{}].inputTargetItem[{}].inputPointsTarget'.format(
+                blend_shape,
+                target_index,
+                target_value),
+                len(points_target),
+                *points_target,
+                type='pointArray')
+            cmds.setAttr('{}.inputTarget[0].inputTargetGroup[{}].inputTargetItem[{}].inputComponentsTarget'.format(
+                blend_shape,
+                target_index,
+                target_value),
+                len(components_target),
+                *components_target,
+                type='componentList')
+
+        if target_value != 6000:
+            cmds.setAttr('{}.inbetweenInfoGroup[{}].inbetweenInfo[{}].inbetweenTargetName'.format(blend_shape,
+                                                                                                  target_index,
+                                                                                                  target_value),
+                         '{}_{}'.format(target, pretty_target_value),
+                         type='string')
+
+        cmds.setAttr('{}.{}'.format(blend_shape, target), target_data['envelope'])
 
 
 def rename_blend_shape(blend_shape):
@@ -304,7 +378,11 @@ def add_target(blend_shape, target):
     else:
         target = cmds.duplicate(node, name=target)[0]
         cmds.blendShape(blend_shape, edit=True, topologyCheck=False, target=(node, index, target, 1.0))
+
         cmds.delete(target)
+
+        cmds.blendShape(blend_shape, edit=True, resetTargetDelta=(0, get_target_index(blend_shape=blend_shape,
+                                                                                      target=target)))
 
     return target
 
@@ -384,6 +462,37 @@ def edit_target_or_in_between(*args):
         if target_shape_editor_values:
             blendshape_node, target_index = target_shape_editor_values[0].split('.')
             cmds.sculptTarget(blendshape_node, edit=True, target=int(target_index))
+
+
+def mirror_target(blend_shape, target):
+    """
+    Mirror blendShape target (It only works with geometries for now)
+    :param blend_shape: str
+    :param target: str
+    """
+    # Get mirror target name
+    if len(target.split('_')) == 3:
+        descriptor, side, usage = target.split('_')
+    else:
+        descriptor = target
+        side = side_lib.left
+        usage = usage_lib.corrective
+    mirror_target_name = '{}_{}_{}'.format(descriptor, side_lib.get_opposite_side(side), usage)
+
+    # Get target data
+    target_data = get_target_data(blend_shape=blend_shape, target=target)
+
+    # Set target data in the mirror target
+    set_target_data(blend_shape=blend_shape, target=mirror_target_name, target_data=target_data)
+
+    # Mirror target
+    get_symmetry = cmds.symmetricModelling(query=True, symmetry=True)
+    target_index = get_target_index(blend_shape, mirror_target_name)
+    cmds.blendShape(blend_shape, edit=True, symmetryAxis='x', symmetrySpace=1, flipTarget=[0, target_index])
+    if get_symmetry:
+        cmds.symmetricModelling(symmetry=True)
+    else:
+        cmds.symmetricModelling(symmetry=False)
 
 
 def copy_target_connection(source=None, target_list=None, *args):

@@ -126,6 +126,9 @@ class MarkingMenu(object):
         cmds.menuItem(parent=blend_shape_menu, label='Transfer shape',
                       command=self.transfer_shape_command)
 
+        cmds.menuItem(parent=blend_shape_menu, label='Mirror mesh targets',
+                      command=self.mirror_mesh_targets)
+
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 
         cmds.menuItem(parent=blend_shape_menu, label='Rename all blendShapes',
@@ -403,6 +406,13 @@ class MarkingMenu(object):
         Transfer shape command plugin command
         """
         cmds.transferShape()
+
+    @staticmethod
+    def mirror_mesh_targets(*args):
+        target_list = blend_shape_lib.get_targets_from_shape_editor(as_index=False)
+        for target in target_list:
+            blend_shape, target = target.split('.')
+            blend_shape_lib.mirror_target(blend_shape=blend_shape, target=target)
 
     @staticmethod
     def export_selection(*args):
