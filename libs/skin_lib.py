@@ -209,13 +209,13 @@ def transfer_skin(source, target, source_skin_index=1, target_skin_index=1, surf
     source_skin_joints = cmds.skinCluster(source_skin_cluster, query=True, influence=True)
 
     target_skin_cluster = get_skin_cluster_index(node=target, index=target_skin_index)
+
     # If skinCluster exists get its joints and add the joints that are not in the skinCluster
     if target_skin_cluster:
         skin_cluster_joints = cmds.skinCluster(target_skin_cluster, query=True, influence=True)
         joints_to_add = [x for x in source_skin_joints if x not in skin_cluster_joints]
 
         cmds.skinCluster(target_skin_cluster, edit=True, addInfluence=joints_to_add, lockWeights=True)
-        rename_skin_cluster(target_skin_cluster)
 
     # If skinCluster does not exist create it
     else:

@@ -381,10 +381,14 @@ class ImportNodesAndConnectionsWindow(window_lib.Helper):
         :param size: list, width and height
         """
         super(ImportNodesAndConnectionsWindow, self).__init__(title='Import nodes and connections Options',
-                                                              size=(450, 130))
+                                                              size=(450, 160))
 
         self.import_nodes = cmds.checkBoxGrp(label='Import nodes: ', value1=True)
         self.import_connections = cmds.checkBoxGrp(label='Import connections: ', value1=True)
+
+        self.search_for = cmds.textFieldGrp(label='Search for: ')
+
+        self.replace_with = cmds.textFieldGrp(label='Replace with: ')
 
         import_path = os.path.dirname(cmds.file(query=True, sceneName=True))
         self.import_path = cmds.textFieldGrp(label='Path: ', text=import_path)
@@ -397,11 +401,15 @@ class ImportNodesAndConnectionsWindow(window_lib.Helper):
                         attachForm=[(self.import_nodes, 'top', 15),
                                     (self.import_nodes, 'left', 40),
                                     (self.import_connections, 'top', 15),
+                                    (self.search_for, 'left', -25),
+                                    (self.replace_with, 'left', -25),
                                     (self.import_path, 'left', -25)],
 
                         attachControl=[(self.import_connections, 'left', 0, self.import_nodes),
-                                       (self.import_path, 'top', 20, self.import_nodes),
-                                       (self.file_search, 'top', 20, self.import_nodes),
+                                       (self.search_for, 'top', 5, self.import_nodes),
+                                       (self.replace_with, 'top', 5, self.search_for),
+                                       (self.import_path, 'top', 5, self.replace_with),
+                                       (self.file_search, 'top', 5, self.replace_with),
                                        (self.file_search, 'left', 5, self.import_path)])
 
     def apply_command(self, *args):
@@ -411,11 +419,17 @@ class ImportNodesAndConnectionsWindow(window_lib.Helper):
         import_nodes = cmds.checkBoxGrp(self.import_nodes, query=True, value1=True)
         import_connections = cmds.checkBoxGrp(self.import_connections, query=True, value1=True)
 
+        search_for = cmds.textFieldGrp(self.search_for, query=True, text=True)
+
+        replace_with = cmds.textFieldGrp(self.replace_with, query=True, text=True)
+
         import_path = cmds.textFieldGrp(self.import_path, query=True, text=True)
 
         import_export_lib.import_nodes_and_connections(path=import_path,
                                                        import_nodes=import_nodes,
-                                                       import_connections=import_connections)
+                                                       import_connections=import_connections,
+                                                       search_for=search_for,
+                                                       replace_with=replace_with)
 
     def file_dialog_command(self, *args):
         """

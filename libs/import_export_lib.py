@@ -125,17 +125,19 @@ def export_nodes_and_connections(file_name, path, export_nodes=True, export_edge
     logging.info(r'{}/{}.ma has been exported'.format(path, file_name))
 
 
-def import_nodes_and_connections(path, import_nodes=True, import_connections=True):
+def import_nodes_and_connections(path, import_nodes=True, import_connections=True, search_for=None, replace_with=None):
     """
     Import connections from mel file
     :param path: str
     :param import_nodes: bool
     :param import_connections: bool
+    :param search_for: str; use "," for more than once
+    :param replace_with: str; use "," for more than once
     """
-    file_name = os.path.basename(path).split('.ma')[0]
-    path = os.path.dirname(path)
+    if search_for:
+        search_and_replace_in_file(path, search_for=search_for, replace_with=replace_with)
 
-    with open(r'{}/{}.ma'.format(path, file_name), 'r') as connections_file:
+    with open(path, 'r') as connections_file:
         lines = connections_file.readlines()
 
         if import_nodes:
@@ -146,7 +148,7 @@ def import_nodes_and_connections(path, import_nodes=True, import_connections=Tru
                                     main_line_list[index] != main_line_list[-1]]
 
             # Create a temporary mel file to import only the nodes that do not exist in the scene
-            with open(r'{}/{}_TEMP.mel'.format(path, file_name), 'w') as connections_file_temp:
+            with open(r'{}_TEMP.mel'.format(path.split('.ma')[0]), 'w') as connections_file_temp:
                 for file_component in component_range_list:
                     if 'createNode' in lines[file_component[0]]:
                         node_name = lines[file_component[0]].split('"')[1]
@@ -154,11 +156,11 @@ def import_nodes_and_connections(path, import_nodes=True, import_connections=Tru
                             for index in range(file_component[0], file_component[1]):
                                 connections_file_temp.write(lines[index])
             # Import nodes
-            cmds.file(r'{}/{}_TEMP.mel'.format(path, file_name), i=True, force=True)  # i = import
-            os.remove(r'{}/{}_TEMP.mel'.format(path, file_name))
+            cmds.file(r'{}_TEMP.mel'.format(path.split('.ma')[0]), i=True, force=True)  # i = import
+            os.remove(r'{}_TEMP.mel'.format(path.split('.ma')[0]))
 
+        # Connect attributes from file, check if the connection exists and force it if false
         if import_connections:
-            # Connect attributes from file, check if the connection exists and force it if false
             for line in lines:
                 if line.startswith('connectAttr'):
                     input_value = line.split('"')[1]
@@ -166,7 +168,10 @@ def import_nodes_and_connections(path, import_nodes=True, import_connections=Tru
                     if not cmds.isConnected(input_value, output_value):
                         cmds.connectAttr(input_value, output_value, force=True)
 
-    logging.info(r'{}/{}.ma has been imported'.format(path, file_name))
+    if search_for:
+        search_and_replace_in_file(path, search_for=replace_with, replace_with=search_for)
+
+    logging.info(r'{} has been imported'.format(path))
 
 
 def export_blend_shape(node, path):
@@ -326,8 +331,8 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index', search_
     :param path: str
     :param skin_index: int. -1 (last), 1, 2, 3
     :param import_method: index or nearest
-    :param search_for: str; use , for more than once
-    :param replace_with: str; use , for more than once
+    :param search_for: str; use "," for more than once
+    :param replace_with: str; use "," for more than once
     :return:
     """
     skin_cluster = skin_lib.get_skin_cluster_index(node, skin_index)
@@ -335,20 +340,7 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index', search_
     path = os.path.dirname(path)
 
     if search_for:
-        search_for = search_for.split(',')
-        replace_with = replace_with.split(',')
-
-        if len(search_for) != len(replace_with):
-            cmds.error('Search for and replace with must have same number of words (split with commas)')
-
-        with open(r'{}/{}'.format(path, file_name), 'r+') as skin_file:
-            lines = skin_file.readlines()
-            skin_file.seek(0)
-            skin_file.truncate()
-            for line in lines:
-                for index, value in enumerate(search_for):
-                    line = line.replace(value, replace_with[index])
-                skin_file.writelines(line)
+        search_and_replace_in_file(r'{}/{}'.format(path, file_name), search_for=search_for, replace_with=replace_with)
 
     # Get json file joints
     skin_data = import_data_from_json(file_name=file_name.split('.')[0],
@@ -368,9 +360,12 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index', search_
         cmds.error('missing in the scene: {}'.format(joints_not_in_scene))
 
     # If skinCluster exists get its joints and add the joints that are not in the skinCluster
+    joints_to_lock = list()
     if skin_cluster:
         skin_cluster_joints = cmds.skinCluster(skin_cluster, query=True, influence=True)
+
         joints_to_add = [x for x in file_skin_joints if x not in skin_cluster_joints]
+        joints_to_lock = [x for x in skin_cluster_joints if x not in file_skin_joints]
 
         cmds.skinCluster(skin_cluster, edit=True, addInfluence=joints_to_add, lockWeights=True)
         skin_lib.rename_skin_cluster(skin_cluster)
@@ -379,20 +374,37 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index', search_
     else:
         skin_cluster = skin_lib.create_skin_cluster(joints=file_skin_joints, node=node, skin_index=skin_index)
 
-    # Import skinCluster JSON
-    cmds.deformerWeights(file_name, path=path, deformer=skin_cluster,
-                         im=True, edit=True, method=import_method)
+    # Reading normalize weights
+    skin_normalize = cmds.skinCluster(skin_cluster, query=True, normalizeWeights=True)
+
+    # disable normalize weights
+    cmds.skinCluster(skin_cluster, edit=True, normalizeWeights=0)
+
+    # Empty skin cluster, if not it does not work as expected
+    node_type = cmds.nodeType(node)
+    if 'nurbs' in node_type:
+        component_type = 'cv'
+    elif 'lattice' in node_type:
+        component_type = 'pt'
+    else:
+        component_type = 'vtx'
+
+    shape_components = '{}.{}[:]'.format(cmds.listRelatives(node, shapes=True, noIntermediate=True)[0], component_type)
+
+    cmds.skinPercent(skin_cluster, shape_components, normalize=False, pruneWeights=100)
+    if joints_to_lock:
+        for jnt in joints_to_lock:
+            cmds.skinCluster(skin_cluster, edit=True, influence=jnt, lockWeights=True)
+
+    # Import skinCluster
+    cmds.deformerWeights(file_name, path=path, deformer=skin_cluster, im=True, method=import_method)
+
+    # Restore normalize weights
+    cmds.skinCluster(skin_cluster, edit=True, normalizeWeights=skin_normalize)
     cmds.skinCluster(skin_cluster, edit=True, forceNormalizeWeights=True)
 
     if search_for:
-        with open(r'{}/{}'.format(path, file_name), 'r+') as skin_file:
-            lines = skin_file.readlines()
-            skin_file.seek(0)
-            skin_file.truncate()
-            for line in lines:
-                for index, value in enumerate(search_for):
-                    line = line.replace(replace_with[index], value)
-                skin_file.writelines(line)
+        search_and_replace_in_file(r'{}/{}'.format(path, file_name), search_for=replace_with, replace_with=search_for)
 
     logging.info('{} has been imported'.format(file_name))
 
@@ -464,3 +476,30 @@ def import_data_from_json(file_name, file_path, relative_path=True):
         data = json.load(read_file)
 
     return data
+
+
+def search_and_replace_in_file(path, search_for, replace_with):
+    """
+    Replace words in the file
+    :param path: str
+    :param search_for: str; use "," for more than once
+    :param replace_with: str; use "," for more than once
+    return path
+    """
+
+    search_for = search_for.split(',')
+    replace_with = replace_with.split(',')
+
+    if len(search_for) != len(replace_with):
+        cmds.error('Search for and replace with must have same number of words (split with commas)')
+
+    with open(path, 'r+') as skin_file:
+        lines = skin_file.readlines()
+        skin_file.seek(0)
+        skin_file.truncate()
+        for line in lines:
+            for index, value in enumerate(search_for):
+                line = line.replace(value, replace_with[index])
+            skin_file.writelines(line)
+
+    return path
