@@ -163,16 +163,12 @@ def replace_shape(node, shape_transform, keep_shapes=False):
 
     shapes_list = cmds.listRelatives(shape_transform, children=True, shapes=True)
 
-    for shp in shapes_list:
-        cmds.parent(shp, node, relative=True, shape=True)
-
-    cmds.delete(shape_transform)
-
-    # rename shapes
-    shapes_list = cmds.listRelatives(node, shapes=True, fullPath=True)
     for index, shape in enumerate(shapes_list):
+        cmds.parent(shape, node, relative=True, shape=True)
         index = '' if shape == shapes_list[0] else index
         cmds.rename(shape, "{}Shape{}".format(node, index))
+
+    cmds.delete(shape_transform)
 
     return cmds.listRelatives(node, shapes=True, fullPath=True)
 
@@ -240,18 +236,19 @@ def get_override_color(spl):
     return cmds.getAttr('{}.overrideColor'.format(spl_shape))
 
 
-def create_curve_from_a_to_b(name, a, b, n, d=3):
+def create_curve_from_a_to_b(name, a, b, n, degree=3):
     cvs_pos_lists = list(math_lib.get_n_positions_from_a_to_b(a, b, n))
-    return cmds.curve(p=cvs_pos_lists, name=name, degree=d)
+    return cmds.curve(p=cvs_pos_lists, name=name, degree=degree)
 
 
 def attach_curve_from_a_to_b(a, b):
     a_nh = node_lib.Helper(a)
     b_nh = node_lib.Helper(b)
 
-    spl = create_curve_from_a_to_b('temp', a, b, 2, d=1)
+    spl = create_curve_from_a_to_b('temp', a, b, 2, degree=1)
     cmds.setAttr('{}.template'.format(cmds.listRelatives(spl, shapes=True)[0]), 1)
-    spl = replace_shape(node=a, shape_transform=spl, keep_shapes=True)[0]
+    spl = replace_shape(node=a, shape_transform=spl, keep_shapes=True)[-1]
+
     b_pmatmult = cmds.createNode('pointMatrixMult', name='{}_{}_{}'.format(b_nh.get_descriptor(),
                                                                            b_nh.get_side(),
                                                                            usage_lib.point_matrix_mult))
@@ -261,11 +258,12 @@ def attach_curve_from_a_to_b(a, b):
                                                                              usage_lib.point_matrix_mult))
 
     cmds.connectAttr('{}.worldMatrix'.format(b), '{}.inMatrix'.format(b_pmatmult))
-    cmds.connectAttr('{}.output'.format(b_pmatmult), '{}.inPoint'.format(a_pmatmult))
     cmds.connectAttr('{}.worldInverseMatrix'.format(a), '{}.inMatrix'.format(a_pmatmult))
 
     for axis in ['X', 'Y', 'Z']:
-        cmds.connectAttr('{}.output{}'.format(a_pmatmult, axis),
-                         '{}.controlPoints[1].{}Value'.format(spl, axis.lower()))
+        cmds.connectAttr('{}.output{}'.format(b_pmatmult, axis), '{}.inPoint{}'.format(a_pmatmult, axis))
+
+        cmds.connectAttr('{}.output{}'.format(a_pmatmult, axis), '{}.controlPoints[1].{}Value'.format(spl,
+                                                                                                      axis.lower()))
 
     return spl
