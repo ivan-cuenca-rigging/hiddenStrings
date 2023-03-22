@@ -327,7 +327,6 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index', search_
         joints_to_lock = [x for x in skin_cluster_joints if x not in file_skin_joints]
 
         cmds.skinCluster(skin_cluster, edit=True, addInfluence=joints_to_add, lockWeights=True)
-        skin_lib.rename_skin_cluster(skin_cluster)
 
     # If skinCluster does not exist create it
     else:
