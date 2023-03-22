@@ -116,7 +116,6 @@ class RenamerWindow(window_lib.Helper):
                 node = cmds.rename(node, cmds.textFieldGrp(self.rename, query=True, text=True))
 
             if increment:
-                print(increment)
                 node = cmds.rename(node, '{}{}'.format(node, increment))
                 increment = self.increment_string(increment)
             if prefix:

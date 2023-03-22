@@ -1,8 +1,14 @@
+# Imports
+import logging
+
 # Maya imports
 from maya import cmds
 
 # Project imports
 from hiddenStrings.libs import side_lib, usage_lib, attribute_lib
+
+
+logging = logging.getLogger(__name__)
 
 
 class Helper(attribute_lib.Helper):
@@ -323,7 +329,7 @@ class Helper(attribute_lib.Helper):
         if structural_parent:
             structural_parent = structural_parent[0]
         else:
-            print('It is a child of the parent, "world".')
+            logging.info('It is a child of the parent "world"')
         return structural_parent
 
     def get_structural_parent_list(self):
