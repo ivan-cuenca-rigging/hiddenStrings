@@ -104,7 +104,7 @@ class RenamerWindow(window_lib.Helper):
         """
         Rename nodes selected
         """
-        selection_list = cmds.ls(selection=True, allPaths=True)
+        selection_list = cmds.ls(selection=True, uuid=True)
 
         rename = cmds.textFieldGrp(self.rename, query=True, text=True)
         prefix = cmds.textFieldGrp(self.prefix, query=True, text=True)
@@ -112,12 +112,14 @@ class RenamerWindow(window_lib.Helper):
         increment = cmds.textFieldGrp(self.increment, query=True, text=True)
 
         for node in selection_list:
+            node = cmds.ls(node, allPaths=True)[0]
             if rename:
                 node = cmds.rename(node, cmds.textFieldGrp(self.rename, query=True, text=True))
 
             if increment:
                 node = cmds.rename(node, '{}{}'.format(node, increment))
                 increment = self.increment_string(increment)
+
             if prefix:
                 node = cmds.rename(node, '{}{}'.format(prefix, node.split('|')[-1]))
 
