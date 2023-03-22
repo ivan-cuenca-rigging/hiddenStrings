@@ -17,7 +17,6 @@ class Helper(object):
         :param title: str, tittle of the window
         :param size: list, width and height
         """
-
         self.window = ''.join([x.capitalize() for x in title.split(' ')])
         self.window = '{}_window'.format(self.window)
         self.title = title
@@ -73,6 +72,7 @@ class Helper(object):
                         attachPosition=[(add_button, 'right', 0, 33),
                                         (close_button, 'left', 0, 66)]
                         )
+        return add_button, apply_button, close_button
 
     def open_window(self):
         """

@@ -70,6 +70,10 @@ class ExportSkinWindow(window_lib.Helper):
         else:
             cmds.intFieldGrp(self.skin_index, edit=True, enable=True)
 
+    def bottom_layout(self):
+        add_button, apply_button, close_button = super(ExportSkinWindow, self).bottom_layout()
+        cmds.button(add_button, edit=True, label='Export')
+
 
 class ImportSkinWindow(window_lib.Helper):
     def __init__(self, *args):
@@ -153,6 +157,10 @@ class ImportSkinWindow(window_lib.Helper):
             cmds.intFieldGrp(self.skin_index, edit=True, enable=False)
         else:
             cmds.intFieldGrp(self.skin_index, edit=True, enable=True)
+
+    def bottom_layout(self):
+        add_button, apply_button, close_button = super(ImportSkinWindow, self).bottom_layout()
+        cmds.button(add_button, edit=True, label='Import')
 
 
 class PushJointWindow(window_lib.Helper):

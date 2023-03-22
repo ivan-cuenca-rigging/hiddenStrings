@@ -372,6 +372,10 @@ class ExportNodesAndConnectionsWindow(window_lib.Helper):
         if folder_path:
             cmds.textFieldGrp(self.export_path, edit=True, text=folder_path[0])
 
+    def bottom_layout(self):
+        add_button, apply_button, close_button = super(ExportNodesAndConnectionsWindow, self).bottom_layout()
+        cmds.button(add_button, edit=True, label='Export')
+
 
 class ImportNodesAndConnectionsWindow(window_lib.Helper):
     def __init__(self, *args):
@@ -438,3 +442,7 @@ class ImportNodesAndConnectionsWindow(window_lib.Helper):
         folder_path = cmds.fileDialog2(dialogStyle=2, fileMode=1, fileFilter='*.ma')
         if folder_path:
             cmds.textFieldGrp(self.import_path, edit=True, text=folder_path[0])
+
+    def bottom_layout(self):
+        add_button, apply_button, close_button = super(ImportNodesAndConnectionsWindow, self).bottom_layout()
+        cmds.button(add_button, edit=True, label='Import')
