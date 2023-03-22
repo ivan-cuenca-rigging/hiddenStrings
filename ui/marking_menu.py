@@ -6,11 +6,10 @@ from functools import partial
 # Maya imports
 from maya import cmds
 
+from hiddenStrings import module_utils
 # Project imports
 from hiddenStrings.libs import guide_lib, blend_shape_lib, connection_lib, skin_lib, import_export_lib
-from hiddenStrings import module_utils
 from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, skin_windows, tools_windows
-
 
 builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings_path))
 if builder_exists:
@@ -146,8 +145,10 @@ class MarkingMenu(object):
 
         cmds.menuItem(parent=blend_shape_menu, label='Import BlendShapes',
                       command=blend_shape_windows.ImportBlendShapeWindow)
+
         cmds.menuItem(parent=blend_shape_menu, label='Export BlendShapes',
-                      command=blend_shape_windows.ExportBlendShapeWindow)
+                      command=self.export_blend_shapes)
+        cmds.menuItem(parent=blend_shape_menu, optionBox=True, command=import_export_lib.export_blend_shapes)
 
     def skins_menu(self, menu_parent, radial_position):
         """
@@ -185,7 +186,10 @@ class MarkingMenu(object):
         cmds.menuItem(parent=skin_menu, divider=True)
 
         cmds.menuItem(parent=skin_menu, label='Import Skins', command=skin_windows.ImportSkinWindow)
-        cmds.menuItem(parent=skin_menu, label='Export Skins', command=skin_windows.ExportSkinWindow)
+
+        cmds.menuItem(parent=skin_menu, label='Export Skins',
+                      command=self.export_skin_clusters)
+        cmds.menuItem(parent=skin_menu, optionBox=True, command=skin_windows.ExportSkinWindow)
 
     def connections_menu(self, menu_parent, radial_position):
         """
@@ -306,6 +310,21 @@ class MarkingMenu(object):
                                source_skin_index=1,
                                target_skin_index=1,
                                surface_association='closestPoint')
+
+    @staticmethod
+    def export_skin_clusters(*args):
+        import_export_lib.export_skin_clusters(node_list=cmds.ls(selection=True),
+                                               path='{}/skinClusters'.format(os.path.dirname(cmds.file(
+                                                   query=True,
+                                                   sceneName=True))),
+                                               skin_index=None)
+
+    @staticmethod
+    def export_blend_shapes(*args):
+        import_export_lib.export_blend_shapes(node_list=cmds.ls(selection=True),
+                                              path='{}/blendShapes'.format(os.path.dirname(cmds.file(
+                                                  query=True,
+                                                  sceneName=True))))
 
     @staticmethod
     def connect_translate_rotate_scale(*args):

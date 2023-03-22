@@ -187,6 +187,9 @@ def export_blend_shape(node, path):
     blend_shape_lib.check_blendshape(blend_shape=blend_shape_name)
     blend_shape_data = blend_shape_lib.get_blend_shape_data(blend_shape_name)
 
+    if not os.path.exists(path):
+        os.makedirs(path)
+
     export_data_to_json(data=blend_shape_data, file_name=blend_shape_name, file_path=path, relative_path=False,
                         compact=True)
 
@@ -255,6 +258,8 @@ def export_skin_cluster(node, path, skin_index=1):
         if os.path.exists(skin_path) and not os.access(skin_path, os.W_OK):
             cmds.warning('{} is not writeable. Check Permissions'.format(skin_path))
         else:
+            if not os.path.exists(path):
+                os.makedirs(path)
             # Export JSON
             cmds.deformerWeights('{}.json'.format(skin_cluster), deformer=skin_cluster, method='index',
                                  export=True, format='JSON', path=path)
@@ -267,6 +272,8 @@ def export_skin_cluster(node, path, skin_index=1):
             if os.path.exists(skin_path) and not os.access(skin_path, os.W_OK):
                 cmds.warning('{} is not writeable. Check Permissions'.format(skin_path))
             else:
+                if not os.path.exists(path):
+                    os.makedirs(path)
                 # Export skinCluster JSON
                 cmds.deformerWeights('{}.json'.format(skin_cluster), deformer=skin_cluster, method='index',
                                      export=True, format='JSON', path=path)
