@@ -347,6 +347,16 @@ def rename_all_blend_shapes():
         rename_blend_shape(blend_shape)
 
 
+def rename_target(blend_shape, target, new_name):
+    """
+    Rename target name
+    :param blend_shape: str
+    :param target: str
+    :param new_name: str
+    """
+    cmds.aliasAttr(new_name, '{}.{}'.format(blend_shape, target))
+
+
 def create_blend_shape(node, target_list=None):
     """
     create a blendShape

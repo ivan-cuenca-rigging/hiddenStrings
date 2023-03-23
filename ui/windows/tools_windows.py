@@ -7,7 +7,7 @@ from maya import cmds
 
 # Project imports
 from hiddenStrings import module_utils
-from hiddenStrings.libs import window_lib, spline_lib, side_lib, usage_lib, import_export_lib
+from hiddenStrings.libs import window_lib, spline_lib, side_lib, usage_lib, import_export_lib, blend_shape_lib
 
 
 class RenamerWindow(window_lib.Helper):
@@ -24,7 +24,13 @@ class RenamerWindow(window_lib.Helper):
                                             columnAlign=(1, 'left'))
         self.replace_with = cmds.textFieldGrp(label='Replace with: ', columnWidth=[(1, 70), (2, 217)],
                                               columnAlign=(1, 'left'))
-        self.replace_button = cmds.button(label='Replace', command=self.search_and_replace_command)
+
+        self.replace_button = cmds.button(label='Replace', width=142,
+                                          command=self.search_and_replace_command)
+
+        self.replace_with_hierarchy_button = cmds.button(label='Replace with hierarchy', width=142,
+                                                         command=self.search_and_replace_with_hierarchy_command)
+
         separator01 = cmds.separator(height=5)
 
         # Rename
@@ -49,7 +55,7 @@ class RenamerWindow(window_lib.Helper):
                                     (self.search_for, 'left', 5),
                                     (self.replace_with, 'left', 5),
                                     (self.replace_button, 'left', 5),
-                                    (self.replace_button, 'right', 5),
+                                    (self.replace_with_hierarchy_button, 'right', 5),
                                     (self.prefix, 'left', 5),
                                     (prefix_text, 'left', 25),
                                     (self.rename_button, 'left', 5),
@@ -63,6 +69,7 @@ class RenamerWindow(window_lib.Helper):
 
                         attachControl=[(self.replace_with, 'top', 5, self.search_for),
                                        (self.replace_button, 'top', 5, self.replace_with),
+                                       (self.replace_with_hierarchy_button, 'top', 5, self.replace_with),
                                        (separator01, 'top', 5, self.replace_button),
 
                                        (prefix_text, 'top', 5, separator01),
@@ -90,15 +97,52 @@ class RenamerWindow(window_lib.Helper):
         """
         pass
 
+    def search_and_replace(self, node):
+        """
+        Search and replace name
+        """
+        node = cmds.ls(node, allPaths=True)[0]
+
+        cmds.rename(node, node.split('|')[-1].replace(cmds.textFieldGrp(self.search_for, query=True, text=True),
+                                                      cmds.textFieldGrp(self.replace_with, query=True, text=True)))
+
     def search_and_replace_command(self, *args):
         """
         Search and replace names of the nodes selected
         """
-        selection_list = cmds.ls(selection=True, allPaths=True)
+        selection_list = cmds.ls(selection=True, uuid=True)
+
+        # Search adn replace
+        for node in selection_list:
+            self.search_and_replace(node)
+
+        # Search and replace blendShapes
+        if blend_shape_lib.get_blend_shapes_from_shape_editor():
+            for blend_shape in blend_shape_lib.get_blend_shapes_from_shape_editor():
+                cmds.rename(blend_shape,
+                            blend_shape.replace(cmds.textFieldGrp(self.search_for, query=True, text=True),
+                                                cmds.textFieldGrp(self.replace_with, query=True, text=True)))
+
+        # Search and replace targets of blendShapes
+        if blend_shape_lib.get_targets_from_shape_editor():
+            for blend_shape_and_target in blend_shape_lib.get_targets_from_shape_editor(as_index=False):
+                blend_shape, target = blend_shape_and_target.split('.')
+                blend_shape_lib.rename_target(blend_shape=blend_shape, target=target,
+                                              new_name=target.replace(
+                                                  cmds.textFieldGrp(self.search_for, query=True, text=True),
+                                                  cmds.textFieldGrp(self.replace_with, query=True, text=True)))
+
+    def search_and_replace_with_hierarchy_command(self, *args):
+        """
+        Search and replace names of the nodes selected with hierarchy
+        """
+        selection_list = [cmds.listRelatives(x, allDescendents=True, shapes=False, path=True)
+                          for x in cmds.ls(selection=True, allPaths=True)][0]
+        selection_list = [cmds.ls(x, uuid=True)[0] for x in selection_list]
+        selection_list += (cmds.ls(selection=True, uuid=True))
 
         for node in selection_list:
-            cmds.rename(node, node.split('|')[-1].replace(cmds.textFieldGrp(self.search_for, query=True, text=True),
-                                                          cmds.textFieldGrp(self.replace_with, query=True, text=True)))
+            self.search_and_replace(node)
 
     def rename_command(self, *args):
         """
