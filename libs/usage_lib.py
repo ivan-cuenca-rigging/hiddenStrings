@@ -31,6 +31,11 @@ pole_vector_constraint = 'pvcns'
 constraint_valid_usages = [parent_constraint, orient_constraint, point_constraint,
                            scale_constraint, aim_constraint, pole_vector_constraint]
 
+
+geometry = 'geo'
+trigger = 'trg'
+driver = 'driver'
+
 # Deformers
 skin_cluster = 'skin'
 blend_shape = 'bs'
@@ -81,6 +86,8 @@ valid_usages = [control,
                 blend_shape, corrective,
                 skin_joint, joint, nurbs_skin_joint, curve_skin_joint,
                 parent_constraint, orient_constraint, point_constraint,
+                geometry, driver,
+                trigger,
                 scale_constraint, aim_constraint, pole_vector_constraint,
                 multiply, divide, add, sub, maximum, minimum, distance, remap_value, reverse, clamp,
                 curve, spline,

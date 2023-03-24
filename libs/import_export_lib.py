@@ -174,6 +174,10 @@ def import_nodes_and_connections(path, import_nodes=True, import_connections=Tru
     logging.info(r'{} has been imported'.format(path))
 
 
+def import_obj(path):
+    return cmds.file(path, type='OBJ', i=True, force=True, returnNewNodes=True)  # i = import
+
+
 def export_blend_shape(node, path):
     """
     Export blendShape of the node given
