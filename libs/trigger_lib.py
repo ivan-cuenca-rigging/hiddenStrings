@@ -3,14 +3,20 @@ from maya import cmds, mel
 
 # Project imports
 from hiddenStrings import module_utils
-from hiddenStrings.libs import import_export_lib, side_lib, usage_lib, attribute_lib
+from hiddenStrings.libs import import_export_lib, side_lib, usage_lib, attribute_lib, connection_lib
 
 
-def create_bary(name='bary', side=side_lib.center):
+def create_bary(name='bary', side=side_lib.center,
+                parent_node=None,
+                driver_node=None,
+                driver_offset='X'):
     """
     Create a bary trigger with bifrost
     :param name: str
     :param side: str
+    :param parent_node: str
+    :param driver_node: str
+    :param driver_offset: str; X, -X, Y, -Y, Z, -Z
     """
     bary_grp = cmds.createNode('transform', name='{}{}_{}_{}'.format(name,
                                                                      usage_lib.get_usage_capitalize(usage_lib.trigger),
@@ -58,3 +64,28 @@ def create_bary(name='bary', side=side_lib.center):
         driver_ah.add_float_attribute(attribute_name='{}{}'.format(weight_attribute, str(index)))
         cmds.connectAttr('{}.baryWeight[{}]'.format(bary_shape, str(index)),
                          '{}.{}{}'.format(driver, weight_attribute, str(index)))
+
+    if parent_node and driver_node:
+        cmds.xform(bary_trigger, worldSpace=True,
+                   matrix=cmds.xform(driver_node, query=True, worldSpace=True, matrix=True))
+
+        connection_lib.connect_offset_parent_matrix(driver=parent_node, driven=bary_trigger)
+
+    cmds.xform(driver, worldSpace=True,
+               matrix=cmds.xform(bary_trigger, query=True, worldSpace=True, matrix=True))
+    if '-' in driver_offset:
+        driver_value = -1
+    else:
+        driver_value = 1
+
+    if 'X' in driver_offset.upper():
+        cmds.move(driver_value, 0, 0, driver, relative=True)
+    elif 'Y' in driver_offset.upper():
+        cmds.move(0, driver_value, 0, driver, relative=True)
+    else:
+        cmds.move(0, 0, driver_value, driver, relative=True)
+
+    connection_lib.transform_to_offset_parent_matrix(node=driver)
+
+    if parent_node and driver_node:
+        connection_lib.connect_offset_parent_matrix(driver=driver_node, driven=driver)
