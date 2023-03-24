@@ -316,7 +316,7 @@ def connect_matrix_from_attribute(driver_and_attr, driven):
                 cmds.setAttr('{}.{}{}'.format(driven, attr, axis), value)
 
 
-def transform_to_offset_parent_matrix(node, world_space=True, *args):
+def transform_to_offset_parent_matrix(node, world_space=False, *args):
     """
     set matrix in the offsetParentMatrix and set transform to default
     :param node: str
@@ -335,7 +335,8 @@ def transform_to_offset_parent_matrix(node, world_space=True, *args):
     for attr in ['translate', 'rotate', 'scale']:
         for axis in 'XYZ':
             value = 0 if attr != 'scale' else 1
-            cmds.setAttr('{}.{}{}'.format(node, attr, axis), value)
+            if cmds.getAttr('{}.{}{}'.format(node, attr, axis), settable=True):
+                cmds.setAttr('{}.{}{}'.format(node, attr, axis), value)
 
 
 def offset_parent_matrix_to_transform(node, world_space=True, *args):
