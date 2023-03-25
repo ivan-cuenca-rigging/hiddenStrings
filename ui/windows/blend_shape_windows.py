@@ -1,11 +1,12 @@
 # Imports
 import os
+from functools import partial
 
 # Maya imports
 from maya import cmds
 
 # Project imports
-from hiddenStrings.libs import window_lib, import_export_lib
+from hiddenStrings.libs import window_lib, import_export_lib, trigger_lib
 
 
 class ExportBlendShapeWindow(window_lib.Helper):
@@ -105,3 +106,84 @@ class ImportBlendShapeWindow(window_lib.Helper):
     def bottom_layout(self):
         add_button, apply_button, close_button = super(ImportBlendShapeWindow, self).bottom_layout()
         cmds.button(add_button, edit=True, label='Import')
+
+
+class CreateBaryWindow(window_lib.Helper):
+    def __init__(self, *args):
+        """
+        Create the import blendShape window
+        :param title: str, title of the window
+        :param size: list, width and height
+        """
+        super(CreateBaryWindow, self).__init__(title='Create Bary Options', size=(450, 185))
+
+        self.descriptor = cmds.textFieldGrp(label='Descriptor: ', text='bary')
+
+        # Side
+        self.side = cmds.optionMenu(label='Side')
+        cmds.menuItem(self.side, label='Left')
+        cmds.menuItem(self.side, label='Center')
+        cmds.menuItem(self.side, label='Right')
+        cmds.optionMenu(self.side, edit=True, value='Center')
+
+        self.parent = cmds.textFieldGrp(label='Parent: ')
+        self.get_parent = cmds.iconTextButton(image='addClip.png', command=partial(self.get_from_scene,
+                                                                                   text_field=self.parent))
+        self.driver = cmds.textFieldGrp(label='Driver: ')
+        self.get_driver = cmds.iconTextButton(image='addClip.png', command=partial(self.get_from_scene,
+                                                                                   text_field=self.driver))
+
+        # Driver axis
+        self.driver_axis = cmds.optionMenu(label='Driver axis')
+        cmds.menuItem(self.driver_axis, label='X')
+        cmds.menuItem(self.driver_axis, label='-X')
+        cmds.menuItem(self.driver_axis, label='Y')
+        cmds.menuItem(self.driver_axis, label='-Y')
+        cmds.menuItem(self.driver_axis, label='Z')
+        cmds.menuItem(self.driver_axis, label='-Z')
+        cmds.optionMenu(self.driver_axis, edit=True, value='X')
+
+        # --------------------------------------------------------------------------------------------------------------
+        cmds.formLayout(self.main_layout, edit=True,
+                        attachForm=[(self.descriptor, 'top', 10),
+                                    (self.side, 'left', 115),
+                                    (self.driver_axis, 'left', 85)],
+
+                        attachControl=[(self.side, 'top', 5, self.descriptor),
+                                       (self.parent, 'top', 5, self.side),
+                                       (self.get_parent, 'top', 5, self.side),
+                                       (self.get_parent, 'left', 5, self.parent),
+                                       (self.driver, 'top', 5, self.parent),
+                                       (self.get_driver, 'top', 5, self.parent),
+                                       (self.get_driver, 'left', 5, self.driver),
+                                       (self.driver_axis, 'top', 5, self.driver)])
+
+    def apply_command(self, *args):
+        """
+        Apply button command
+        """
+        descriptor = cmds.textFieldGrp(self.descriptor, query=True, text=True)
+
+        side = cmds.optionMenu(self.side, query=True, value=True)
+        if side == 'Left':
+            side = 'l'
+        if side == 'Center':
+            side = 'c'
+        if side == 'Right':
+            side = 'r'
+
+        parent = cmds.textFieldGrp(self.parent, query=True, text=True)
+
+        driver = cmds.textFieldGrp(self.driver, query=True, text=True)
+
+        driver_axis = cmds.optionMenu(self.driver_axis, query=True, value=True)
+
+        trigger_lib.create_bary(descriptor=descriptor,
+                                side=side,
+                                parent_node=parent,
+                                driver_node=driver,
+                                driver_axis=driver_axis)
+
+    @staticmethod
+    def get_from_scene(text_field, *args):
+        cmds.textFieldGrp(text_field, edit=True, text=cmds.ls(selection=True)[0])

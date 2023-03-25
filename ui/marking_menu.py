@@ -8,7 +8,7 @@ from maya import cmds
 
 from hiddenStrings import module_utils
 # Project imports
-from hiddenStrings.libs import guide_lib, blend_shape_lib, connection_lib, skin_lib, import_export_lib
+from hiddenStrings.libs import guide_lib, blend_shape_lib, connection_lib, skin_lib, import_export_lib, trigger_lib
 from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, skin_windows, tools_windows
 
 builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings_path))
@@ -128,16 +128,13 @@ class MarkingMenu(object):
         cmds.menuItem(parent=blend_shape_menu, label='Mirror targets',
                       command=self.mirror_targets)
 
-        cmds.menuItem(parent=blend_shape_menu, divider=True)
-
-        cmds.menuItem(parent=blend_shape_menu, label='Rename all blendShapes',
-                      command=self.rename_all_blend_shapes)
-
-        cmds.menuItem(parent=blend_shape_menu, divider=True)
-
-        cmds.menuItem(parent=blend_shape_menu, label='Trigger', enable=False)
         cmds.menuItem(parent=blend_shape_menu, label='Copy target connection',
                       command=blend_shape_lib.copy_target_connection)
+
+        cmds.menuItem(parent=blend_shape_menu, divider=True)
+
+        cmds.menuItem(parent=blend_shape_menu, label='Bary', command=self.create_default_bary)
+        cmds.menuItem(parent=blend_shape_menu, optionBox=True, command=blend_shape_windows.CreateBaryWindow)
 
         cmds.menuItem(parent=blend_shape_menu, divider=True)
         cmds.menuItem(parent=blend_shape_menu, label='              Import/Export', enable=False)
@@ -149,6 +146,11 @@ class MarkingMenu(object):
         cmds.menuItem(parent=blend_shape_menu, label='Export BlendShapes',
                       command=self.export_blend_shapes)
         cmds.menuItem(parent=blend_shape_menu, optionBox=True, command=import_export_lib.export_blend_shapes)
+
+        cmds.menuItem(parent=blend_shape_menu, divider=True)
+
+        cmds.menuItem(parent=blend_shape_menu, label='Rename all blendShapes',
+                      command=self.rename_all_blend_shapes)
 
     def skins_menu(self, menu_parent, radial_position):
         """
@@ -165,9 +167,6 @@ class MarkingMenu(object):
 
         cmds.menuItem(parent=skin_menu, label='Set Labels',
                       command=self.set_labels)
-
-        cmds.menuItem(parent=skin_menu, label='Rename all skinClusters',
-                      command=self.rename_all_skin_clusters)
 
         cmds.menuItem(parent=skin_menu, divider=True)
 
@@ -190,6 +189,11 @@ class MarkingMenu(object):
         cmds.menuItem(parent=skin_menu, label='Export Skins',
                       command=self.export_skin_clusters)
         cmds.menuItem(parent=skin_menu, optionBox=True, command=skin_windows.ExportSkinWindow)
+
+        cmds.menuItem(parent=skin_menu, divider=True)
+
+        cmds.menuItem(parent=skin_menu, label='Rename all skinClusters',
+                      command=self.rename_all_skin_clusters)
 
     def connections_menu(self, menu_parent, radial_position):
         """
@@ -428,18 +432,34 @@ class MarkingMenu(object):
 
     @staticmethod
     def mirror_targets(*args):
+        """
+        Mirror blendShape targets
+        """
         target_list = blend_shape_lib.get_targets_from_shape_editor(as_index=False)
         for target in target_list:
             blend_shape, target = target.split('.')
             blend_shape_lib.mirror_target(blend_shape=blend_shape, target=target)
 
     @staticmethod
+    def create_default_bary(*args):
+        """
+        Create a default bary
+        """
+        trigger_lib.create_bary()
+
+    @staticmethod
     def export_selection(*args):
+        """
+        Export selection
+        """
         import_export_lib.export_selection(file_name='selection_data',
                                            path=r'{}/temp'.format(module_utils.hidden_strings_path))
 
     @staticmethod
     def import_selection(*args):
+        """
+        Import selection
+        """
         import_export_lib.import_selection(path=r'{}/temp/selection_data.json'.format(module_utils.hidden_strings_path))
 
     @staticmethod
