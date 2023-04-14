@@ -133,7 +133,7 @@ class MarkingMenu(object):
 
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 
-        cmds.menuItem(parent=blend_shape_menu, label='Bary', command=self.create_default_bary)
+        cmds.menuItem(parent=blend_shape_menu, label='Pose Reader: Bary', command=self.create_default_bary)
         cmds.menuItem(parent=blend_shape_menu, optionBox=True, command=blend_shape_windows.CreateBaryWindow)
 
         cmds.menuItem(parent=blend_shape_menu, divider=True)
