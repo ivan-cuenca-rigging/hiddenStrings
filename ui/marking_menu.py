@@ -1,7 +1,6 @@
 # Imports
 import importlib
 import os
-from functools import partial
 
 # Maya imports
 from maya import cmds
@@ -83,14 +82,14 @@ class MarkingMenu(object):
         cmds.menuItem(parent=local_rotation_axis_hierarchy, label='Show',
                       command=self.show_local_rotation_axis)
         cmds.menuItem(parent=local_rotation_axis_hierarchy, label='Show with hierarchy',
-                      command=partial(self.show_local_rotation_axis, hierarchy=True))
+                      command=self.show_local_rotation_axis_with_hierarchy)
 
         cmds.menuItem(parent=local_rotation_axis_hierarchy, divider=True)
 
         cmds.menuItem(parent=local_rotation_axis_hierarchy, label='Hide',
                       command=self.hide_local_rotation_axis)
         cmds.menuItem(parent=local_rotation_axis_hierarchy, label='Hide with hierarchy',
-                      command=partial(self.hide_local_rotation_axis, hierarchy=True))
+                      command=self.hide_local_rotation_axis_with_hierarchy)
 
         cmds.menuItem(parent=self.menu_name, divider=True)
         cmds.menuItem(parent=self.menu_name, label='          Module utils', enable=False)
@@ -476,6 +475,14 @@ class MarkingMenu(object):
             if cmds.attributeQuery('displayLocalAxis', node=node, exists=True):
                 cmds.setAttr('{}.displayLocalAxis'.format(node), True)
 
+    def show_local_rotation_axis_with_hierarchy(self, *args):
+        """
+        Show the local rotation axis of the selection with hierarchy
+        """
+        selection_list = cmds.ls(selection=True)
+        self.show_local_rotation_axis(hierarchy=True)
+        cmds.select(selection_list)
+
     @staticmethod
     def hide_local_rotation_axis(hierarchy=False, *args):
         """
@@ -489,6 +496,14 @@ class MarkingMenu(object):
         for node in selection_list:
             if cmds.attributeQuery('displayLocalAxis', node=node, exists=True):
                 cmds.setAttr('{}.displayLocalAxis'.format(node), False)
+
+    def hide_local_rotation_axis_with_hierarchy(self, *args):
+        """
+        Hide the local rotation axis of the selection with hierarchy
+        """
+        selection_list = cmds.ls(selection=True)
+        self.hide_local_rotation_axis(hierarchy=True)
+        cmds.select(selection_list)
 
     # Builder
     def builder_menu(self):
