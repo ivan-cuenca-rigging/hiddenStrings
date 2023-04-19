@@ -323,7 +323,8 @@ def set_target_data(blend_shape, target, target_data):
                          '{}_{}'.format(target, pretty_target_value),
                          type='string')
 
-        cmds.setAttr('{}.{}'.format(blend_shape, target), target_data['envelope'])
+        if cmds.getAttr('{}.{}'.format(blend_shape, target), settable=True):
+            cmds.setAttr('{}.{}'.format(blend_shape, target), target_data['envelope'])
 
 
 def rename_blend_shape(blend_shape):
