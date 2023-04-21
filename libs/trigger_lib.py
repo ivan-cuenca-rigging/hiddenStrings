@@ -1,5 +1,8 @@
+# imports
+import os
+
 # Maya imports
-from maya import cmds, mel
+from maya import cmds
 
 # Project imports
 from hiddenStrings import module_utils
@@ -33,7 +36,7 @@ def create_bary(descriptor='bary', side=side_lib.center,
     compound_namespace = 'rigging'
     compound_name = 'barycentricPoseReader'
 
-    source_file = r'{}/bifrost/{}'.format(module_utils.hidden_strings_path, compound_name)
+    source_file = r'{}/bifrost/{}.json'.format(module_utils.hidden_strings_path, compound_name)
 
     bifrost_lib.copy_bifrost_compound(source_file=source_file, destination_dir=bifrost_lib.bifrost_path, force=True)
 
