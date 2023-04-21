@@ -1,11 +1,14 @@
 # Imports
+import logging
 from collections import OrderedDict
 
 # Maya imports
 from maya import cmds, mel
 
 # Project imports
-from hiddenStrings.libs import side_lib, usage_lib, node_lib
+from hiddenStrings.libs import side_lib, usage_lib
+
+logging = logging.getLogger(__name__)
 
 
 def check_blendshape(blend_shape):
@@ -108,6 +111,23 @@ def get_blend_shape_index(blend_shape):
     return index
     """
     return cmds.listConnections('{}.midLayerParent'.format(blend_shape), plugs=True)[0].split('[')[-1].split(']')[0]
+
+
+def get_blendshape_target_list(blend_shape):
+    """
+    Get the blendshape targets names
+    :param blend_shape
+    """
+    # Get the number of targets
+    blend_shape_target_length = cmds.blendShape(blend_shape, query=True, weightCount=True)
+
+    # Get the target names
+    source_target_list = []
+    for i in range(blend_shape_target_length):
+        target_name = cmds.aliasAttr("{}.weight[{}]".format(blend_shape, i), query=True)
+        source_target_list.append(target_name)
+
+    return source_target_list
 
 
 def get_target_name(blend_shape, target_index):
@@ -560,20 +580,53 @@ def mirror_target(blend_shape, target):
             cmds.delete(mirror_rebuild)
 
 
-def copy_target_connection(source=None, target_list=None, *args):
+def copy_target_connection(source=None, destination_list=None, *args):
     """
     copy blendShape target's connections
     :param source: str, blendShape.target
-    :param target_list: list, [blendShape.target, ...]
+    :param destination_list: list, [blendShape.target, ...]
     """
-    if not source and not target_list:
+    if not source and not destination_list:
         target_selection_list = get_targets_from_shape_editor(as_index=False)
         source = target_selection_list[0]
-        target_list = target_selection_list[1:]
+        destination_list = target_selection_list[1:]
 
     source_input_connections = cmds.listConnections(source, destination=False, plugs=True)[0]
-    for target in target_list:
+    for target in destination_list:
         cmds.connectAttr(source_input_connections, target)
+
+
+def copy_blendshape_connections(source=None, destination_list=None, *args):
+    """
+    copy blendShape targets' connections
+    :param source: str, blendShape
+    :param destination_list: list, [blendShape1, ...]
+    """
+    if not source and not destination_list:
+        blendshape_list = get_blend_shapes_from_shape_editor()
+
+        if len(blendshape_list) > 0:
+            source = blendshape_list[0]
+            destination_list = blendshape_list[1:]
+        else:
+            source = cmds.ls(selection=True)[0]
+            destination_list = cmds.ls(selection=True)[1:]
+
+    # Get the targets' names
+    source_target_list = get_blendshape_target_list(blend_shape=source)
+
+    # Check if the destination have the same target and connect it
+    for destination in destination_list:
+        for target in source_target_list:
+            if check_target(blend_shape=destination, target= target):
+                copy_target_connection(source='{}.{}'.format(source, target),
+                                       destination_list=['{}.{}'.format(destination, target)])
+            else:
+                logging.info('{}.{} does not exists'.format(destination, target))
+
+
+def transfer_blend_shape(source, destination):
+    pass
 
 
 def order_shape_editor_blend_shapes(blend_shape_list):

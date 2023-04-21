@@ -124,11 +124,16 @@ class MarkingMenu(object):
         cmds.menuItem(parent=blend_shape_menu, label='Transfer shape',
                       command=self.transfer_shape_command)
 
+        cmds.menuItem(parent=blend_shape_menu, divider=True)
+
         cmds.menuItem(parent=blend_shape_menu, label='Mirror targets',
                       command=self.mirror_targets)
 
         cmds.menuItem(parent=blend_shape_menu, label='Copy target connection',
                       command=blend_shape_lib.copy_target_connection)
+
+        cmds.menuItem(parent=blend_shape_menu, label='Copy Blendshape connections',
+                      command=blend_shape_lib.copy_blendshape_connections)
 
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 
