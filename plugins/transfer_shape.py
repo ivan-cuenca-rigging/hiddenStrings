@@ -23,9 +23,9 @@
 # USAGE:
 # cmds.transferShape()
 #
-# cmds.transferShape(target='node1', source='node2', worldSpace=True)
+# cmds.transferShape(source='node1', target='node2', worldSpace=True)
 #
-# cmds.transferShape(t='node1', s='node2', ws=True)
+# cmds.transferShape(s='node1', t='node2', ws=True)
 #
 #
 # AUTHOR:

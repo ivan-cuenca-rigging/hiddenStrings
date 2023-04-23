@@ -40,6 +40,7 @@ driver = 'driver'
 skin_cluster = 'skin'
 blend_shape = 'bs'
 corrective = 'crr'
+animation_curve = 'acrv'
 
 multiply = 'mult'
 divide = 'div'
@@ -83,7 +84,7 @@ test = 'test'
 valid_usages = [control,
                 nurbs,
                 guide,
-                blend_shape, corrective,
+                blend_shape, corrective, animation_curve,
                 skin_joint, joint, nurbs_skin_joint, curve_skin_joint,
                 parent_constraint, orient_constraint, point_constraint,
                 geometry, driver,

@@ -135,13 +135,18 @@ class MarkingMenu(object):
         cmds.menuItem(parent=blend_shape_menu, label='Copy Blendshape connections',
                       command=blend_shape_lib.copy_blendshape_connections)
 
-        cmds.menuItem(parent=blend_shape_menu, label='Transfer Blendshape targets',
-                      command=blend_shape_lib.transfer_blend_shape)
-
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 
         cmds.menuItem(parent=blend_shape_menu, label='Pose Reader: Bary', command=self.create_default_bary)
         cmds.menuItem(parent=blend_shape_menu, optionBox=True, command=blend_shape_windows.CreateBaryWindow)
+
+        cmds.menuItem(parent=blend_shape_menu, divider=True)
+
+        cmds.menuItem(parent=blend_shape_menu, label='Transfer Blendshape targets',
+                      command=blend_shape_lib.transfer_blend_shape)
+
+        cmds.menuItem(parent=blend_shape_menu, label='Automatic Correctives',
+                      command=blend_shape_windows.AutomaticCorrectiveWindow)
 
         cmds.menuItem(parent=blend_shape_menu, divider=True)
         cmds.menuItem(parent=blend_shape_menu, label='              Import/Export', enable=False)

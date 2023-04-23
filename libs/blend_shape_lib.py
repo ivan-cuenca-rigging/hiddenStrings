@@ -6,7 +6,7 @@ from collections import OrderedDict
 from maya import cmds, mel
 
 # Project imports
-from hiddenStrings.libs import side_lib, usage_lib
+from hiddenStrings.libs import side_lib, usage_lib, skin_lib
 
 logging = logging.getLogger(__name__)
 
@@ -374,7 +374,10 @@ def rename_target(blend_shape, target, new_name):
     :param target: str
     :param new_name: str
     """
-    cmds.aliasAttr(new_name, '{}.{}'.format(blend_shape, target))
+    if new_name != target:
+        cmds.aliasAttr(new_name, '{}.{}'.format(blend_shape, target))
+
+    return new_name
 
 
 def create_blend_shape(node, target_list=None):
@@ -411,9 +414,9 @@ def add_target(blend_shape, target):
 
         cmds.delete(target)
 
-        cmds.blendShape(blend_shape, edit=True, resetTargetDelta=(0, get_target_index(blend_shape=blend_shape,
-                                                                                      target=target)))
-    return target
+        cmds.blendShape(blend_shape, edit=True, resetTargetDelta=(0, index))
+
+    return get_target_name(blend_shape=blend_shape, target_index=index)
 
 
 def add_in_between(blend_shape, existing_target, in_between_target, value):
@@ -449,7 +452,7 @@ def remove_target(blend_shape, target):
     """
     check_blendshape(blend_shape=blend_shape)
 
-    mel.eval('removeMultiInstance {}.{}'.format(blend_shape, target))
+    cmds.removeMultiInstance('{}.{}'.format(blend_shape, target), b=True)
 
 
 def remove_in_between(blend_shape, target, value):
@@ -734,3 +737,103 @@ def order_shape_editor_blend_shapes(blend_shape_list):
 
     # Set the shape editor index order
     cmds.setAttr('shapeEditorManager.blendShapeDirectory[0].childIndices', blend_shape_index_order, type='Int32Array')
+
+
+def automatic_corrective(geometry_name='test_c_geo',
+                         control_name='test_c_ctr',
+                         attr_name='rotateZ',
+                         attr_value=-90,
+                         create_sdk=True):
+    """
+    Creates a blendshape target with a delta mush
+    :param geometry_name: str
+    :param control_name: str
+    :param attr_name: str
+    :param attr_value: float
+    :param create_sdk: bool
+    """
+    if len(control_name.split('_')) == 3:
+        control_descriptor, control_side = control_name.split('_')[:2]
+    else:
+        control_descriptor = control_name
+        control_side = side_lib.center
+
+    default_attr_value = cmds.getAttr('{}.{}'.format(control_name, attr_name))
+
+    # Get blendshape
+    blend_shape = get_blend_shape(node=geometry_name)
+
+    # Create target
+    attr_value_formatted = str(attr_value).replace('-', 'M').replace('.', 'd')
+    target_name = '{}{}{}{}_{}_{}'.format(control_descriptor,
+                                          attr_name[0].upper(),
+                                          attr_name[-1].lower(),
+                                          attr_value_formatted,
+                                          control_side,
+                                          usage_lib.corrective)
+
+    if check_target(blend_shape=blend_shape, target=target_name):
+        logging.error('{}.{} already exists, delete it before using this tool'.format(blend_shape, target_name))
+        return
+
+    target = add_target(blend_shape=blend_shape, target=target_name)
+    target = rename_target(blend_shape=blend_shape, target=target, new_name=target_name)
+
+    # Set skinCluster to dualQuaternion
+    cmds.refresh()
+    skin_name = skin_lib.get_skin_cluster_index(node=geometry_name)
+    if not skin_name:
+        cmds.error('The geometry given has not a skinCluster')
+
+    # Create delta Mush
+    cmds.refresh()
+    delta_mush_name = cmds.deltaMush(geometry_name, smoothingIterations=10, smoothingStep=0.5, envelope=1)[0]
+    cmds.setAttr('{}.distanceWeight'.format(delta_mush_name), 1)
+    cmds.setAttr('{}.inwardConstraint'.format(delta_mush_name), 1)
+
+    skin_method_default_value = cmds.getAttr('{}.skinningMethod'.format(skin_name))
+    cmds.setAttr('{}.skinningMethod'.format(skin_name), 1)
+
+    # Set pose
+    cmds.refresh()
+    cmds.setAttr('{}.{}'.format(control_name, attr_name), attr_value)
+
+    # Extract delta
+    cmds.refresh()
+    delta = cmds.duplicate(geometry_name, name=target)[0]
+
+    # Set skinCluster to its default
+    cmds.refresh()
+    cmds.setAttr('{}.skinningMethod'.format(skin_name), skin_method_default_value)
+
+    # Delete deltaMush
+    cmds.delete(delta_mush_name)
+
+    # Add target
+    cmds.refresh()
+    target_index = get_target_index(blend_shape=blend_shape, target=target)
+
+    cmds.setAttr('{}.{}'.format(blend_shape, target), 1)
+
+    cmds.sculptTarget(blend_shape, edit=True, target=target_index)
+    cmds.transferShape(source=delta, target=geometry_name, worldSpace=True)
+    cmds.sculptTarget(blend_shape, edit=True, target=target_index)
+
+    cmds.delete(delta)
+
+    cmds.setAttr('{}.{}'.format(control_name, attr_name), default_attr_value)
+
+    # Anim curve creation
+    if create_sdk:
+        sdk_name = '{}{}{}{}_{}_{}'.format(control_descriptor, attr_name[0].upper(), attr_name[-1].upper(),
+                                           attr_value_formatted, control_side, usage_lib.animation_curve)
+        sdk_name = cmds.createNode('animCurveUU', name=sdk_name)
+        cmds.setKeyframe(sdk_name, float=default_attr_value, value=0, inTangentType='linear', outTangentType='linear')
+        cmds.setKeyframe(sdk_name, float=attr_value, value=1, inTangentType='linear', outTangentType='linear')
+
+        # Connections
+        cmds.connectAttr('{}.{}'.format(control_name, attr_name), '{}.input'.format(sdk_name))
+        cmds.connectAttr('{}.output'.format(sdk_name), '{}.{}'.format(blend_shape, target))
+
+    else:
+        cmds.setAttr('{}.{}'.format(blend_shape, target), 0)
