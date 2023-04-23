@@ -135,6 +135,9 @@ class MarkingMenu(object):
         cmds.menuItem(parent=blend_shape_menu, label='Copy Blendshape connections',
                       command=blend_shape_lib.copy_blendshape_connections)
 
+        cmds.menuItem(parent=blend_shape_menu, label='Transfer Blendshape targets',
+                      command=blend_shape_lib.transfer_blend_shape)
+
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 
         cmds.menuItem(parent=blend_shape_menu, label='Pose Reader: Bary', command=self.create_default_bary)

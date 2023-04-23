@@ -180,7 +180,7 @@ def get_target_values(blend_shape, target):
 
 def get_target_index(blend_shape, target):
     """
-    Get the last index of a blendshape
+    Get the index of a blendshape target
     :param blend_shape: str
     :param target: str
     """
@@ -204,7 +204,6 @@ def get_next_target_index(blend_shape):
         index = len(cmds.listAttr('{}.weight'.format(blend_shape), multi=True))
     else:
         index = 0
-
     return int(index)
 
 
@@ -414,7 +413,6 @@ def add_target(blend_shape, target):
 
         cmds.blendShape(blend_shape, edit=True, resetTargetDelta=(0, get_target_index(blend_shape=blend_shape,
                                                                                       target=target)))
-
     return target
 
 
@@ -422,9 +420,9 @@ def add_in_between(blend_shape, existing_target, in_between_target, value):
     """
     Add target to an existing blendShape
     :param blend_shape: str
+    :param existing_target: str
     :param in_between_target: str
     :param value: float, 0 to 1
-    :param existing_target: str
     """
     check_blendshape(blend_shape=blend_shape)
     value = float(value)
@@ -451,9 +449,7 @@ def remove_target(blend_shape, target):
     """
     check_blendshape(blend_shape=blend_shape)
 
-    index = get_target_index(blend_shape=blend_shape, target=target)
-
-    mel.eval('blendShapeDeleteTargetGroup {} {}'.format(blend_shape, index))
+    mel.eval('removeMultiInstance {}.{}'.format(blend_shape, target))
 
 
 def remove_in_between(blend_shape, target, value):
@@ -591,9 +587,11 @@ def copy_target_connection(source=None, destination_list=None, *args):
         source = target_selection_list[0]
         destination_list = target_selection_list[1:]
 
-    source_input_connections = cmds.listConnections(source, destination=False, plugs=True)[0]
-    for target in destination_list:
-        cmds.connectAttr(source_input_connections, target)
+    source_input_connections = cmds.listConnections(source, destination=False, plugs=True)
+    if source_input_connections:
+        source_input_connections = source_input_connections[0]
+        for target in destination_list:
+            cmds.connectAttr(source_input_connections, target)
 
 
 def copy_blendshape_connections(source=None, destination_list=None, *args):
@@ -618,15 +616,98 @@ def copy_blendshape_connections(source=None, destination_list=None, *args):
     # Check if the destination have the same target and connect it
     for destination in destination_list:
         for target in source_target_list:
-            if check_target(blend_shape=destination, target= target):
+            if check_target(blend_shape=destination, target=target):
                 copy_target_connection(source='{}.{}'.format(source, target),
                                        destination_list=['{}.{}'.format(destination, target)])
             else:
                 logging.info('{}.{} does not exists'.format(destination, target))
 
 
-def transfer_blend_shape(source, destination):
-    pass
+def transfer_blend_shape(source=None, destination=None, *args):
+    """
+    Transfer blendShapes
+    :param source: str
+    :param destination: str
+    """
+    if not source and not destination:
+        blendshape_list = get_blend_shapes_from_shape_editor()
+
+        if len(blendshape_list) > 0:
+            source = blendshape_list[0]
+            destination = blendshape_list[1]
+        else:
+            source = cmds.ls(selection=True)[0]
+            destination = cmds.ls(selection=True)[1]
+
+            if cmds.objectType(source, isType='transform'):
+                source = get_blend_shape(source)
+            if cmds.objectType(destination, isType='transform'):
+                destination = get_blend_shape(destination)
+
+    # Create the source base geometry
+    source_base = cmds.rename(cmds.listRelatives(cmds.createNode('mesh'), parent=True)[0],
+                              '{}Base_{}_geo'.format(source.split('_')[0], source.split('_')[1]))
+    source_base_shape = cmds.listRelatives(source_base, shapes=True, noIntermediate=True)[0]
+
+    cmds.connectAttr('{}.originalGeometry[0]'.format(source), '{}.inMesh'.format(source_base_shape))
+
+    # Create the destination base geometry
+    destination_base = cmds.rename(cmds.listRelatives(cmds.createNode('mesh'), parent=True)[0],
+                                   '{}Base_{}_geo'.format(destination.split('_')[0], destination.split('_')[1]))
+    destination_base_shape = cmds.listRelatives(destination_base, shapes=True, noIntermediate=True)[0]
+
+    cmds.connectAttr('{}.originalGeometry[0]'.format(destination), '{}.inMesh'.format(destination_base_shape))
+
+    # Wrap
+    cmds.select(destination_base)
+    proximity_wrap = cmds.deformer(type='proximityWrap')[0]
+    cmds.setAttr('{}.wrapMode'.format(proximity_wrap), 0)
+
+    # Get source target list
+    source_target_list = get_blendshape_target_list(blend_shape=source)
+
+    # Delete old targets
+    for target in source_target_list:
+        if check_target(blend_shape=destination, target=target):
+            remove_target(blend_shape=destination, target=target)
+
+    # Transfer each target
+    for target in source_target_list:
+        target_values = get_target_values(blend_shape=source, target=target)
+        for value in target_values[::-1]:
+            if value == 1.0:
+                source_rebuild = cmds.sculptTarget(source, edit=True, regenerate=True,
+                                                   target=get_target_index(blend_shape=source, target=target))[0]
+            else:
+                source_rebuild = cmds.sculptTarget(source, edit=True, regenerate=True,
+                                                   target=get_target_index(blend_shape=source, target=target),
+                                                   inbetweenWeight=value)[0]
+
+            temporal_blend_shape = create_blend_shape(node=source_base, target_list=[source_rebuild])
+            cmds.setAttr('{}.{}'.format(temporal_blend_shape, get_target_name(blend_shape=temporal_blend_shape,
+                                                                              target_index=0)), 1)
+
+            # Wrap driver connections (now that we have the shapeOrig)
+            if not cmds.isConnected('{}Orig.outMesh'.format(source_base_shape),
+                                    '{}.drivers[0].driverBindGeometry'.format(proximity_wrap)):
+                cmds.connectAttr('{}Orig.outMesh'.format(source_base_shape),
+                                 '{}.drivers[0].driverBindGeometry'.format(proximity_wrap))
+                cmds.connectAttr('{}.worldMesh[0]'.format(source_base_shape),
+                                 '{}.drivers[0].driverGeometry'.format(proximity_wrap))
+
+            delta = cmds.duplicate(destination_base)[0]
+
+            if value == 1.0:
+                new_target = add_target(blend_shape=destination, target=delta)
+                rename_target(blend_shape=destination, target=new_target, new_name=target)
+                copy_target_connection(source='{}.{}'.format(source, target),
+                                       destination_list=['{}.{}'.format(destination, target)])
+            else:
+                add_in_between(blend_shape=destination, existing_target=target, in_between_target=delta, value=value)
+
+            cmds.delete(source_rebuild, temporal_blend_shape, delta)
+
+    cmds.delete(source_base, destination_base)
 
 
 def order_shape_editor_blend_shapes(blend_shape_list):
