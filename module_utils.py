@@ -7,17 +7,18 @@ import logging
 # Maya imports
 from maya import cmds
 
-logging = logging.getLogger(__name__)
-
 
 hidden_strings_path = os.path.dirname(__file__)
 hidden_strings_name = os.path.basename(hidden_strings_path)
+
+logging = logging.getLogger(hidden_strings_name)
 
 
 def reload(*args):
     """
     Reload the given module and all children
     """
+    previous_logging = logging
     # Get a reference to each loaded module
     loaded_modules = dict([(key, value) for key, value in sys.modules.items()
                            if key.startswith(hidden_strings_name) and
@@ -36,7 +37,7 @@ def reload(*args):
         old_module.__dict__.update(new_module.__dict__)
 
     # Print in the command line
-    logging.info('Module reloaded')
+    previous_logging.info('Module reloaded')
 
 
 def set_user_setup():
