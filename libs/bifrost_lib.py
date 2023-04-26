@@ -4,7 +4,7 @@ import shutil
 import logging
 
 # Maya imports
-from maya import cmds, mel
+from maya import mel
 
 # Project imports
 from hiddenStrings import module_utils
@@ -12,10 +12,10 @@ from hiddenStrings import module_utils
 logging = logging.getLogger(__name__)
 
 bifrost_path = r'{}/autodesk/Bifrost/compounds'.format(os.path.dirname(
-                                                   os.path.dirname(
                                                         os.path.dirname(
+                                                          os.path.dirname(
                                                             os.path.dirname(
-                                                                os.path.dirname(module_utils.hidden_strings_path))))))
+                                                              os.path.dirname(module_utils.hidden_strings_path))))))
 
 
 def copy_bifrost_compound(source_file, destination_dir, force=True):

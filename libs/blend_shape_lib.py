@@ -695,7 +695,7 @@ def transfer_blend_shape(source=None, destination=None, *args):
                                     '{}.drivers[0].driverBindGeometry'.format(proximity_wrap)):
                 cmds.connectAttr('{}Orig.outMesh'.format(source_base_shape),
                                  '{}.drivers[0].driverBindGeometry'.format(proximity_wrap))
-                cmds.connectAttr('{}.worldMesh[0]'.format(source_base_shape),
+                cmds.connectAttr('{}.outMesh'.format(source_base_shape),
                                  '{}.drivers[0].driverGeometry'.format(proximity_wrap))
 
             delta = cmds.duplicate(destination_base)[0]
