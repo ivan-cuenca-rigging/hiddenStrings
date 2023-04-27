@@ -68,7 +68,7 @@ Python 3
    If it does not exist it will create a userSetup.py with the hiddenStrings imports .
 
 If you don't want to auto create the userSetup.py or load the markingMenu, the hotkeys or the plugins you can set these
-parameters to False in the `__init__.py`
+parameters to False in the `config.py`
 
 --------------------------------------------
 
