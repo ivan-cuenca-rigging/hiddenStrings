@@ -91,13 +91,6 @@ class MarkingMenu(object):
         cmds.menuItem(parent=local_rotation_axis_hierarchy, label='Hide with hierarchy',
                       command=self.hide_local_rotation_axis_with_hierarchy)
 
-        cmds.menuItem(parent=self.menu_name, divider=True)
-        cmds.menuItem(parent=self.menu_name, label='          Module utils', enable=False)
-        cmds.menuItem(parent=self.menu_name, divider=True)
-
-        cmds.menuItem(parent=self.menu_name, label='     Reload hiddenStrings',
-                      image=self.icon_path, command=module_utils.reload)
-
         # ---------- East ----------
         if builder_exists:
             self.builder_menu()
