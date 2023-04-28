@@ -64,7 +64,7 @@ class MarkingMenu(object):
         self.maya_editors_menu(menu_parent=self.menu_name, radial_position='S')
 
         # ---------- South List ----------
-        cmds.menuItem(parent=self.menu_name, label='                Tools', enable=False)
+        cmds.menuItem(parent=self.menu_name, label='           Tools', enable=False)
         cmds.menuItem(parent=self.menu_name, divider=True)
 
         cmds.menuItem(parent=self.menu_name, label='Save selection', command=self.export_selection)
