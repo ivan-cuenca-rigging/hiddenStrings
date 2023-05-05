@@ -625,7 +625,7 @@ class MarkingMenu(object):
 
         cmds.menuItem(parent=template_guides_menu, divider=True)
 
-        cmds.menuItem(parent=template_guides_menu, label='Face', enable=False)
+        cmds.menuItem(parent=template_guides_menu, label='Face', command=self.create_face_guides)
 
     @staticmethod
     def build_rig(*args):
