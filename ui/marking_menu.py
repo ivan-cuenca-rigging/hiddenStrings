@@ -13,7 +13,10 @@ from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, s
 builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings_path))
 if builder_exists:
     from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
+    from hiddenStrings.builder.modules.face import ear
+
     from hiddenStrings.ui.windows import body_windows
+    from hiddenStrings.ui.windows import face_windows
 
 
 class MarkingMenu(object):
@@ -563,20 +566,19 @@ class MarkingMenu(object):
         cmds.menuItem(optionBox=True, command=body_windows.NeckWindow)
 
         # Arms guides
-        cmds.menuItem(parent=body_guides_menu, label='Arms', command=self.create_arm_guides)
+        cmds.menuItem(parent=body_guides_menu, label='Arms', command=self.create_arms_guides)
         cmds.menuItem(optionBox=True, command=body_windows.ArmWindow)
 
         # Legs guides
-        cmds.menuItem(parent=body_guides_menu, label='Legs', command=self.create_leg_guides)
+        cmds.menuItem(parent=body_guides_menu, label='Legs', command=self.create_legs_guides)
         cmds.menuItem(optionBox=True, command=body_windows.LegWindow)
 
-    @staticmethod
-    def face_menu(menu_parent, radial_position):
+    def face_menu(self, menu_parent, radial_position):
         """
         Create the face menu items
         """
         face_guides_menu = cmds.menuItem(parent=menu_parent, label='Face Guides', radialPosition=radial_position,
-                                         subMenu=True, enable=False)
+                                         subMenu=True, enable=True)
 
         cmds.menuItem(parent=face_guides_menu, label='             Face             ', enable=False)
         cmds.menuItem(parent=face_guides_menu, divider=True)
@@ -598,8 +600,8 @@ class MarkingMenu(object):
         cmds.menuItem(optionBox=True, enable=False)
 
         # Ears guides
-        cmds.menuItem(parent=face_guides_menu, label='Ears', enable=False)
-        cmds.menuItem(optionBox=True, enable=False)
+        cmds.menuItem(parent=face_guides_menu, label='Ears', command=self.create_ears_guides)
+        cmds.menuItem(optionBox=True, command=face_windows.EarWindow)
 
         # Mouth guides
         cmds.menuItem(parent=face_guides_menu, label='Mouth', enable=False)
@@ -664,8 +666,8 @@ class MarkingMenu(object):
         self.create_root_guides()
         self.create_column_guides()
         self.create_neck_guides()
-        self.create_arm_guides()
-        self.create_leg_guides()
+        self.create_arms_guides()
+        self.create_legs_guides()
 
     @staticmethod
     def create_root_guides(*args):
@@ -692,7 +694,7 @@ class MarkingMenu(object):
         neck_module.create_guides()
 
     @staticmethod
-    def create_arm_guides(*args):
+    def create_arms_guides(*args):
         """
         Create arm guides command
         """
@@ -703,7 +705,7 @@ class MarkingMenu(object):
         arm_r_module.create_guides(connect_to_opposite_value=True)
 
     @staticmethod
-    def create_leg_guides(*args):
+    def create_legs_guides(*args):
         """
         Create leg guides command
         """
@@ -712,3 +714,20 @@ class MarkingMenu(object):
 
         leg_l_module.create_guides()
         leg_r_module.create_guides(connect_to_opposite_value=True)
+
+    def create_face_guides(self, *args):
+        """
+        face guides template
+        """
+        self.create_ears_guides()
+
+    @staticmethod
+    def create_ears_guides(*args):
+        """
+        Create ears guides command
+        """
+        ear_l_module = ear.Ear(side='l')
+        ear_r_module = ear.Ear(side='r')
+
+        ear_l_module.create_guides()
+        ear_r_module.create_guides(connect_to_opposite_value=True)
