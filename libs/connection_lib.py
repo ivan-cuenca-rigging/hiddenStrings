@@ -218,15 +218,17 @@ def connect_offset_parent_matrix(driver, driven,
                                  translate=True,
                                  rotate=True,
                                  scale=True,
-                                 shear=True):
+                                 shear=True,
+                                 world=True):
     """
-    Connect worldMatrix from driven to the offsetParentMatrix of the driven
+    Connect driver to the offsetParentMatrix of the driven
     :param translate: bool
     :param rotate: bool
     :param scale: bool
     :param shear: bool
     :param driver: str
     :param driven: str
+    :param world: bool
     :return multMatrix node
     """
     if len(driven.split('_')) != 3:
@@ -237,14 +239,19 @@ def connect_offset_parent_matrix(driver, driven,
     else:
         desc, side, usage = driven.split('_')
 
-    # Get the difference between the two objects
-    matrix_difference = math_lib.multiply_matrices_4_by_4(cmds.getAttr('{}.worldMatrix'.format(driven)),
-                                                         cmds.getAttr('{}.worldInverseMatrix'.format(driver)))
-
     # Logic
     multmat = cmds.createNode('multMatrix', name='{}{}_{}_multmat'.format(desc, usage.capitalize(), side))
-    cmds.setAttr('{}.matrixIn[0]'.format(multmat), matrix_difference, type='matrix')
-    cmds.connectAttr('{}.worldMatrix'.format(driver), '{}.matrixIn[1]'.format(multmat))
+
+    if world:
+        driven_matrix = cmds.getAttr('{}.worldMatrix'.format(driven))
+        driver_inverse_matrix = cmds.getAttr('{}.worldInverseMatrix'.format(driver))
+        matrix_difference = math_lib.multiply_matrices_4_by_4(driven_matrix, driver_inverse_matrix)
+        cmds.setAttr('{}.matrixIn[0]'.format(multmat), matrix_difference, type='matrix')
+        cmds.connectAttr('{}.worldMatrix'.format(driver), '{}.matrixIn[1]'.format(multmat))
+    else:
+        matrix_difference = cmds.getAttr('{}.worldMatrix'.format(driven))
+        cmds.connectAttr('{}.matrix'.format(driver), '{}.matrixIn[0]'.format(multmat))
+        cmds.setAttr('{}.matrixIn[1]'.format(multmat), matrix_difference, type='matrix')
 
     if translate and rotate and scale and shear:
         cmds.connectAttr('{}.matrixSum'.format(multmat), '{}.offsetParentMatrix'.format(driven))
