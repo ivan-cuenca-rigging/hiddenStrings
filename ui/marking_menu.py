@@ -627,12 +627,18 @@ class MarkingMenu(object):
 
         cmds.menuItem(parent=template_guides_menu, label='Face', command=self.create_face_guides)
 
-    @staticmethod
-    def build_rig(*args):
+    def build_rig(self, *args):
         """
         Look for the guides' groups and create the rig
         """
         guides_grp = 'guides_c_grp'
+
+        # If not guides found create the default ones (for testing)
+        if not cmds.objExists(guides_grp):
+            self.create_biped_guides()
+            self.create_face_guides()
+
+        # For each module create the rig with the guides
         guides_groups = cmds.listRelatives(guides_grp, children=True)
         for guide_group in guides_groups:
             descriptor = guide_group.split('Guides')[0]
