@@ -28,12 +28,12 @@ def set_labels():
             cmds.setAttr('{}.type'.format(jnt), 18)
             cmds.setAttr('{}.otherType'.format(jnt), '{}{}'.format(desc, usage_capitalize), type='string')
 
-            logging.info('labels has been set')
+            logging.info('labels has been set.')
         else:
             cmds.setAttr('{}.type'.format(jnt), 18)
             cmds.setAttr('{}.otherType'.format(jnt), jnt, type='string')
-            cmds.warning('{} has an incorrect name, should be renamed with the following pattern:'
-                         ' descriptor_side_usage'.format(jnt))
+            logging.info('{} has an incorrect name, should be renamed with the following pattern:'
+                         ' descriptor_side_usage.'.format(jnt))
 
 
 def set_skin_pose(*args):

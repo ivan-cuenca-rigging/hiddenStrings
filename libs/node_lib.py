@@ -329,7 +329,7 @@ class Helper(attribute_lib.Helper):
         if structural_parent:
             structural_parent = structural_parent[0]
         else:
-            logging.info('It is a child of the parent "world"')
+            logging.info('It is a child of the parent "world".')
         return structural_parent
 
     def get_structural_parent_list(self):
@@ -371,7 +371,7 @@ class Helper(attribute_lib.Helper):
         parent_name = '{}{}_{}_{}'.format(self.get_descriptor(), self.get_usage().capitalize(), self.get_side(), usage)
         if cmds.objExists(parent_name):
             new_structural_parent = parent_name
-            cmds.warning('This parent already exists')
+            logging.info('This parent already exists.')
         else:
             new_structural_parent = cmds.createNode('transform', name=parent_name, parent=self.get_structural_parent())
             self.set_to_zero()

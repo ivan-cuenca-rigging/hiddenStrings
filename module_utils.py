@@ -37,7 +37,7 @@ def reload(*args):
         old_module.__dict__.update(new_module.__dict__)
 
     # Print in the command line
-    previous_logging.info('Module reloaded')
+    previous_logging.info('Module reloaded.')
 
 
 def set_user_setup():

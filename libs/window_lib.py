@@ -2,12 +2,15 @@
 from PySide2.QtGui import QIcon
 from shiboken2 import wrapInstance
 from PySide2.QtWidgets import QWidget
+import logging
 
 # Maya imports
 from maya import cmds, OpenMayaUI
 
 # Project imports
 from hiddenStrings import module_utils
+
+logging = logging.getLogger(__name__)
 
 
 class Helper(object):
@@ -97,7 +100,7 @@ class Helper(object):
         """
         Apply button command
         """
-        cmds.warning('{} need an Apply Command'.format(self.title))
+        logging.info('{} need an Apply Command.'.format(self.title))
 
     def close_window(self, *args):
         """

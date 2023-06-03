@@ -122,7 +122,7 @@ def export_nodes_and_connections(file_name, path, export_nodes=True, export_edge
             if len(connections_string) != 0:
                 connections_file.writelines(connections_string)
 
-    logging.info(r'{}/{}.ma has been exported'.format(path, file_name))
+    logging.info(r'{}/{}.ma has been exported.'.format(path, file_name))
 
 
 def import_nodes_and_connections(path, import_nodes=True, import_connections=True, search_for=None, replace_with=None):
@@ -171,7 +171,7 @@ def import_nodes_and_connections(path, import_nodes=True, import_connections=Tru
     if search_for:
         search_and_replace_in_file(path, search_for=replace_with, replace_with=search_for)
 
-    logging.info(r'{} has been imported'.format(path))
+    logging.info(r'{} has been imported.'.format(path))
 
 
 def import_obj(path):
@@ -197,7 +197,7 @@ def export_blend_shape(node, path):
     export_data_to_json(data=blend_shape_data, file_name=blend_shape_name, file_path=path, relative_path=False,
                         compact=True)
 
-    logging.info(r'{}/{}.json has been exported'.format(path, blend_shape_name))
+    logging.info(r'{}/{}.json has been exported.'.format(path, blend_shape_name))
 
 
 def export_blend_shapes(node_list, path):
@@ -229,7 +229,7 @@ def import_blend_shape(node, path):
 
     blend_shape_lib.set_blendshape_data(blend_shape=blend_shape, blend_shape_data=blend_shape_data)
 
-    logging.info(r'{}/{}.json has been imported'.format(path, file_name))
+    logging.info(r'{}/{}.json has been imported.'.format(path, file_name))
 
 
 def import_blend_shapes(path):
@@ -260,7 +260,7 @@ def export_skin_cluster(node, path, skin_index=1):
         skin_path = r'{}/{}.json'.format(path, skin_cluster)
         # Check if the file exists and is writable
         if os.path.exists(skin_path) and not os.access(skin_path, os.W_OK):
-            cmds.warning('{} is not writeable. Check Permissions'.format(skin_path))
+            logging.info('{} is not writeable. Check Permissions.'.format(skin_path))
         else:
             if not os.path.exists(path):
                 os.makedirs(path)
@@ -274,7 +274,7 @@ def export_skin_cluster(node, path, skin_index=1):
             skin_path = r'{}/{}.json'.format(path, skin_cluster)
             # Check if the file exists and is writable
             if os.path.exists(skin_path) and not os.access(skin_path, os.W_OK):
-                cmds.warning('{} is not writeable. Check Permissions'.format(skin_path))
+                logging.info('{} is not writeable. Check Permissions.'.format(skin_path))
             else:
                 if not os.path.exists(path):
                     os.makedirs(path)
@@ -375,7 +375,7 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index', search_
     if search_for:
         search_and_replace_in_file(r'{}/{}'.format(path, file_name), search_for=replace_with, replace_with=search_for)
 
-    logging.info('{} has been imported'.format(file_name))
+    logging.info('{} has been imported.'.format(file_name))
 
 
 def import_skin_clusters(path, import_method='index'):

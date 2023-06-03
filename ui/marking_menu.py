@@ -13,7 +13,7 @@ from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, s
 builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings_path))
 if builder_exists:
     from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
-    from hiddenStrings.builder.modules.face import ear
+    from hiddenStrings.builder.modules.face import ear, cheek
 
     from hiddenStrings.ui.windows import body_windows
     from hiddenStrings.ui.windows import face_windows
@@ -596,8 +596,8 @@ class MarkingMenu(object):
         cmds.menuItem(optionBox=True, enable=False)
 
         # Cheeks guides
-        cmds.menuItem(parent=face_guides_menu, label='Cheeks', enable=False)
-        cmds.menuItem(optionBox=True, enable=False)
+        cmds.menuItem(parent=face_guides_menu, label='Cheeks', command=self.create_cheeks_guides)
+        cmds.menuItem(optionBox=True, command=face_windows.CheekWindow)
 
         # Ears guides
         cmds.menuItem(parent=face_guides_menu, label='Ears', command=self.create_ears_guides)
@@ -721,6 +721,8 @@ class MarkingMenu(object):
         """
         self.create_ears_guides()
 
+        self.create_cheeks_guides()
+
     @staticmethod
     def create_ears_guides(*args):
         """
@@ -731,3 +733,14 @@ class MarkingMenu(object):
 
         ear_l_module.create_guides()
         ear_r_module.create_guides(connect_to_opposite_value=True)
+
+    @staticmethod
+    def create_cheeks_guides(*args):
+        """
+        Create cheeks guides command
+        """
+        cheek_l_module = cheek.Cheek(side='l')
+        cheek_r_module = cheek.Cheek(side='r')
+
+        cheek_l_module.create_guides()
+        cheek_r_module.create_guides(connect_to_opposite_value=True)

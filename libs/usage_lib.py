@@ -77,6 +77,7 @@ point_matrix_mult = 'pmatmult'
 quat_to_euler = 'qte'
 point_on_curve_info = 'pocinfo'
 nearest_point_on_curve = 'npoc'
+component_match = 'cmatch'
 
 test = 'test'
 
@@ -102,7 +103,7 @@ valid_usages = [control,
                 point_matrix_mult,
                 quat_to_euler,
                 point_on_curve_info, nearest_point_on_curve,
-                group, zero, set_driven_key, reference]
+                group, zero, set_driven_key, reference, component_match]
 
 
 def get_usage_capitalize(usage):

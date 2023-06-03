@@ -1,8 +1,13 @@
+# Imports
+import logging
+
 # Maya imports
 from maya import cmds
 
 # Project imports
 from hiddenStrings.libs import node_lib, side_lib, usage_lib, math_lib
+
+logging = logging.getLogger(__name__)
 
 
 class Helper(node_lib.Helper):
@@ -21,7 +26,7 @@ class Helper(node_lib.Helper):
         Check if the usage is valid
         """
         if self.get_usage() not in usage_lib.skeleton_valid_usages:
-            cmds.warning('this control has not a valid usage, {}'.format(usage_lib.skeleton_valid_usages))
+            logging.info('this control has not a valid usage, {}.'.format(usage_lib.skeleton_valid_usages))
 
     # ---------- Create Method ----------
     def create(self,

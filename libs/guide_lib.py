@@ -1,8 +1,13 @@
+# Imports
+import logging
+
 # Maya imports
 from maya import cmds
 
 # Project imports
 from hiddenStrings.libs import node_lib, side_lib, usage_lib, spline_lib, skeleton_lib, math_lib
+
+logging = logging.getLogger(__name__)
 
 
 class Helper(node_lib.Helper):
@@ -24,7 +29,7 @@ class Helper(node_lib.Helper):
         Check if the usage is in the guides usage_lib
         """
         if self.get_usage() not in usage_lib.guide_valid_usages:
-            cmds.warning('this guide has not a valid usage, use {}'.format(usage_lib.guide_valid_usages))
+            logging.info('this guide has not a valid usage, use "{}".'.format(usage_lib.guide_valid_usages))
 
     # ---------- Set Methods ----------
     def set_shape_color(self, color_key='yellow'):
@@ -93,7 +98,7 @@ class Helper(node_lib.Helper):
 
         opposite_name = '{}_{}_{}'.format(self.descriptor, opposite_side, self.usage)
         if not cmds.objExists(opposite_name):
-            cmds.warning('{} does not exist in the scene, cannot connect opposite side'.format(opposite_name))
+            logging.info('{} does not exist in the scene, cannot connect opposite side.'.format(opposite_name))
         else:
             mult_matrix = cmds.createNode('multMatrix', name='{}{}_{}_{}'.format(self.descriptor,
                                                                                  self.usage.capitalize(),
@@ -113,7 +118,7 @@ class Helper(node_lib.Helper):
 
         opposite_name = '{}_{}_{}'.format(self.descriptor, opposite_side, self.usage)
         if not cmds.objExists(opposite_name):
-            cmds.warning('{} does not exist in the scene, cannot connect opposite side'.format(opposite_name))
+            logging.info('{} does not exist in the scene, cannot connect opposite side.'.format(opposite_name))
         else:
             mult_matrix = cmds.createNode('multMatrix', name='{}{}_{}_{}'.format(self.descriptor,
                                                                                  self.usage.capitalize(),
@@ -131,4 +136,4 @@ def delete_guides(*args):
     if cmds.objExists(guides_grp):
         cmds.delete(cmds.ls(guides_grp))
     else:
-        cmds.warning('{} does not exists'.format(guides_grp))
+        logging.info('{} does not exists.'.format(guides_grp))

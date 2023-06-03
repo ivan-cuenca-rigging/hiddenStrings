@@ -1,5 +1,10 @@
+# Imports
+import logging
+
 # Maya imports
 from maya import cmds
+
+logging = logging.getLogger(__name__)
 
 
 class Helper(object):
@@ -100,7 +105,7 @@ class Helper(object):
         :return: attribute's name
         """
         if self.check_attribute_exists(attribute_name):
-            cmds.warning('{}.{} already exists'.format(self.name, attribute_name))
+            logging.info('{}.{} already exists.'.format(self.name, attribute_name))
         else:
             cmds.addAttr(self.name, longName=attribute_name, **kwargs)
             cmds.setAttr('{}.{}'.format(self.name, attribute_name), keyable=keyable, channelBox=not keyable)

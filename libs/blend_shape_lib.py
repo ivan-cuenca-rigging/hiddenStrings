@@ -623,7 +623,7 @@ def copy_blendshape_connections(source=None, destination_list=None, *args):
                 copy_target_connection(source='{}.{}'.format(source, target),
                                        destination_list=['{}.{}'.format(destination, target)])
             else:
-                logging.info('{}.{} does not exists'.format(destination, target))
+                logging.info('{}.{} does not exists.'.format(destination, target))
 
 
 def transfer_blend_shape(source=None, destination=None, *args):

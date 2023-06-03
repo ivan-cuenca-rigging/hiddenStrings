@@ -1,7 +1,13 @@
+# Imports
+import logging
+
 # Maya imports
 from maya import cmds
 
+# Project imports
 from hiddenStrings.libs import usage_lib, spline_lib, node_lib, attribute_lib
+
+logging = logging.getLogger(__name__)
 
 
 class Helper(node_lib.Helper, attribute_lib.Helper):
@@ -21,7 +27,7 @@ class Helper(node_lib.Helper, attribute_lib.Helper):
         Check if the usage is valid
         """
         if self.get_usage() not in usage_lib.control_valid_usages:
-            cmds.warning('this control has not a valid usage, use {}'.format(usage_lib.control_valid_usages))
+            logging.info('this control has not a valid usage, use "{}".'.format(usage_lib.control_valid_usages))
 
     # ---------- Get and Set Methods ----------
     def get_shape(self):

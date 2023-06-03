@@ -1,8 +1,13 @@
+# Imports
+import logging
+
 # Maya imports
 from maya import cmds
 
 # Project imports
 from hiddenStrings.libs import side_lib, usage_lib, math_lib, attribute_lib
+
+logging = logging.getLogger(__name__)
 
 
 def connect_3_axis(driver, driven, attr):
@@ -228,7 +233,7 @@ def connect_offset_parent_matrix(driver, driven,
         desc = driven
         side = side_lib.center
         usage = ''
-        cmds.warning('Names must have 3 fields {descriptor}_{side}_{usage}')
+        logging.info('Names should have 3 fields {descriptor}_{side}_{usage}.')
     else:
         desc, side, usage = driven.split('_')
 
