@@ -153,6 +153,13 @@ def push_joint(parent_node, driven_node,
     :param rotation_axis: str; X, -X, Y, -Y, Z or -Z
     :param structural_parent: str
     """
+    if len(parent_node.split('_')) == 3:
+        parent_descriptor, parent_side, parent_usage = parent_node.split('_')
+    else:
+        parent_descriptor = parent_node
+        parent_side = side_lib.center
+        parent_usage = ''
+
     if len(driven_node.split('_')) == 3:
         descriptor, side, usage = driven_node.split('_')
     else:
@@ -168,6 +175,17 @@ def push_joint(parent_node, driven_node,
     if '-' in rotation_axis:
         rotation_axis = '{}M'.format(rotation_axis[-1])
 
+    # Zero the driver matrix
+    driver_mult_matrix = cmds.createNode('multMatrix', name='{}{}_{}_{}'.format(parent_descriptor,
+                                                                                parent_usage.capitalize(),
+                                                                                parent_side,
+                                                                                usage_lib.mult_matrix))
+
+    cmds.setAttr('{}.matrixIn[0]'.format(driver_mult_matrix),
+                 math_lib.inverse_matrix(matrix_a=cmds.xform(parent_node, query=True, worldSpace=True, matrix=True)),
+                 type='matrix')
+    cmds.connectAttr('{}.worldMatrix'.format(parent_node), '{}.matrixIn[1]'.format(driver_mult_matrix))
+
     # BlendMatrix to get the position of the driver and half rotation from each
     blend_matrix = cmds.createNode('blendMatrix', name='{}R{}Push{}_{}_{}'.format(descriptor,
                                                                                   rotation_axis,
@@ -175,7 +193,7 @@ def push_joint(parent_node, driven_node,
                                                                                   side,
                                                                                   usage_lib.blend_matrix))
 
-    cmds.connectAttr('{}.worldMatrix'.format(parent_node), '{}.inputMatrix'.format(blend_matrix))
+    cmds.connectAttr('{}.matrixSum'.format(driver_mult_matrix), '{}.inputMatrix'.format(blend_matrix))
     cmds.connectAttr('{}.worldMatrix'.format(driven_node), '{}.target[0].targetMatrix'.format(blend_matrix))
 
     cmds.setAttr('{}.target[0].translateWeight'.format(blend_matrix), 1)
