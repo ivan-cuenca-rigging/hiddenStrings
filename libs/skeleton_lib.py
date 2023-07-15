@@ -261,3 +261,43 @@ def push_joint(parent_node, driven_node,
                                                        'visibility', 'radius'])
 
     return joint_sh.get_name()
+
+
+def create_local_skeleton(skeleton_grp,
+                          world_control='center_c_ctr'):
+    """
+    Create a local joint for each skeleton joint
+    :param skeleton_grp: str
+    :param world_control: str
+    return list of local joints
+    """
+    if cmds.listRelatives(skeleton_grp, allDescendents=True):
+        skeleton_group_nh = node_lib.Helper(skeleton_grp)
+
+        skeleton_local_grp = cmds.createNode('transform', name='{}Local_{}_{}'.format(skeleton_group_nh.get_descriptor(),
+                                                                                      skeleton_group_nh.get_side(),
+                                                                                      usage_lib.group))
+        cmds.parent(skeleton_local_grp, skeleton_group_nh.get_structural_parent())
+
+        skeleton_joint_list = [x for x in cmds.listRelatives(skeleton_grp, children=True, allDescendents=True) if
+                               x.endswith(usage_lib.skin_joint)]
+        local_joint_list = list()
+        for skin_joint in skeleton_joint_list:
+            skin_joint_helper = Helper(skin_joint)
+            skin_joint_local = cmds.createNode('joint', name='{}Local_{}_{}'.format(skin_joint_helper.get_descriptor(),
+                                                                                    skin_joint_helper.get_side(),
+                                                                                    skin_joint_helper.get_usage()))
+            local_joint_list.append(skin_joint_local)
+
+            cmds.parent(skin_joint_local, skeleton_local_grp)
+
+            mult_mat = cmds.createNode('multMatrix', name='{}Local_{}_{}'.format(skin_joint_helper.get_descriptor(),
+                                                                                 skin_joint_helper.get_side(),
+                                                                                 usage_lib.mult_matrix))
+
+            cmds.connectAttr('{}.worldMatrix'.format(skin_joint), '{}.matrixIn[0]'.format(mult_mat))
+            cmds.connectAttr('{}.worldInverseMatrix'.format(world_control), '{}.matrixIn[1]'.format(mult_mat))
+
+            cmds.connectAttr('{}.matrixSum'.format(mult_mat), '{}.offsetParentMatrix'.format(skin_joint_local))
+
+        return local_joint_list
