@@ -139,11 +139,11 @@ def create_skeleton_chain_from_a_to_b(descriptor,
     return joint_list
 
 
-def push_joint(parent_node, driven_node,
-               suffix='',
-               forbidden_word='01',
-               rotation_axis='Y',
-               structural_parent='pushJoints_c_grp'):
+def create_push_joint(parent_node, driven_node,
+                      suffix='',
+                      forbidden_word='01',
+                      rotation_axis='Y',
+                      structural_parent='pushJoints_c_grp'):
     """
     Create a pushJoint system
     :param parent_node: str
