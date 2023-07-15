@@ -453,7 +453,7 @@ class MarkingMenu(object):
         """
         Create a default bary
         """
-        trigger_lib.create_bary()
+        trigger_lib.create_bary_trigger()
 
     @staticmethod
     def export_selection(*args):

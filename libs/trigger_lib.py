@@ -9,10 +9,10 @@ from hiddenStrings import module_utils
 from hiddenStrings.libs import import_export_lib, side_lib, usage_lib, attribute_lib, connection_lib, bifrost_lib
 
 
-def create_bary(descriptor='bary', side=side_lib.center,
-                parent_node=None,
-                driver_node=None,
-                driver_axis='X'):
+def create_bary_trigger(descriptor='bary', side=side_lib.center,
+                        parent_node=None,
+                        driver_node=None,
+                        driver_axis='X'):
     """
     Create a bary trigger with bifrost
     :param descriptor: str
@@ -92,3 +92,7 @@ def create_bary(descriptor='bary', side=side_lib.center,
 
     if parent_node and driver_node:
         connection_lib.connect_offset_parent_matrix(driver=driver_node, driven=driver)
+
+
+def create_angle_trigger():
+    pass

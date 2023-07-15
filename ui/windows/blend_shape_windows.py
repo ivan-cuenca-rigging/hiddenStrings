@@ -178,11 +178,11 @@ class CreateBaryWindow(window_lib.Helper):
 
         driver_axis = cmds.optionMenu(self.driver_axis, query=True, value=True)
 
-        trigger_lib.create_bary(descriptor=descriptor,
-                                side=side,
-                                parent_node=parent,
-                                driver_node=driver,
-                                driver_axis=driver_axis)
+        trigger_lib.create_bary_trigger(descriptor=descriptor,
+                                        side=side,
+                                        parent_node=parent,
+                                        driver_node=driver,
+                                        driver_axis=driver_axis)
 
     @staticmethod
     def get_from_scene(text_field, *args):
