@@ -176,10 +176,12 @@ def create_push_joint(parent_node, driven_node,
         rotation_axis = '{}M'.format(rotation_axis[-1])
 
     # Zero the driver matrix
-    driver_mult_matrix = cmds.createNode('multMatrix', name='{}{}_{}_{}'.format(parent_descriptor,
-                                                                                parent_usage.capitalize(),
-                                                                                parent_side,
-                                                                                usage_lib.mult_matrix))
+    driver_mult_matrix = cmds.createNode('multMatrix', name='{}{}{}{}_{}_{}'.format(parent_descriptor,
+                                                                                    parent_usage.capitalize(),
+                                                                                    rotation_axis,
+                                                                                    suffix,
+                                                                                    parent_side,
+                                                                                    usage_lib.mult_matrix))
 
     cmds.setAttr('{}.matrixIn[0]'.format(driver_mult_matrix),
                  math_lib.inverse_matrix(matrix_a=cmds.xform(parent_node, query=True, worldSpace=True, matrix=True)),
@@ -194,12 +196,30 @@ def create_push_joint(parent_node, driven_node,
                                                                                   usage_lib.blend_matrix))
 
     cmds.connectAttr('{}.matrixSum'.format(driver_mult_matrix), '{}.inputMatrix'.format(blend_matrix))
-    cmds.connectAttr('{}.worldMatrix'.format(driven_node), '{}.target[0].targetMatrix'.format(blend_matrix))
 
-    cmds.setAttr('{}.target[0].translateWeight'.format(blend_matrix), 1)
-    cmds.setAttr('{}.target[0].rotateWeight'.format(blend_matrix), 0.5)
+    cmds.setAttr('{}.target[0].targetMatrix'.format(blend_matrix),
+                 cmds.xform(driven_node, query=True, worldSpace=True, matrix=True), type='matrix')
+    cmds.setAttr('{}.target[0].translateWeight'.format(blend_matrix), 0)
+    cmds.setAttr('{}.target[0].rotateWeight'.format(blend_matrix), 1)
     cmds.setAttr('{}.target[0].scaleWeight'.format(blend_matrix), 0)
     cmds.setAttr('{}.target[0].shearWeight'.format(blend_matrix), 0)
+
+    cmds.connectAttr('{}.worldMatrix'.format(driven_node), '{}.target[1].targetMatrix'.format(blend_matrix))
+    cmds.setAttr('{}.target[1].translateWeight'.format(blend_matrix), 1)
+    cmds.setAttr('{}.target[1].rotateWeight'.format(blend_matrix), 0.5)
+    cmds.setAttr('{}.target[1].scaleWeight'.format(blend_matrix), 0)
+    cmds.setAttr('{}.target[1].shearWeight'.format(blend_matrix), 0)
+
+    # Zero the blend matrix rotation
+    blend_mult_matrix = cmds.createNode('multMatrix', name='{}{}{}_{}_{}'.format(descriptor,
+                                                                                 rotation_axis,
+                                                                                 suffix,
+                                                                                 side,
+                                                                                 usage_lib.mult_matrix))
+
+    cmds.setAttr('{}.matrixIn[0]'.format(blend_mult_matrix),
+                 math_lib.inverse_matrix(matrix_a=cmds.getAttr('{}.outputMatrix'.format(blend_matrix))), type='matrix')
+    cmds.connectAttr('{}.outputMatrix'.format(blend_matrix), '{}.matrixIn[1]'.format(blend_mult_matrix))
 
     # Decompose the matrix to get the rotation in 1 axis
     decompose_matrix = cmds.createNode('decomposeMatrix', name='{}R{}Push{}_{}_{}'.format(descriptor,
@@ -207,7 +227,8 @@ def create_push_joint(parent_node, driven_node,
                                                                                           suffix,
                                                                                           side,
                                                                                           usage_lib.decompose_matrix))
-    cmds.connectAttr('{}.outputMatrix'.format(blend_matrix), '{}.inputMatrix'.format(decompose_matrix))
+
+    cmds.connectAttr('{}.matrixSum'.format(blend_mult_matrix), '{}.inputMatrix'.format(decompose_matrix))
 
     # Create structural parent if it does not exist
     if not cmds.objExists(structural_parent):
