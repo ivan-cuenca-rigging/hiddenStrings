@@ -225,7 +225,7 @@ class PushJointWindow(window_lib.Helper):
 
         structural_parent = cmds.textFieldGrp(self.structural_parent, query=True, text=True)
 
-        skeleton_lib.create_push_joint(parent_node=parent_node, driven_node=driver_node,
+        skeleton_lib.create_push_joint(parent_node=parent_node, driver_node=driver_node,
                                        suffix=suffix,
                                        forbidden_word=forbidden_word,
                                        rotation_axis=rotation_axis,

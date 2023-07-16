@@ -240,7 +240,8 @@ def connect_offset_parent_matrix(driver, driven,
         desc, side, usage = driven.split('_')
 
     # Logic
-    multmat = cmds.createNode('multMatrix', name='{}{}_{}_multmat'.format(desc, usage.capitalize(), side))
+    multmat = cmds.createNode('multMatrix',
+                              name='{}{}_{}_{}'.format(desc, usage.capitalize(), side, usage_lib.mult_matrix))
 
     if world:
         driven_matrix = cmds.getAttr('{}.worldMatrix'.format(driven))

@@ -11,15 +11,13 @@ from hiddenStrings.libs import import_export_lib, side_lib, usage_lib, attribute
 
 def create_bary_trigger(descriptor='bary', side=side_lib.center,
                         parent_node=None,
-                        driver_node=None,
-                        driver_axis='X'):
+                        driver_node=None):
     """
     Create a bary trigger with bifrost
     :param descriptor: str
     :param side: str
     :param parent_node: str
     :param driver_node: str
-    :param driver_axis: str; X, -X, Y, -Y, Z, -Z
     """
     bary_grp = cmds.createNode('transform', name='{}{}_{}_{}'.format(descriptor,
                                                                      usage_lib.get_usage_capitalize(usage_lib.trigger),
@@ -94,5 +92,29 @@ def create_bary_trigger(descriptor='bary', side=side_lib.center,
         connection_lib.connect_offset_parent_matrix(driver=driver_node, driven=driver)
 
 
-def create_angle_trigger():
-    pass
+def create_angle_trigger(parent_node, driven_node,
+                         forbidden_word='01',
+                         structural_parent='triggers_c_grp'):
+    """
+    Create a angle trigger system
+    :param parent_node: str
+    :param driven_node: str
+    :param forbidden_word: str
+    :param structural_parent: str
+    """
+    if len(parent_node.split('_')) == 3:
+        parent_descriptor, parent_side, parent_usage = parent_node.split('_')
+    else:
+        parent_descriptor = parent_node
+        parent_side = side_lib.center
+        parent_usage = ''
+
+    if len(driven_node.split('_')) == 3:
+        descriptor, side, usage = driven_node.split('_')
+    else:
+        descriptor = driven_node
+        side = side_lib.center
+
+    if forbidden_word:
+        descriptor = ''.join(descriptor.split(forbidden_word))
+
