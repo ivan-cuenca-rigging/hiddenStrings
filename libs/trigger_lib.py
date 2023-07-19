@@ -1,12 +1,12 @@
 # imports
-import os
 
 # Maya imports
 from maya import cmds
 
 # Project imports
 from hiddenStrings import module_utils
-from hiddenStrings.libs import import_export_lib, side_lib, usage_lib, attribute_lib, connection_lib, bifrost_lib
+from hiddenStrings.libs import (import_export_lib, attribute_lib, connection_lib, bifrost_lib, vector_lib,
+                                side_lib, usage_lib)
 
 
 def create_bary_trigger(descriptor='bary', side=side_lib.center,
@@ -92,16 +92,17 @@ def create_bary_trigger(descriptor='bary', side=side_lib.center,
         connection_lib.connect_offset_parent_matrix(driver=driver_node, driven=driver)
 
 
-def create_angle_trigger(parent_node, driven_node,
+def create_angle_trigger(parent_node, driver_node,
                          forbidden_word='01',
                          structural_parent='triggers_c_grp'):
     """
-    Create a angle trigger system
+    Create an angle trigger system
     :param parent_node: str
-    :param driven_node: str
+    :param driver_node: str
     :param forbidden_word: str
     :param structural_parent: str
     """
+    # Splitting names for renaming all the nodes
     if len(parent_node.split('_')) == 3:
         parent_descriptor, parent_side, parent_usage = parent_node.split('_')
     else:
@@ -109,12 +110,91 @@ def create_angle_trigger(parent_node, driven_node,
         parent_side = side_lib.center
         parent_usage = ''
 
-    if len(driven_node.split('_')) == 3:
-        descriptor, side, usage = driven_node.split('_')
+    if len(driver_node.split('_')) == 3:
+        descriptor, side, usage = driver_node.split('_')
     else:
-        descriptor = driven_node
+        descriptor = driver_node
         side = side_lib.center
 
     if forbidden_word:
         descriptor = ''.join(descriptor.split(forbidden_word))
 
+    # Create structural parent if it does not exist
+    if not cmds.objExists(structural_parent):
+        cmds.createNode('transform', name=structural_parent)
+
+    # Create Angle reader group
+    angle_reader_group = cmds.createNode('transform', name='{}AngleReader_{}_grp'.format(descriptor, side),
+                                         parent=structural_parent)
+
+    cmds.xform(angle_reader_group, worldSpace=True,
+               matrix=cmds.xform(driver_node, query=True, worldSpace=True, matrix=True))
+
+    connection_lib.connect_offset_parent_matrix(driver=parent_node, driven=angle_reader_group)
+
+    # Create the reader
+    ref_reader = cmds.createNode('transform', name='{}Reader_{}_{}'.format(descriptor, side, usage_lib.reference),
+                                 parent=angle_reader_group)
+    ref_reader_static = cmds.createNode('transform',
+                                        name='{}ReaderStatic_{}_{}'.format(descriptor, side, usage_lib.reference),
+                                        parent=angle_reader_group)
+
+    # Give the position to the reader
+    reader_mult_mat = cmds.createNode('multMatrix',
+                                      name='{}ReaderRef_{}_{}'.format(driver_node, side, usage_lib.mult_matrix))
+
+    cmds.connectAttr('{}.worldMatrix'.format(driver_node), '{}.matrixIn[0]'.format(reader_mult_mat))
+    cmds.connectAttr('{}.worldInverseMatrix'.format(parent_node), '{}.matrixIn[1]'.format(reader_mult_mat))
+    cmds.setAttr('{}.matrixIn[2]'.format(reader_mult_mat),
+                 cmds.getAttr('{}.worldMatrix'.format(parent_node)), type='matrix')
+    cmds.setAttr('{}.matrixIn[3]'.format(reader_mult_mat),
+                 cmds.getAttr('{}.worldInverseMatrix'.format(driver_node)), type='matrix')
+
+    cmds.connectAttr('{}.matrixSum'.format(reader_mult_mat), '{}.offsetParentMatrix'.format(ref_reader))
+    cmds.setAttr('{}.translateX'.format(ref_reader), 1)
+    cmds.setAttr('{}.translateX'.format(ref_reader_static), 1)
+
+    cmds.setAttr('{}.displayHandle'.format(ref_reader), 1)
+    cmds.setAttr('{}.displayHandle'.format(ref_reader_static), 1)
+
+    # Create a vector for the reader
+    vector_reader_pma = vector_lib.create_pma_vector_from_a_to_b(a=angle_reader_group, b=ref_reader)
+    vector_reader_static_pma = vector_lib.create_pma_vector_from_a_to_b(a=angle_reader_group, b=ref_reader_static)
+
+    # Create attribute helper and separator
+    reader_ah = attribute_lib.Helper(angle_reader_group)
+    reader_ah.add_separator_attribute(separator_name='Outputs')
+
+    for num in ['01', '02', '03', '04']:
+        # Create a reader in each direction
+        ref_transform = cmds.createNode('transform',
+                                        name='{}Reader{}_{}_{}'.format(descriptor, num, side, usage_lib.reference),
+                                        parent=angle_reader_group)
+
+        # Give the position to each transform
+        axis = 'Y' if num == '01' or num == '03' else 'Z'
+        value = 1 if num == '01' or num == '02' else -1
+
+        cmds.setAttr('{}.translate{}'.format(ref_transform, axis), value)
+        cmds.setAttr('{}.displayHandle'.format(ref_transform), 1)
+
+        # Create a vector for each direction
+        vector_pma = vector_lib.create_pma_vector_from_a_to_b(a=angle_reader_group, b=ref_transform)
+
+        # Create an angle between for each direction
+        angle_between = vector_lib.create_angle_between_two_pma_nodes(vector_pma, vector_reader_pma)
+        angle_between_static = vector_lib.create_angle_between_two_pma_nodes(vector_pma, vector_reader_static_pma)
+
+        # Remap values to normalize the outputs
+        remap_value = cmds.createNode('remapValue',
+                                      name='{}Reader{}_{}_{}'.format(descriptor, num, side, usage_lib.remap_value))
+
+        cmds.connectAttr(angle_between, '{}.inputValue'.format(remap_value))
+        cmds.connectAttr(angle_between_static, '{}.inputMax'.format(remap_value))
+
+        cmds.setAttr('{}.outputMin'.format(remap_value), 1)
+        cmds.setAttr('{}.outputMax'.format(remap_value), 0)
+
+        # Create attribute
+        reader_ah.add_float_attribute(attribute_name='output{}'.format(num))
+        cmds.connectAttr('{}.outValue'.format(remap_value), '{}.output{}'.format(angle_reader_group, num))

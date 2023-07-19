@@ -249,6 +249,7 @@ def connect_offset_parent_matrix(driver, driven,
         matrix_difference = math_lib.multiply_matrices_4_by_4(driven_matrix, driver_inverse_matrix)
         cmds.setAttr('{}.matrixIn[0]'.format(multmat), matrix_difference, type='matrix')
         cmds.connectAttr('{}.worldMatrix'.format(driver), '{}.matrixIn[1]'.format(multmat))
+
     else:
         matrix_difference = cmds.getAttr('{}.worldMatrix'.format(driven))
         cmds.connectAttr('{}.matrix'.format(driver), '{}.matrixIn[0]'.format(multmat))

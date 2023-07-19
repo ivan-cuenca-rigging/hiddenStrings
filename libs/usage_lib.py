@@ -46,6 +46,8 @@ multiply = 'mult'
 divide = 'div'
 add = 'add'
 sub = 'sub'
+plus_minus_Average = 'pma'
+angle_between = 'ab'
 maximum = 'max'
 minimum = 'min'
 distance = 'dist'
@@ -91,7 +93,8 @@ valid_usages = [control,
                 geometry, driver,
                 trigger,
                 scale_constraint, aim_constraint, pole_vector_constraint,
-                multiply, divide, add, sub, maximum, minimum, distance, remap_value, reverse, clamp,
+                multiply, divide, add, sub, maximum, minimum, distance, remap_value, reverse, clamp, plus_minus_Average,
+                angle_between,
                 curve, spline,
                 uvpin,
                 skin_cluster,
