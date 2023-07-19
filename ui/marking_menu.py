@@ -55,10 +55,7 @@ class MarkingMenu(object):
         Create the marking menu items
         """
         # ---------- North ----------
-        self.blend_shapes_menu(menu_parent=self.menu_name, radial_position='N')
-
-        # ---------- North-West ----------
-        self.skins_menu(menu_parent=self.menu_name, radial_position='NW')
+        self.deformation_menu(menu_parent=self.menu_name, radial_position='N')
 
         # ---------- West ----------
         self.connections_menu(menu_parent=self.menu_name, radial_position='W')
@@ -98,17 +95,46 @@ class MarkingMenu(object):
         if builder_exists:
             self.builder_menu()
 
+    def deformation_menu(self, menu_parent, radial_position):
+        """
+        Create the deformation menu items
+        """
+        deformation_menu = cmds.menuItem(parent=menu_parent, label='Deformation', radialPosition=radial_position,
+                                         subMenu=True)
+
+        cmds.menuItem(parent=deformation_menu, label='Shape Editor', radialPosition='NE',
+                      command=cmds.ShapeEditor)
+
+        self.blend_shapes_menu(menu_parent=deformation_menu, radial_position='E')
+
+        cmds.menuItem(parent=deformation_menu, label='Paint Skin Weights', radialPosition='NW',
+                      command=cmds.ArtPaintSkinWeightsToolOptions)
+
+        self.skins_menu(menu_parent=deformation_menu, radial_position='W')
+
+        # ---- south ----
+        cmds.menuItem(parent=deformation_menu, label='          Triggers', enable=False)
+        cmds.menuItem(parent=deformation_menu, divider=True)
+
+        cmds.menuItem(parent=deformation_menu, label='Pose Reader: Angle', command=self.create_default_angle_reader)
+        cmds.menuItem(parent=deformation_menu, optionBox=True, command=blend_shape_windows.CreateAngleWindow)
+
+        cmds.menuItem(parent=deformation_menu, label='Pose Reader: Bary', command=self.create_default_bary)
+        cmds.menuItem(parent=deformation_menu, optionBox=True, command=blend_shape_windows.CreateBaryWindow)
+
     def blend_shapes_menu(self, menu_parent, radial_position):
         """
         Create the shapes menu items
         """
-        blend_shape_menu = cmds.menuItem(parent=menu_parent, label='BlendShapes', radialPosition=radial_position,
+        blend_shape_menu = cmds.menuItem(parent=menu_parent, label='Blendshapes', radialPosition=radial_position,
                                          subMenu=True)
 
-        cmds.menuItem(parent=blend_shape_menu, label='Shape Editor', radialPosition='N',
-                      command=cmds.ShapeEditor)
-
         cmds.menuItem(parent=blend_shape_menu, label='           blendShapes Utils', enable=False)
+        cmds.menuItem(parent=blend_shape_menu, divider=True)
+
+        cmds.menuItem(parent=blend_shape_menu, label='Rename all blendShapes',
+                      command=self.rename_all_blend_shapes)
+
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 
         cmds.menuItem(parent=blend_shape_menu, label='Edit Blendshape / In-Between',
@@ -133,11 +159,6 @@ class MarkingMenu(object):
 
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 
-        cmds.menuItem(parent=blend_shape_menu, label='Pose Reader: Bary', command=self.create_default_bary)
-        cmds.menuItem(parent=blend_shape_menu, optionBox=True, command=blend_shape_windows.CreateBaryWindow)
-
-        cmds.menuItem(parent=blend_shape_menu, divider=True)
-
         cmds.menuItem(parent=blend_shape_menu, label='Transfer Blendshape targets',
                       command=blend_shape_lib.transfer_blend_shape)
 
@@ -155,11 +176,6 @@ class MarkingMenu(object):
                       command=self.export_blend_shapes)
         cmds.menuItem(parent=blend_shape_menu, optionBox=True, command=import_export_lib.export_blend_shapes)
 
-        cmds.menuItem(parent=blend_shape_menu, divider=True)
-
-        cmds.menuItem(parent=blend_shape_menu, label='Rename all blendShapes',
-                      command=self.rename_all_blend_shapes)
-
     def skins_menu(self, menu_parent, radial_position):
         """
         Create the skins menu items
@@ -167,10 +183,12 @@ class MarkingMenu(object):
         skin_menu = cmds.menuItem(parent=menu_parent, label='Skins', radialPosition=radial_position,
                                   subMenu=True)
 
-        cmds.menuItem(parent=skin_menu, label='Paint Skin Weights', radialPosition='NW',
-                      command=cmds.ArtPaintSkinWeightsToolOptions)
-
         cmds.menuItem(parent=skin_menu, label='             Skins Utils', enable=False)
+        cmds.menuItem(parent=skin_menu, divider=True)
+
+        cmds.menuItem(parent=skin_menu, label='Rename all skinClusters',
+                      command=self.rename_all_skin_clusters)
+
         cmds.menuItem(parent=skin_menu, divider=True)
 
         cmds.menuItem(parent=skin_menu, label='Set Labels',
@@ -197,11 +215,6 @@ class MarkingMenu(object):
         cmds.menuItem(parent=skin_menu, label='Export Skins',
                       command=self.export_skin_clusters)
         cmds.menuItem(parent=skin_menu, optionBox=True, command=skin_windows.ExportSkinWindow)
-
-        cmds.menuItem(parent=skin_menu, divider=True)
-
-        cmds.menuItem(parent=skin_menu, label='Rename all skinClusters',
-                      command=self.rename_all_skin_clusters)
 
     def connections_menu(self, menu_parent, radial_position):
         """
@@ -447,6 +460,13 @@ class MarkingMenu(object):
         for target in target_list:
             blend_shape, target = target.split('.')
             blend_shape_lib.mirror_target(blend_shape=blend_shape, target=target)
+
+    @staticmethod
+    def create_default_angle_reader(*args):
+        """
+        Create a default angle reader
+        """
+        trigger_lib.create_angle_trigger(parent_node=cmds.ls(selection=True)[0], driver_node=cmds.ls(selection=True)[1])
 
     @staticmethod
     def create_default_bary(*args):

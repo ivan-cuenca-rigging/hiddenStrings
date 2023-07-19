@@ -108,6 +108,46 @@ class ImportBlendShapeWindow(window_lib.Helper):
         cmds.button(add_button, edit=True, label='Import')
 
 
+class CreateAngleWindow(window_lib.Helper):
+    def __init__(self, *args):
+        """
+        Create the import blendShape window
+        :param title: str, title of the window
+        :param size: list, width and height
+        """
+        super(CreateAngleWindow, self).__init__(title='Create Bary Options', size=(450, 105))
+
+        self.parent = cmds.textFieldGrp(label='Parent: ')
+        self.get_parent = cmds.iconTextButton(image='addClip.png', command=partial(self.get_from_scene,
+                                                                                   text_field=self.parent))
+        self.driver = cmds.textFieldGrp(label='Driver: ')
+        self.get_driver = cmds.iconTextButton(image='addClip.png', command=partial(self.get_from_scene,
+                                                                                   text_field=self.driver))
+        # --------------------------------------------------------------------------------------------------------------
+        cmds.formLayout(self.main_layout, edit=True,
+                        attachForm=[(self.parent, 'top', 10),
+                                    (self.get_parent, 'top', 10)],
+
+                        attachControl=[(self.driver, 'top', 5, self.parent),
+                                       (self.get_driver, 'top', 5, self.parent),
+                                       (self.get_driver, 'left', 5, self.driver),
+                                       (self.get_parent, 'left', 5, self.parent)])
+
+    def apply_command(self, *args):
+        """
+        Apply button command
+        """
+        parent = cmds.textFieldGrp(self.parent, query=True, text=True)
+
+        driver = cmds.textFieldGrp(self.driver, query=True, text=True)
+
+        trigger_lib.create_angle_trigger(parent_node=parent, driver_node=driver)
+
+    @staticmethod
+    def get_from_scene(text_field, *args):
+        cmds.textFieldGrp(text_field, edit=True, text=cmds.ls(selection=True)[0])
+
+
 class CreateBaryWindow(window_lib.Helper):
     def __init__(self, *args):
         """
