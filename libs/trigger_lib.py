@@ -162,7 +162,7 @@ def create_angle_trigger(parent_node, driver_node,
     vector_reader_static_pma = vector_lib.create_pma_vector_from_a_to_b(a=angle_reader_group, b=ref_reader_static)
 
     # Create attribute helper and separator
-    reader_ah = attribute_lib.Helper(angle_reader_group)
+    reader_ah = attribute_lib.Helper(ref_reader)
     reader_ah.add_separator_attribute(separator_name='Outputs')
 
     for num in ['01', '02', '03', '04']:
@@ -197,4 +197,4 @@ def create_angle_trigger(parent_node, driver_node,
 
         # Create attribute
         reader_ah.add_float_attribute(attribute_name='output{}'.format(num))
-        cmds.connectAttr('{}.outValue'.format(remap_value), '{}.output{}'.format(angle_reader_group, num))
+        cmds.connectAttr('{}.outValue'.format(remap_value), '{}.output{}'.format(ref_reader, num))
