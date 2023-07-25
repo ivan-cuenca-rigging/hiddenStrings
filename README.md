@@ -76,11 +76,9 @@ parameters to False in the `config.py`
 
 Hold <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>Right click</kbd> to open the marking menu
 
-<kbd>&uarr;</kbd> blendShapes utils
+<kbd>&uarr;</kbd> Deformation
 
-<kbd>&#8598; </kbd> Skins utils
-
-<kbd>&larr;</kbd> Connections utils
+<kbd>&larr;</kbd> Connections
 
 <kbd>&darr;</kbd> Maya windows
 
