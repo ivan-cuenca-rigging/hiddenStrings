@@ -80,7 +80,7 @@ def format_skin_cluster_name(node,
     :return: skinCluster name
     """
     if len(node.split('_')) != 3:
-        return '{}{}_{}'.format(node, str(skin_index).zfill(2), usage_lib.skin_cluster)
+        return '{}{}_{}'.format(node, str(skin_index).zfill(1), usage_lib.skin_cluster)
     else:
         descriptor, side, usage = node.split('_')
         return '{}{}{}_{}_{}'.format(descriptor, usage.capitalize(), str(skin_index).zfill(2),
