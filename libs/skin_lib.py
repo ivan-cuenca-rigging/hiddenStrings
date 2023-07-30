@@ -83,7 +83,7 @@ def format_skin_cluster_name(node,
         return '{}{}_{}'.format(node, str(skin_index).zfill(1), usage_lib.skin_cluster)
     else:
         descriptor, side, usage = node.split('_')
-        return '{}{}{}_{}_{}'.format(descriptor, usage.capitalize(), str(skin_index).zfill(2),
+        return '{}{}{}_{}_{}'.format(descriptor, usage.capitalize(), str(skin_index).zfill(1),
                                      side,
                                      usage_lib.skin_cluster)
 
@@ -228,3 +228,23 @@ def transfer_skin(source, target, source_skin_index=1, target_skin_index=1, surf
                          noMirror=True,
                          influenceAssociation='label',
                          normalize=True)
+
+
+def add_joint_to_skin_cluster(joint_name, skin_cluster_name):
+    """
+    Add a joint to an existing skinCluster
+    :param joint_name: str
+    :param skin_cluster_name: str
+    """
+    joint_index = str(len(cmds.listConnections('{}.matrix'.format(skin_cluster_name))))
+
+    cmds.connectAttr('{}.worldMatrix[0]'.format(joint_name),
+                     '{}.matrix[{}]'.format(skin_cluster_name, joint_index))
+    cmds.connectAttr('{}.lockInfluenceWeights'.format(joint_name),
+                     '{}.lockWeights[{}]'.format(skin_cluster_name, joint_index))
+    cmds.connectAttr('{}.objectColorRGB'.format(joint_name),
+                     '{}.influenceColor[{}]'.format(skin_cluster_name, joint_index))
+
+    cmds.setAttr('{}.bindPreMatrix[{}]'.format(skin_cluster_name, joint_index),
+                 cmds.getAttr('{}.worldInverseMatrix'.format(joint_name)),
+                 type='matrix')
