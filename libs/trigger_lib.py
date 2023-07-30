@@ -198,3 +198,42 @@ def create_angle_trigger(parent_node, driver_node,
         # Create attribute
         reader_ah.add_float_attribute(attribute_name='output{}'.format(num))
         cmds.connectAttr('{}.outValue'.format(remap_value), '{}.output{}'.format(ref_reader, num))
+
+
+def build_biped_angle_trigger_template():
+    """
+    Build the angle trigger for each articulation, take into account that you need to change some reference nodes
+    position to place it correctly
+    """
+    # Head
+    create_angle_trigger(parent_node='neck_c_skn',
+                         driver_node='head_c_skn')
+    # Neck
+    create_angle_trigger(parent_node='spineTop_c_skn',
+                         driver_node='neck_c_skn')
+    for side in ('l', 'r'):
+        # Clavicle
+        create_angle_trigger(parent_node='spineTop_c_skn',
+                             driver_node='clavicleArm_{}_skn'.format(side))
+        # UpArm
+        create_angle_trigger(parent_node='clavicleArm_{}_skn'.format(side),
+                             driver_node='upArm01_{}_skn'.format(side))
+        # LowArm
+        create_angle_trigger(parent_node=cmds.ls('upArm??_{}_jnt'.format(side))[0],
+                             driver_node='lowArm01_{}_skn'.format(side))
+        # hand
+        create_angle_trigger(parent_node=cmds.ls('lowArm??_{}_jnt'.format(side))[0],
+                             driver_node='handArm_{}_skn'.format(side))
+
+        # UpLeg
+        create_angle_trigger(parent_node='spineBottom_c_skn',
+                             driver_node='upLeg01_{}_skn'.format(side))
+        # LowLeg
+        create_angle_trigger(parent_node=cmds.ls('upLeg??_{}_jnt'.format(side))[0],
+                             driver_node='lowLeg01_{}_skn'.format(side))
+        # Foot
+        create_angle_trigger(parent_node=cmds.ls('lowLeg??_{}_jnt'.format(side))[0],
+                             driver_node='footLeg_{}_skn'.format(side))
+        # FootMiddle
+        create_angle_trigger(parent_node='footLeg_{}_skn'.format(side),
+                             driver_node='footLegMiddle_{}_skn'.format(side))
