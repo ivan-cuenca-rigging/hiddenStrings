@@ -384,6 +384,12 @@ class NeckWindow(window_lib.Helper):
         # Create Ik middle
         self.create_ik_middle_system = cmds.checkBoxGrp(label='Create Ik middle: ', value1=True)
 
+        # Start Ik world rotation
+        self.start_ik_world_rotation = cmds.optionMenu(label='Start Ik orientation')
+        cmds.menuItem(self.start_ik_world_rotation, label='System')
+        cmds.menuItem(self.start_ik_world_rotation, label='World')
+        cmds.optionMenu(self.start_ik_world_rotation, edit=True, value='World')
+
         # End Ik world rotation
         self.end_ik_world_rotation = cmds.optionMenu(label='End Ik orientation')
         cmds.menuItem(self.end_ik_world_rotation, label='System')
@@ -401,6 +407,7 @@ class NeckWindow(window_lib.Helper):
                                     (fk_settings_text, 'left', 5), (fk_settings_text, 'right', 5),
                                     (separator03, 'left', 5), (separator03, 'right', 5),
                                     (ik_settings_text, 'left', 5), (ik_settings_text, 'right', 5),
+                                    (self.start_ik_world_rotation, 'left', 39),
                                     (self.end_ik_world_rotation, 'left', 43),
                                     (self.end_ik_world_rotation, 'bottom', 5)],
 
@@ -418,7 +425,8 @@ class NeckWindow(window_lib.Helper):
                                        (separator03, 'top', 5, self.create_fk_inv_system),
                                        (ik_settings_text, 'top', 5, separator03),
                                        (self.create_ik_middle_system, 'top', 5, ik_settings_text),
-                                       (self.end_ik_world_rotation, 'top', 5, self.create_ik_middle_system)],
+                                       (self.start_ik_world_rotation, 'top', 5, self.create_ik_middle_system),
+                                       (self.end_ik_world_rotation, 'top', 5, self.start_ik_world_rotation)],
 
                         attachPosition=[(self.name, 'top', 0, 5),
                                         (self.end_ik_world_rotation, 'bottom', 0, 5)]
@@ -452,6 +460,12 @@ class NeckWindow(window_lib.Helper):
 
         create_ik_middle_system = cmds.checkBoxGrp(self.create_ik_middle_system, query=True, value1=True)
 
+        start_ik_world_rotation = cmds.optionMenu(self.start_ik_world_rotation, query=True, value=True)
+        if start_ik_world_rotation == 'System':
+            start_ik_world_rotation = False
+        if start_ik_world_rotation == 'World':
+            start_ik_world_rotation = True
+
         end_ik_world_rotation = cmds.optionMenu(self.end_ik_world_rotation, query=True, value=True)
         if end_ik_world_rotation == 'System':
             end_ik_world_rotation = False
@@ -467,6 +481,7 @@ class NeckWindow(window_lib.Helper):
                                   create_fk_system_default_value=create_fk_system,
                                   create_fk_inverse_default_value=create_fk_inv_system,
                                   create_ik_middle_default_value=create_ik_middle_system,
+                                  start_ik_world_rotation_default_value=start_ik_world_rotation,
                                   end_ik_world_rotation_default_value=end_ik_world_rotation)
 
 
@@ -560,6 +575,12 @@ class SpineWindow(window_lib.Helper):
         # Create Ik middle
         self.create_ik_middle_system = cmds.checkBoxGrp(label='Create Ik middle: ', value1=True)
 
+        # Start Ik world rotation
+        self.start_ik_world_rotation = cmds.optionMenu(label='Start Ik orientation')
+        cmds.menuItem(self.start_ik_world_rotation, label='System')
+        cmds.menuItem(self.start_ik_world_rotation, label='World')
+        cmds.optionMenu(self.start_ik_world_rotation, edit=True, value='System')
+
         # End Ik world rotation
         self.end_ik_world_rotation = cmds.optionMenu(label='End Ik orientation')
         cmds.menuItem(self.end_ik_world_rotation, label='System')
@@ -577,6 +598,7 @@ class SpineWindow(window_lib.Helper):
                                     (fk_settings_text, 'left', 5), (fk_settings_text, 'right', 5),
                                     (separator03, 'left', 5), (separator03, 'right', 5),
                                     (ik_settings_text, 'left', 5), (ik_settings_text, 'right', 5),
+                                    (self.start_ik_world_rotation, 'left', 39),
                                     (self.end_ik_world_rotation, 'left', 43),
                                     (self.end_ik_world_rotation, 'bottom', 5)],
 
@@ -594,7 +616,8 @@ class SpineWindow(window_lib.Helper):
                                        (separator03, 'top', 5, self.create_fk_inv_system),
                                        (ik_settings_text, 'top', 5, separator03),
                                        (self.create_ik_middle_system, 'top', 5, ik_settings_text),
-                                       (self.end_ik_world_rotation, 'top', 5, self.create_ik_middle_system)],
+                                       (self.start_ik_world_rotation, 'top', 5, self.create_ik_middle_system),
+                                       (self.end_ik_world_rotation, 'top', 5, self.start_ik_world_rotation)],
 
                         attachPosition=[(self.name, 'top', 0, 5),
                                         (self.end_ik_world_rotation, 'bottom', 0, 5)]
@@ -628,6 +651,12 @@ class SpineWindow(window_lib.Helper):
 
         create_ik_middle_system = cmds.checkBoxGrp(self.create_ik_middle_system, query=True, value1=True)
 
+        start_ik_world_rotation = cmds.optionMenu(self.start_ik_world_rotation, query=True, value=True)
+        if start_ik_world_rotation == 'System':
+            start_ik_world_rotation = False
+        if start_ik_world_rotation == 'World':
+            start_ik_world_rotation = True
+
         end_ik_world_rotation = cmds.optionMenu(self.end_ik_world_rotation, query=True, value=True)
         if end_ik_world_rotation == 'System':
             end_ik_world_rotation = False
@@ -643,4 +672,5 @@ class SpineWindow(window_lib.Helper):
                                    create_fk_system_default_value=create_fk_system,
                                    create_fk_inverse_default_value=create_fk_inv_system,
                                    create_ik_middle_default_value=create_ik_middle_system,
+                                   start_ik_world_rotation_default_value=start_ik_world_rotation,
                                    end_ik_world_rotation_default_value=end_ik_world_rotation)
