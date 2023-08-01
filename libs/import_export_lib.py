@@ -59,7 +59,6 @@ def export_nodes_and_connections(file_name, path, export_nodes=True, export_edge
     :param export_connections: bool
     """
     node_list = cmds.ls(sl=True)
-
     cmds.file(r'{}/{}.ma'.format(path, file_name), type='mayaAscii', exportSelectedStrict=True, force=True)
 
     with open(r'{}/{}.ma'.format(path, file_name), 'r+') as connections_file:
@@ -80,12 +79,11 @@ def export_nodes_and_connections(file_name, path, export_nodes=True, export_edge
             inputs_list = cmds.listConnections(node, destination=False, plugs=True, skipConversionNodes=True)
             if inputs_list:
                 inputs_list = [x for x in inputs_list if x.split('.')[0] in node_list]
-                inputs_list = [(x, cmds.listConnections(x,
-                                                        source=False,
-                                                        plugs=True,
-                                                        skipConversionNodes=True)[0]) for x in inputs_list]
-                for value in inputs_list:
-                    connections_string += '\nconnectAttr "{}" "{}";'.format(value[0], value[1])
+
+                for input_value in inputs_list:
+                    output_value = [x for x in cmds.listConnections(input_value, plugs=True, source=True)
+                                    if node in x][0]
+                    connections_string += '\nconnectAttr "{}" "{}";'.format(input_value, output_value)
 
             # Get outputs
             outputs_list = cmds.listConnections(node, source=False, plugs=True, skipConversionNodes=True)
@@ -95,7 +93,6 @@ def export_nodes_and_connections(file_name, path, export_nodes=True, export_edge
                                                       destination=False,
                                                       plugs=True,
                                                       skipConversionNodes=True)[0], x) for x in outputs_list]
-
             # Get edges
             if not export_edges:
                 if not bool(inputs_list) or not bool(outputs_list):
