@@ -230,14 +230,26 @@ def transfer_skin(source, target, source_skin_index=1, target_skin_index=1, surf
                          normalize=True)
 
 
-def add_joint_to_skin_cluster(joint_name, skin_cluster_name):
+def add_joint_to_skin_cluster(joint_name, skin_cluster_name, prebind_name=None):
     """
     Add a joint to an existing skinCluster
+    :param prebind_name: str
     :param joint_name: str
     :param skin_cluster_name: str
     """
+    # Checks
+    if not cmds.objExists(joint_name):
+        logging.error('{} does not exists in the scene'.format(joint_name))
+    if not cmds.objExists(skin_cluster_name):
+        logging.error('{} does not exists in the scene'.format(skin_cluster_name))
+    if prebind_name:
+        if not cmds.objExists(prebind_name):
+            logging.error('{} does not exists in the scene'.format(prebind_name))
+
+    # Get next joint skin index for the skinCluster connections
     joint_index = str(len(cmds.listConnections('{}.matrix'.format(skin_cluster_name))))
 
+    # Create connections
     cmds.connectAttr('{}.worldMatrix[0]'.format(joint_name),
                      '{}.matrix[{}]'.format(skin_cluster_name, joint_index))
     cmds.connectAttr('{}.lockInfluenceWeights'.format(joint_name),
@@ -245,6 +257,11 @@ def add_joint_to_skin_cluster(joint_name, skin_cluster_name):
     cmds.connectAttr('{}.objectColorRGB'.format(joint_name),
                      '{}.influenceColor[{}]'.format(skin_cluster_name, joint_index))
 
-    cmds.setAttr('{}.bindPreMatrix[{}]'.format(skin_cluster_name, joint_index),
-                 cmds.getAttr('{}.worldInverseMatrix'.format(joint_name)),
-                 type='matrix')
+    # If prebind exists then connect it, else set to its default value
+    if prebind_name:
+        cmds.connectAttr('{}.worldInverseMatrix'.format(prebind_name),
+                         '{}.bindPreMatrix[{}]'.format(skin_cluster_name, joint_index))
+    else:
+        cmds.setAttr('{}.bindPreMatrix[{}]'.format(skin_cluster_name, joint_index),
+                     cmds.getAttr('{}.worldInverseMatrix'.format(joint_name)),
+                     type='matrix')
