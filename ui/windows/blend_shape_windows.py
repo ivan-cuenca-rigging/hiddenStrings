@@ -17,7 +17,7 @@ class ExportBlendShapeWindow(window_lib.Helper):
         :param size: list, width and height
         """
         super(ExportBlendShapeWindow, self).__init__(title='Export blendShape Options', size=(450, 130))
-        export_path = os.path.dirname(cmds.file(query=True, sceneName=True))
+        export_path = '{}/blendShapes'.format(os.path.dirname(cmds.file(query=True, sceneName=True)))
         self.export_path = cmds.textFieldGrp(label='Path: ', text=export_path)
 
         self.file_search = cmds.iconTextButton(style='iconOnly', image1='folder-closed.png',
@@ -62,10 +62,10 @@ class ImportBlendShapeWindow(window_lib.Helper):
         :param size: list, width and height
         """
         super(ImportBlendShapeWindow, self).__init__(title='Import blendShape Options', size=(450, 150))
-
         self.import_folder = cmds.checkBoxGrp(label='Import folder: ', value1=False)
 
-        self.import_path = cmds.textFieldGrp(label='Path: ')
+        import_path = '{}/blendShapes'.format(os.path.dirname(cmds.file(query=True, sceneName=True)))
+        self.import_path = cmds.textFieldGrp(label='Path: ', text=import_path)
         self.file_search = cmds.iconTextButton(style='iconOnly', image1='folder-closed.png',
                                                command=self.file_dialog_command)
 

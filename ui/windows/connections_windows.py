@@ -327,7 +327,7 @@ class ExportNodesAndConnectionsWindow(window_lib.Helper):
         self.export_edges = cmds.checkBoxGrp(label='Export edges: ', value1=False)
         self.export_connections = cmds.checkBoxGrp(label='Export connections: ', value1=True)
 
-        export_path = os.path.dirname(cmds.file(query=True, sceneName=True))
+        export_path = '{}/connections'.format(os.path.dirname(cmds.file(query=True, sceneName=True)))
         self.export_path = cmds.textFieldGrp(label='Path: ', text=export_path)
 
         self.file_search = cmds.iconTextButton(style='iconOnly', image1='folder-closed.png',
@@ -394,7 +394,7 @@ class ImportNodesAndConnectionsWindow(window_lib.Helper):
 
         self.replace_with = cmds.textFieldGrp(label='Replace with: ')
 
-        import_path = os.path.dirname(cmds.file(query=True, sceneName=True))
+        import_path = '{}/connections'.format(os.path.dirname(cmds.file(query=True, sceneName=True)))
         self.import_path = cmds.textFieldGrp(label='Path: ', text=import_path)
 
         self.file_search = cmds.iconTextButton(style='iconOnly', image1='folder-closed.png',

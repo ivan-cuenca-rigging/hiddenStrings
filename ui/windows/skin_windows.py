@@ -23,7 +23,7 @@ class ExportSkinWindow(window_lib.Helper):
                                                onCommand=self.set_skin_index_enable,
                                                offCommand=self.set_skin_index_enable)
 
-        export_path = os.path.dirname(cmds.file(query=True, sceneName=True))
+        export_path = '{}/skinClusters'.format(os.path.dirname(cmds.file(query=True, sceneName=True)))
         self.export_path = cmds.textFieldGrp(label='Path: ', text=export_path)
 
         self.file_search = cmds.iconTextButton(style='iconOnly', image1='folder-closed.png',
@@ -98,7 +98,8 @@ class ImportSkinWindow(window_lib.Helper):
 
         self.replace_with = cmds.textFieldGrp(label='Replace with: ')
 
-        self.import_path = cmds.textFieldGrp(label='Path: ')
+        import_path = '{}/skinClusters'.format(os.path.dirname(cmds.file(query=True, sceneName=True)))
+        self.import_path = cmds.textFieldGrp(label='Path: ', text=import_path)
         self.file_search = cmds.iconTextButton(style='iconOnly', image1='folder-closed.png',
                                                command=self.file_dialog_command)
 
