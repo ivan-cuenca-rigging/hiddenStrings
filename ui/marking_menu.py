@@ -174,7 +174,8 @@ class MarkingMenu(object):
 
         cmds.menuItem(parent=blend_shape_menu, label='Export BlendShapes',
                       command=self.export_blend_shapes)
-        cmds.menuItem(parent=blend_shape_menu, optionBox=True, command=import_export_lib.export_blend_shapes)
+        cmds.menuItem(parent=blend_shape_menu, optionBox=True,
+                      command=blend_shape_windows.ExportBlendShapeWindow)
 
     def skins_menu(self, menu_parent, radial_position):
         """
@@ -347,9 +348,8 @@ class MarkingMenu(object):
     @staticmethod
     def export_blend_shapes(*args):
         import_export_lib.export_blend_shapes(node_list=cmds.ls(selection=True),
-                                              path='{}/blendShapes'.format(os.path.dirname(cmds.file(
-                                                  query=True,
-                                                  sceneName=True))))
+                                              path='{}/blendShapes'.format(os.path.dirname(cmds.file(query=True,
+                                                                                                     sceneName=True))))
 
     @staticmethod
     def connect_translate_rotate_scale(*args):
