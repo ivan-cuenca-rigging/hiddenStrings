@@ -441,11 +441,13 @@ def create_uvpin(nurbs,
 def create_follow(base,
                   driver,
                   driven,
+                  follow_name=None,
                   rot=False,
                   pos=False,
                   default_value=True):
     """
     create a follow, if rot or pos is True, the follow will be split
+    :param follow_name: str, if true use it as name
     :param base: str, node or node + Attribute
     :param driver: str, node or node + Attribute
     :param driven: str
@@ -484,8 +486,8 @@ def create_follow(base,
                  math_lib.multiply_matrices_4_by_4(matrix_a=driven_matrix, matrix_b=base_inverse_matrix), type='matrix')
 
     # driver
-    if '.' in driver:
-        driver_descriptor = driver.split('.')[-1].split('_')[0]
+    if follow_name:
+        driver_descriptor = follow_name
         driver_capitalize_descriptor = '{}{}'.format(driver_descriptor[0].upper(), driver_descriptor[1:])
         driver_output = driver
         driver_inverse_matrix = math_lib.inverse_matrix(cmds.getAttr(driver))
@@ -547,15 +549,16 @@ def create_follow(base,
     # Add follow attr
     driven_ah = attribute_lib.Helper(driven)
     driven_ah.add_separator_attribute(separator_name='Follows')
-    if rot:
-        attr_name = 'follow{}Rot'.format(driver_capitalize_descriptor)
-        driven_ah.add_float_attribute(attr_name, minValue=0, maxValue=1, defaultValue=default_value)
-        cmds.connectAttr('{}.{}'.format(driven, attr_name), '{}.{}.rotateWeight'.format(blend_matrix, target_index))
 
     if pos:
         attr_name = 'follow{}Pos'.format(driver_capitalize_descriptor)
         driven_ah.add_float_attribute(attr_name, minValue=0, maxValue=1, defaultValue=default_value)
         cmds.connectAttr('{}.{}'.format(driven, attr_name), '{}.{}.translateWeight'.format(blend_matrix, target_index))
+
+    if rot:
+        attr_name = 'follow{}Rot'.format(driver_capitalize_descriptor)
+        driven_ah.add_float_attribute(attr_name, minValue=0, maxValue=1, defaultValue=default_value)
+        cmds.connectAttr('{}.{}'.format(driven, attr_name), '{}.{}.rotateWeight'.format(blend_matrix, target_index))
 
     if not pos and not rot:
         attr_name = 'follow{}'.format(driver_capitalize_descriptor)
