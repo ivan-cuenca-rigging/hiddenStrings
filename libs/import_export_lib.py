@@ -342,7 +342,6 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index', search_
 
     # Reading normalize weights
     skin_normalize = cmds.skinCluster(skin_cluster, query=True, normalizeWeights=True)
-
     # disable normalize weights
     cmds.skinCluster(skin_cluster, edit=True, normalizeWeights=0)
 
@@ -390,7 +389,7 @@ def import_skin_clusters(path, import_method='index'):
 
         node = cmds.listRelatives(skin_data['deformerWeight']['shapes'][0]['name'], parent=True)[0]
         skin_cluster = skin_data['deformerWeight']['weights'][0]['deformer']
-        skin_index = int(skin_cluster.split('_')[0][-2:])
+        skin_index = int(skin_cluster.split('_')[0][-1:])
 
         import_skin_cluster(node=node, path=r'{}/{}'.format(path, skin_file),
                             skin_index=skin_index, import_method=import_method)
