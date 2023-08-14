@@ -81,7 +81,8 @@ def export_nodes_and_connections(file_name, path, export_nodes=True, export_edge
                 inputs_list = [x for x in inputs_list if x.split('.')[0] in node_list]
 
                 for input_value in inputs_list:
-                    output_value = [x for x in cmds.listConnections(input_value, plugs=True, source=True)
+                    output_value = [x for x in cmds.listConnections(input_value, plugs=True, source=True,
+                                                                    skipConversionNodes=True)
                                     if node in x][0]
                     connections_string += '\nconnectAttr "{}" "{}";'.format(input_value, output_value)
 
