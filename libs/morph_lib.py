@@ -101,7 +101,8 @@ def create_morph_deformer(driver,
 
         if create_component_tag:
             # Use the component tag as a mask for the morph
-            cmds.setAttr('{}.input[{}].componentTagExpression'.format(morph_node, index), driver, type='string')
+            cmds.connectAttr('{}.componentTagExpression'.format(cmatch_node),
+                             '{}.input[{}].componentTagExpression'.format(morph_node, index))
 
     cmds.optionVar(intValue=('deformationUseComponentTags', deformation_use_component_tags_value))
 
