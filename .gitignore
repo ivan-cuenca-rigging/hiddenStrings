@@ -1,3 +1,4 @@
-/.idea/
-/builder/
-/temp/
+.idea
+builder
+temp
+.vscode
