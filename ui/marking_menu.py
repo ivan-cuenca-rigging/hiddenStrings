@@ -7,6 +7,7 @@ from maya import cmds
 
 from hiddenStrings import module_utils
 # Project imports
+from hiddenStrings import config as hiddenStrings_config
 from hiddenStrings.libs import guide_lib, blend_shape_lib, connection_lib, skin_lib, import_export_lib, trigger_lib
 from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, skin_windows, tools_windows
 
@@ -90,6 +91,10 @@ class MarkingMenu(object):
                       command=self.hide_local_rotation_axis)
         cmds.menuItem(parent=local_rotation_axis_hierarchy, label='Hide with hierarchy',
                       command=self.hide_local_rotation_axis_with_hierarchy)
+        
+        if hiddenStrings_config.dev_mode:
+            cmds.menuItem(parent=self.menu_name, divider=True)
+            cmds.menuItem(parent=self.menu_name, label='Reload modules', command=module_utils.reload)
 
         # ---------- East ----------
         if builder_exists:

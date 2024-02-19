@@ -8,3 +8,5 @@ markingMenu_click_input = 1  # 1 -> left click, 2 -> middle click, 3 -> right cl
 load_hotkeys_bool = True
 
 load_plugins_bool = True
+
+dev_mode = True
