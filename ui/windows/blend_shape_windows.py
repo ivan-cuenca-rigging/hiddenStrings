@@ -285,3 +285,109 @@ class AutomaticCorrectiveWindow(window_lib.Helper):
     @staticmethod
     def get_from_scene(text_field, *args):
         cmds.textFieldGrp(text_field, edit=True, text=cmds.ls(selection=True)[0])
+
+
+class multiplyVertexValues(window_lib.Helper):
+    def __init__(self, *args):
+        """
+        Create set vertex position multiplied by a value window, by 0 will remove its deformation
+        
+        :param title: str, title of the window
+        :param size: list, width and height
+        """
+        super(multiplyVertexValues, self).__init__(title='Multiply vertex values', size=(300, 210))
+        
+        self.axes_check_box = cmds.checkBoxGrp(label='Axes: ', label1='All', value1=True,
+                                               onCommand=self.set_axis_enable,
+                                               offCommand=self.set_axis_enable)
+        
+        self.axis_check_box = cmds.checkBoxGrp(numberOfCheckBoxes=3, label1='X ', label2='Y ', label3='Z ',
+                                               value1=True, value2=True, value3=True, enable=False)
+
+        self.button_0d1 = cmds.button(label='0.1', command=partial(self.run, 0.1), width=25)
+        self.button_0d2 = cmds.button(label='0.2', command=partial(self.run, 0.2), width=25)
+        self.button_0d3 = cmds.button(label='0.3', command=partial(self.run, 0.3), width=25)
+        self.button_0d4 = cmds.button(label='0.4', command=partial(self.run, 0.4), width=25)
+        self.button_0d5 = cmds.button(label='0.5', command=partial(self.run, 0.5), width=25)
+        self.button_0d6 = cmds.button(label='0.6', command=partial(self.run, 0.6), width=25)
+        self.button_0d7 = cmds.button(label='0.7', command=partial(self.run, 0.7), width=25)
+        self.button_0d8 = cmds.button(label='0.8', command=partial(self.run, 0.8), width=25)
+        self.button_0d9 = cmds.button(label='0.9', command=partial(self.run, 0.9), width=25)
+
+        self.button_0d25 = cmds.button(label='0.25', command=partial(self.run, 0.25), width=25)
+        self.button_0d75 = cmds.button(label='0.75', command=partial(self.run, 0.75), width=25)
+
+        self.value_field = cmds.floatFieldGrp(label="Value: ", columnWidth2=(35, 35))
+
+        # --------------------------------------------------------------------------------------------------------------
+        cmds.formLayout(
+            self.main_layout,
+            edit=True,
+            attachForm=[
+                (self.axes_check_box, "top", 10),
+                (self.axes_check_box, "left", -106),
+                (self.axis_check_box, "left", 36),
+                (self.button_0d25, "left", 137.5),
+                (self.button_0d1, "left", 5),
+                (self.button_0d75, "left", 137.5),
+                (self.value_field, "left", 5),
+            ],
+            attachControl=[
+                (self.axis_check_box, "top", 5, self.axes_check_box),
+                (self.button_0d25, "top", 5, self.axis_check_box),
+                (self.button_0d1, "top", 5, self.button_0d25),
+                (self.button_0d2, "top", 5, self.button_0d25),
+                (self.button_0d3, "top", 5, self.button_0d25),
+                (self.button_0d4, "top", 5, self.button_0d25),
+                (self.button_0d5, "top", 5, self.button_0d25),
+                (self.button_0d6, "top", 5, self.button_0d25),
+                (self.button_0d7, "top", 5, self.button_0d25),
+                (self.button_0d8, "top", 5, self.button_0d25),
+                (self.button_0d9, "top", 5, self.button_0d25),
+                (self.button_0d2, "left", 8.125, self.button_0d1),
+                (self.button_0d3, "left", 8.125, self.button_0d2),
+                (self.button_0d4, "left", 8.125, self.button_0d3),
+                (self.button_0d5, "left", 8.125, self.button_0d4),
+                (self.button_0d6, "left", 8.125, self.button_0d5),
+                (self.button_0d7, "left", 8.125, self.button_0d6),
+                (self.button_0d8, "left", 8.125, self.button_0d7),
+                (self.button_0d9, "left", 8.125, self.button_0d8),
+                (self.button_0d75, "top", 5, self.button_0d5),
+                (self.value_field, "top", 5, self.button_0d75),
+            ],
+        )
+
+    def set_axis_enable(self, *args):
+        if cmds.checkBoxGrp(self.axes_check_box, query=True, enable=True, value1=True):
+            cmds.checkBoxGrp(self.axis_check_box, edit=True, enable=False)
+        else:
+            cmds.checkBoxGrp(self.axis_check_box, edit=True, enable=True)
+
+    def run(self, value, *args):
+        axes = str()
+        if cmds.checkBoxGrp(self.axes_check_box, query=True, value1=True):
+            axes = 'xyz'
+        else:
+            if cmds.checkBoxGrp(self.axis_check_box, query=True, value1=True):
+                axes = "{}x".format(axes)
+            if cmds.checkBoxGrp(self.axis_check_box, query=True, value2=True):
+                axes = "{}y".format(axes)
+            if cmds.checkBoxGrp(self.axis_check_box, query=True, value3=True):
+                axes = "{}z".format(axes)
+
+        geo_vtx_list = cmds.ls(cmds.polyListComponentConversion(cmds.ls(selection=True), toVertex=True), flatten=True)
+        
+        for vtx in geo_vtx_list:
+            geo = vtx.split('.')[-2]
+            vtx_num = vtx.split('[')[-1].split(']')[0]
+            for axis in axes.lower():
+                vtx_value = cmds.getAttr('{}.pnts[{}].pnt{}'.format(geo, vtx_num, axis))
+                cmds.setAttr('{}.pnts[{}].pnt{}'.format(geo, vtx_num, axis), vtx_value*value)
+    
+    def test():
+        print("test")
+
+    def apply_command(self, *args):
+        value = cmds.floatFieldGrp(self.value_field, query=True, value1=True)
+
+        self.run(value=value)

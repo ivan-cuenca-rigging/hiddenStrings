@@ -112,6 +112,9 @@ class MarkingMenu(object):
 
         self.blend_shapes_menu(menu_parent=deformation_menu, radial_position='E')
 
+        cmds.menuItem(parent=deformation_menu, label='Transfer shape', radialPosition='SE',
+                      command=self.transfer_shape_command)
+        
         cmds.menuItem(parent=deformation_menu, label='Paint Skin Weights', radialPosition='NW',
                       command=cmds.ArtPaintSkinWeightsToolOptions)
 
@@ -145,11 +148,8 @@ class MarkingMenu(object):
         cmds.menuItem(parent=blend_shape_menu, label='Edit Blendshape / In-Between',
                       command=blend_shape_lib.edit_target_or_in_between)
 
-        cmds.menuItem(parent=blend_shape_menu, label='Sculpt tool',
-                      command=self.set_mesh_bulge_tool)
-
-        cmds.menuItem(parent=blend_shape_menu, label='Transfer shape',
-                      command=self.transfer_shape_command)
+        cmds.menuItem(parent=blend_shape_menu, label='Multiply vertex values',
+                      command=blend_shape_windows.multiplyVertexValues)
 
         cmds.menuItem(parent=blend_shape_menu, divider=True)
 
