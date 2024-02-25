@@ -170,6 +170,60 @@ class RenamerWindow(window_lib.Helper):
             if suffix:
                 cmds.rename(node, '{}{}'.format(node.split('|')[-1], suffix))
 
+        # rename blendShapes
+        if blend_shape_lib.get_blend_shapes_from_shape_editor():
+            for blend_shape in blend_shape_lib.get_blend_shapes_from_shape_editor():
+                if rename:
+                    blend_shape = cmds.rename(blend_shape, cmds.textFieldGrp(self.rename, query=True, text=True))
+
+                if increment:
+                    blend_shape = cmds.rename(
+                        blend_shape, "{}{}".format(blend_shape, increment)
+                    )
+                    increment = self.increment_string(increment)
+
+                if prefix:
+                    blend_shape = cmds.rename(
+                        blend_shape, "{}{}".format(prefix, blend_shape.split("|")[-1])
+                    )
+
+                if suffix:
+                    cmds.rename(
+                        blend_shape, "{}{}".format(blend_shape.split("|")[-1], suffix)
+                    )
+
+        # rename targets of blendShapes
+        if blend_shape_lib.get_targets_from_shape_editor():
+            for blend_shape_and_target in blend_shape_lib.get_targets_from_shape_editor(as_index=False):
+                blend_shape, target = blend_shape_and_target.split(".")
+                if rename:
+                    target = blend_shape_lib.rename_target(
+                        blend_shape=blend_shape,
+                        target=target,
+                        new_name=cmds.textFieldGrp(self.rename, query=True, text=True)
+                    )
+
+                if increment:
+                    target = blend_shape_lib.rename_target(
+                        blend_shape=blend_shape,
+                        target=target,
+                        new_name="{}{}".format(target, increment)
+                    )
+                    increment = self.increment_string(increment)
+
+                if prefix:
+                    target = blend_shape_lib.rename_target(
+                        blend_shape=blend_shape,
+                        target=target,
+                        new_name="{}{}".format(prefix, target.split("|")[-1]))
+
+                if suffix:
+                    target = blend_shape_lib.rename_target(
+                        blend_shape=blend_shape,
+                        target=target,
+                        new_name="{}{}".format(target.split("|")[-1], suffix),
+                    )
+
     def clean_command(self, *args):
         """
         Clean all fields of the window
