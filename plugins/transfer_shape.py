@@ -56,19 +56,23 @@ sourceFlagLong = '-source'
 targetFlag = '-t'
 targetFlagLong = '-target'
 
-worldSpaceFlag = '-ws'
-worldSpaceFlagLong = '-worldSpace'
+worldSpaceFlag = "-ws"
+worldSpaceFlagLong = "-worldSpace"
+
+helpFlag = "-h"
+helpFlagLong = "-help"
 
 
 class PluginCommand(OpenMaya.MPxCommand):
+    """
+    Transfer the shape of a mesh, nurbs, curve or lattice from first selection to the second selection.
+    Both nodes must have the same number of components
+    source, s : string
+    target, t : string
+    worldSpace, ws : Bool
+    help, h : Bool
+    """
     def __init__(self):
-        """
-        Transfer the shape of a mesh, nurbs, curve or lattice from first selection to the second selection.
-        Both nodes must have the same number of components
-        source, s : string
-        target, t : string
-        worldSpace, ws : Bool
-        """
         OpenMaya.MPxCommand.__init__(self)
 
         self.source = None
@@ -87,6 +91,13 @@ class PluginCommand(OpenMaya.MPxCommand):
         """
         args_data = OpenMaya.MArgDatabase(self.syntax(), *args)
 
+        if args_data.isFlagSet(helpFlag):
+            self.help = args_data.flagArgumentBool(helpFlag, 0)
+
+        if self.help:
+            self.print_help()
+            return
+        
         if args_data.isFlagSet(sourceFlag):
             self.source = args_data.flagArgumentString(sourceFlag, 0)
         else:
@@ -109,6 +120,10 @@ class PluginCommand(OpenMaya.MPxCommand):
         Command script
         """
         self.parse_arguments(*args)
+        
+        if self.help:
+            return
+        
         if self.world_space:
             self.om_space = OpenMaya.MSpace.kWorld
         else:
@@ -250,6 +265,26 @@ class PluginCommand(OpenMaya.MPxCommand):
         for key, value in source_points.items():
             cmds.xform('{}.{}'.format(self.target, key),
                        worldSpace=world_space, objectSpace=object_space, translation=value)
+    
+    @staticmethod
+    def print_help():
+        print('--------------------------------------------------------------------------------')
+        print('--------------------------------------------------------------------------------')
+        print(' ')
+        print('Transfer the shape of a mesh, nurbs, curve or lattice')
+        print('If source/target are not provided')
+        print('the transfer will occur from the first selection to the second selection.')
+        print('Both nodes must have the same number of components')
+        print(" ")
+        print('--------------------------------------------------------------------------------')
+        print(" ")
+        print('source, s : string')
+        print('target, t : string')
+        print('worldSpace, ws : Bool')
+        print('help, h : Bool')
+        print(" ")
+        print('--------------------------------------------------------------------------------')
+        print('--------------------------------------------------------------------------------')
 
 
 def command_creator():
@@ -269,6 +304,7 @@ def syntax_creator():
     syntax.addFlag(sourceFlag, sourceFlagLong, OpenMaya.MSyntax.kString)
     syntax.addFlag(targetFlag, targetFlagLong, OpenMaya.MSyntax.kString)
     syntax.addFlag(worldSpaceFlag, worldSpaceFlagLong, OpenMaya.MSyntax.kBoolean)
+    syntax.addFlag(helpFlag, helpFlagLong, OpenMaya.MSyntax.kBoolean)
 
     return syntax
 
@@ -297,7 +333,7 @@ def initializePlugin(plugin):
 
     try:
         m_plugin.registerCommand(command_name, command_creator, syntax_creator)
-    except:
+    except:  # noqa: E722
         sys.stderr.write('Failed to register command: {}'.format(command_name))
 
 
@@ -308,5 +344,5 @@ def uninitializePlugin(plugin):
     m_plugin = OpenMaya.MFnPlugin(plugin)
     try:
         m_plugin.deregisterCommand(command_name)
-    except:
+    except:  # noqa: E722
         sys.stderr.write('Failed to de-register command: {}'.format(command_name))
