@@ -5,8 +5,8 @@ import os
 # Maya imports
 from maya import cmds
 
-from hiddenStrings import module_utils
 # Project imports
+from hiddenStrings import module_utils
 from hiddenStrings import config as hiddenStrings_config
 from hiddenStrings.libs import guide_lib, blend_shape_lib, connection_lib, skin_lib, import_export_lib, trigger_lib
 from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, skin_windows, tools_windows
@@ -288,7 +288,7 @@ class MarkingMenu(object):
         maya_editors_menu = cmds.menuItem(parent=menu_parent, label='Maya editors', radialPosition=radial_position,
                                           subMenu=True)
 
-        cmds.menuItem(parent=maya_editors_menu, label='Shape Editor', radialPosition='N',
+        cmds.menuItem(parent=maya_editors_menu, label='Shape Editor', radialPosition='NE',
                       command=cmds.ShapeEditor)
 
         cmds.menuItem(parent=maya_editors_menu, label='Paint Skin Weights', radialPosition='NW',
@@ -300,7 +300,7 @@ class MarkingMenu(object):
         cmds.menuItem(parent=maya_editors_menu, label='Graph Editor', radialPosition='E',
                       command=cmds.GraphEditor)
 
-        cmds.menuItem(parent=maya_editors_menu, label='Reference Editor', radialPosition='NE',
+        cmds.menuItem(parent=maya_editors_menu, label='Reference Editor', radialPosition='N',
                       command=cmds.ReferenceEditor)
 
         cmds.menuItem(parent=maya_editors_menu, label='Component Editor', radialPosition='SW',
