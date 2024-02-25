@@ -127,10 +127,23 @@ class RenamerWindow(window_lib.Helper):
         if blend_shape_lib.get_targets_from_shape_editor():
             for blend_shape_and_target in blend_shape_lib.get_targets_from_shape_editor(as_index=False):
                 blend_shape, target = blend_shape_and_target.split('.')
-                blend_shape_lib.rename_target(blend_shape=blend_shape, target=target,
+                blend_shape_lib.rename_target(blend_shape=blend_shape, 
+                                              target=target,
                                               new_name=target.replace(
                                                   cmds.textFieldGrp(self.search_for, query=True, text=True),
                                                   cmds.textFieldGrp(self.replace_with, query=True, text=True)))
+
+        # Search and replace in betweens of targets of blendshapes                
+        if blend_shape_lib.get_in_betweens_from_shape_editor():
+            for in_between in blend_shape_lib.get_in_betweens_from_shape_editor(as_index=False):
+                in_between_name = '.'.join(in_between.split('.')[2:])
+                blend_shape_lib.rename_in_between(blend_shape=in_between.split('.')[0],
+                                                  target= in_between.split('.')[1],
+                                                  in_between=in_between_name,
+                                                  new_name=in_between.split('.')[2].replace(
+                                                      cmds.textFieldGrp(self.search_for, query=True, text=True),
+                                                      cmds.textFieldGrp(self.replace_with, query=True, text=True)))
+
 
     def search_and_replace_with_hierarchy_command(self, *args):
         """
@@ -223,6 +236,44 @@ class RenamerWindow(window_lib.Helper):
                         target=target,
                         new_name="{}{}".format(target.split("|")[-1], suffix),
                     )
+        
+        # rename in betweens of targets of blendshapes                
+        if blend_shape_lib.get_in_betweens_from_shape_editor():
+            for in_between in blend_shape_lib.get_in_betweens_from_shape_editor(as_index=False):
+                blend_shape = in_between.split('.')[0]
+                target = in_between.split('.')[1]
+                in_between_name = '.'.join(in_between.split('.')[2:])
+                blend_shape_lib.rename_in_between(blend_shape=blend_shape,
+                                                  target=target,
+                                                  in_between=in_between_name,
+                                                  new_name=in_between.split('.')[2].replace(
+                                                      cmds.textFieldGrp(self.search_for, query=True, text=True),
+                                                      cmds.textFieldGrp(self.replace_with, query=True, text=True)))
+
+                if rename:
+                    in_between_name = blend_shape_lib.rename_in_between(blend_shape=blend_shape,
+                                                                        target=target,
+                                                                        in_between=in_between_name,
+                        new_name=cmds.textFieldGrp(self.rename, query=True, text=True))
+
+                if increment:
+                    in_between_name = blend_shape_lib.rename_in_between(blend_shape=blend_shape,
+                                                                        target=target,
+                                                                        in_between=in_between_name,
+                        new_name="{}{}".format(in_between_name, increment))
+                    increment = self.increment_string(increment)
+
+                if prefix:
+                    in_between_name = blend_shape_lib.rename_in_between(blend_shape=blend_shape,
+                                                                        target=target,
+                                                                        in_between=in_between_name,
+                        new_name="{}{}".format(prefix, in_between_name))
+
+                if suffix:
+                    in_between_name = blend_shape_lib.rename_in_between(blend_shape=blend_shape,
+                                                                        target=target,
+                                                                        in_between=in_between_name,
+                        new_name="{}{}".format(in_between_name, suffix))
 
     def clean_command(self, *args):
         """

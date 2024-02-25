@@ -207,6 +207,24 @@ def get_next_target_index(blend_shape):
     return int(index)
 
 
+def get_in_between_value(blend_shape, target, in_between):
+    """
+    Get the in between value
+
+    :param str blend_shape: name of the blendshape
+    :param str target: name of the target
+    :param str in_between: name of the in between
+
+    return in between value
+    """
+    for value in get_target_values(blend_shape=blend_shape, target=target):
+        in_between_name = cmds.getAttr('{}.inbetweenInfoGroup[{}].inbetweenInfo[5{}].inbetweenTargetName'.format(
+                                                                            blend_shape,
+                                                                            get_target_index(blend_shape, target),
+                                                                            str(value).split('.')[-1]))
+        if in_between_name == in_between:
+            return value
+
 def get_blend_shapes_from_shape_editor():
     """
     Get blendShapes from the shape editor
@@ -215,12 +233,25 @@ def get_blend_shapes_from_shape_editor():
     return mel.eval('getShapeEditorTreeviewSelection(11)')
 
 
-def get_in_betweens_from_shape_editor():
+def get_in_betweens_from_shape_editor(as_index=True):
     """
     Get in-between targets from the shape editor
-    return target list [blendShape1.0.5, blendShape1.0.3, ...]
+    :param as_index: bool
+    return target list [blendShape1.0.5500, blendShape1.0.5300, ...]
     """
-    return mel.eval('getShapeEditorTreeviewSelection(16)')
+    selection_list = mel.eval("getShapeEditorTreeviewSelection(16)")
+    if not as_index:
+        selection_list = ['{}.{}.{}'.format(
+                                x.split('.')[0], 
+                                get_target_name(blend_shape=x.split('.')[0],
+                                                target_index=x.split('.')[1]),
+                                cmds.getAttr('{}.inbetweenInfoGroup[{}].inbetweenInfo[{}].inbetweenTargetName'.format(
+                                                                                                    x.split('.')[0],
+                                                                                                    x.split('.')[1],
+                                                                                                    x.split('.')[2])))
+                          for x in selection_list]
+
+    return selection_list
 
 
 def get_blend_shape_data(blend_shape):
@@ -373,12 +404,33 @@ def rename_target(blend_shape, target, new_name):
     :param blend_shape: str
     :param target: str
     :param new_name: str
+    :return: target name
     """
     if new_name != target:
         cmds.aliasAttr(new_name, '{}.{}'.format(blend_shape, target))
 
     return new_name
 
+
+def rename_in_between(blend_shape, target, in_between, new_name):
+    """
+    Rename in between name
+    :param blend_shape: str
+    :param target: str
+    :param in_between: str
+    :param new_name: str
+    :return: in between name
+    """
+    target_index = get_target_index(blend_shape, target)
+    in_between_value = str(get_in_between_value(blend_shape=blend_shape, target=target, in_between=in_between))
+    cmds.setAttr('{}.inbetweenInfoGroup[{}].inbetweenInfo[5{}].inbetweenTargetName'.format(
+                                                                                blend_shape,
+                                                                                target_index,
+                                                                                in_between_value.split('.')[-1]), 
+                new_name,
+                type='string')
+
+    return new_name
 
 def create_blend_shape(node, target_list=None):
     """
