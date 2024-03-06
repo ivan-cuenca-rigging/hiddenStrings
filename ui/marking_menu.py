@@ -112,7 +112,7 @@ class MarkingMenu(object):
 
         self.blend_shapes_menu(menu_parent=deformation_menu, radial_position='E')
 
-        cmds.menuItem(parent=deformation_menu, label='Transfer shape', radialPosition='SE',
+        cmds.menuItem(parent=deformation_menu, label='Transfer shape', radialPosition='N',
                       command=self.transfer_shape_command)
         
         cmds.menuItem(parent=deformation_menu, label='Paint Skin Weights', radialPosition='NW',

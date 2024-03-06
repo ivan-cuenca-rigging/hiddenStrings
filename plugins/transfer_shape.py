@@ -78,6 +78,8 @@ class PluginCommand(OpenMaya.MPxCommand):
         self.source = None
         self.target = None
 
+        self.help = False
+
         self.world_space = False
         self.om_space = None
 
