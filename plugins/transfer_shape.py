@@ -182,7 +182,6 @@ class PluginCommand(OpenMaya.MPxCommand):
         """
         Without this, the above redoIt and undoIt will not be called
         """
-
         return True
 
     def transfer_mesh_shape(self, source_points=None):
@@ -201,37 +200,79 @@ class PluginCommand(OpenMaya.MPxCommand):
         source.updateSurface()
         target.updateSurface()
 
+
+
     def transfer_nurbs_shape(self, source_points=None):
         """
         Transfer nurbs shape
         """
-        source = OpenMaya.MFnNurbsSurface(self.source)
-        target = OpenMaya.MFnNurbsSurface(self.target)
+        # I've tried with OpenMaya but it seems it does not work when working with blendshapes in edit mode
+        if self.world_space:
+            world_space = True
+            object_space = False
+        else:
+            world_space = False
+            object_space = True
+
+        # Get lattice points positions
+        source_point_list = cmds.ls('{}.cv[*][*]'.format(self.source), flatten=True)
+        target_point_list = cmds.ls('{}.cv[*][*]'.format(self.target), flatten=True)
 
         if not source_points:
-            source_points = source.cvPositions(self.om_space)
-            self.target_points_store = target.cvPositions(self.om_space)
+            source_points = dict()
+            self.target_points_store = dict()
 
-        target.setCVPositions(source_points, self.om_space)
+            for point_name in source_point_list:
+                point = point_name.split('.')[-1]
+                source_points[point] = cmds.xform(point_name, query=True,
+                                                worldSpace=world_space, objectSpace=object_space,
+                                                translation=True)
 
-        source.updateSurface()
-        target.updateSurface()
+            for point_name in target_point_list:
+                point = point_name.split('.')[-1]
+                self.target_points_store[point] = cmds.xform(point_name, query=True,
+                                                            worldSpace=world_space, objectSpace=object_space,
+                                                            translation=True)
+        # Set nurbs points positions
+        for key, value in source_points.items():
+            cmds.xform('{}.{}'.format(self.target, key),
+                    worldSpace=world_space, objectSpace=object_space, translation=value)
 
     def transfer_curve_shape(self, source_points=None):
         """
         Transfer curve shape
         """
-        source = OpenMaya.MFnNurbsCurve(self.source)
-        target = OpenMaya.MFnNurbsCurve(self.target)
+        # I've tried with OpenMaya but it seems it does not work when working with blendshapes in edit mode
+        if self.world_space:
+            world_space = True
+            object_space = False
+        else:
+            world_space = False
+            object_space = True
+
+        # Get lattice points positions
+        source_point_list = cmds.ls('{}.cv[*]'.format(self.source), flatten=True)
+        target_point_list = cmds.ls('{}.cv[*]'.format(self.target), flatten=True)
 
         if not source_points:
-            source_points = source.cvPositions(self.om_space)
-            self.target_points_store = target.cvPositions(self.om_space)
+            source_points = dict()
+            self.target_points_store = dict()
 
-        target.setCVPositions(source_points, self.om_space)
+            for point_name in source_point_list:
+                point = point_name.split('.')[-1]
+                source_points[point] = cmds.xform(point_name, query=True,
+                                                worldSpace=world_space, objectSpace=object_space,
+                                                translation=True)
 
-        source.updateCurve()
-        target.updateCurve()
+            for point_name in target_point_list:
+                point = point_name.split('.')[-1]
+                self.target_points_store[point] = cmds.xform(point_name, query=True,
+                                                            worldSpace=world_space, objectSpace=object_space,
+                                                            translation=True)
+        # Set curve points positions
+        for key, value in source_points.items():
+            cmds.xform('{}.{}'.format(self.target, key),
+                    worldSpace=world_space, objectSpace=object_space, translation=value)
 
     def transfer_lattice_shape(self, source_points=None):
         """
@@ -255,19 +296,19 @@ class PluginCommand(OpenMaya.MPxCommand):
             for point_name in source_point_list:
                 point = point_name.split('.')[-1]
                 source_points[point] = cmds.xform(point_name, query=True,
-                                                  worldSpace=world_space, objectSpace=object_space,
-                                                  translation=True)
+                                                worldSpace=world_space, objectSpace=object_space,
+                                                translation=True)
 
             for point_name in target_point_list:
                 point = point_name.split('.')[-1]
                 self.target_points_store[point] = cmds.xform(point_name, query=True,
-                                                             worldSpace=world_space, objectSpace=object_space,
-                                                             translation=True)
+                                                            worldSpace=world_space, objectSpace=object_space,
+                                                            translation=True)
         # Set lattices points positions
         for key, value in source_points.items():
             cmds.xform('{}.{}'.format(self.target, key),
-                       worldSpace=world_space, objectSpace=object_space, translation=value)
-    
+                    worldSpace=world_space, objectSpace=object_space, translation=value)
+
     @staticmethod
     def print_help():
         print('--------------------------------------------------------------------------------')
@@ -288,13 +329,11 @@ class PluginCommand(OpenMaya.MPxCommand):
         print('--------------------------------------------------------------------------------')
         print('--------------------------------------------------------------------------------')
 
-
 def command_creator():
     """
     Create the command
     """
     return PluginCommand()
-
 
 def syntax_creator():
     """
@@ -310,7 +349,6 @@ def syntax_creator():
 
     return syntax
 
-
 def maya_useNewAPI():
     """
     The presence of this function tells Maya that the plugin produces, and
@@ -319,7 +357,6 @@ def maya_useNewAPI():
     some hours wasted because of this :)
     """
     pass
-
 
 def initializePlugin(plugin):
     """
@@ -337,7 +374,6 @@ def initializePlugin(plugin):
         m_plugin.registerCommand(command_name, command_creator, syntax_creator)
     except:  # noqa: E722
         sys.stderr.write('Failed to register command: {}'.format(command_name))
-
 
 def uninitializePlugin(plugin):
     """
