@@ -31,7 +31,7 @@ def check_target(blend_shape, target):
     """
     check_blendshape(blend_shape=blend_shape)
 
-    targets_list = cmds.listAttr('{}.weight'.format(blend_shape), multi=True)
+    targets_list = get_blendshape_target_list(blend_shape=blend_shape)
     if targets_list and target in targets_list:
         return True
     else:
@@ -69,6 +69,9 @@ def get_blend_shape_name(node):
     :param node: str
     :return: blendShape name
     """
+    if not node:
+        logging.error('Invalid input for node')
+        return
     if len(node.split('_')) != 3:
         return '{}_{}'.format(node, usage_lib.blend_shape)
     else:
@@ -118,16 +121,11 @@ def get_blendshape_target_list(blend_shape):
     Get the blendshape targets names
     :param blend_shape
     """
-    # Get the number of targets
-    blend_shape_target_length = cmds.blendShape(blend_shape, query=True, weightCount=True)
-
-    # Get the target names
-    source_target_list = []
-    for i in range(blend_shape_target_length):
-        target_name = cmds.aliasAttr("{}.weight[{}]".format(blend_shape, i), query=True)
-        source_target_list.append(target_name)
-
-    return source_target_list
+    target_list = cmds.aliasAttr(blend_shape, query=True)
+    if target_list:
+        return target_list[0::2]
+    else:
+        return None
 
 
 def get_target_name(blend_shape, target_index):
@@ -137,22 +135,13 @@ def get_target_name(blend_shape, target_index):
     :param target_index: int
     :return: target name
     """
-    return cmds.listAttr('{}.weight[{}]'.format(blend_shape, target_index))[0]
+    target_list = cmds.aliasAttr(blend_shape, query=True)
+    target_dict = dict()
+    for target_name in target_list[1::2]:
+        index = target_list.index(target_name)
+        target_dict[target_name.split('[')[-1].split(']')[0]] = target_list[index - 1]
 
-
-def get_targets_from_shape_editor(as_index=True):
-    """
-    Get targets from the shape editor
-    :param as_index: bool
-    return target list as_index -> [blendShape1.0, blendShape1.1, ...] not as_index [blendShape1.target, ...]
-    """
-    selection_list = mel.eval('getShapeEditorTreeviewSelection(24)')
-    if not as_index:
-        selection_list = ['{}.{}'.format(x.split('.')[0],
-                                         get_target_name(blend_shape=x.split('.')[0],
-                                                         target_index=x.split('.')[1])) for x in selection_list]
-
-    return selection_list
+    return target_dict[str(target_index)]
 
 
 def get_target_values(blend_shape, target):
@@ -185,10 +174,15 @@ def get_target_index(blend_shape, target):
     :param target: str
     """
     check_blendshape(blend_shape=blend_shape)
+   
+    target_list = cmds.aliasAttr(blend_shape, query=True)
 
-    targets_list = cmds.listAttr('{}.weight'.format(blend_shape), multi=True)
-    if targets_list and target in targets_list:
-        return targets_list.index(target)
+    if target_list and target in target_list:
+        target_dict = dict()
+        for target_name in target_list[0::2]:
+            index = target_list.index(target)
+            target_dict[target_name] = target_list[index + 1].split('[')[-1].split(']')[0]
+        return int(target_dict[target])
     else:
         return None
 
@@ -200,11 +194,18 @@ def get_next_target_index(blend_shape):
     """
     check_blendshape(blend_shape=blend_shape)
 
-    if cmds.listAttr('{}.weight'.format(blend_shape), multi=True):
-        index = len(cmds.listAttr('{}.weight'.format(blend_shape), multi=True))
+    target_list = cmds.aliasAttr(blend_shape, query=True)
+    if target_list:
+        target_index_list = list()
+        for target_name in target_list[1::2]:
+            target_index = target_name.split('[')[-1].split(']')[0]
+            target_index_list.append(int(target_index))
+        index = max(target_index_list) + 1
+
     else:
         index = 0
-    return int(index)
+
+    return index
 
 
 def get_in_between_value(blend_shape, target, in_between):
@@ -230,7 +231,22 @@ def get_blend_shapes_from_shape_editor():
     Get blendShapes from the shape editor
     return blendShape list [blendShape1, blendShape2, ...]
     """
-    return mel.eval('getShapeEditorTreeviewSelection(11)')
+    return mel.eval('getShapeEditorTreeviewSelection(1)')
+
+
+def get_targets_from_shape_editor(as_index=True):
+    """
+    Get targets from the shape editor
+    :param as_index: bool
+    return target list as_index -> [blendShape1.0, blendShape1.1, ...] not as_index [blendShape1.target, ...]
+    """
+    selection_list = mel.eval('getShapeEditorTreeviewSelection(4)')
+    if not as_index:
+        selection_list = ['{}.{}'.format(x.split('.')[0],
+                                         get_target_name(blend_shape=x.split('.')[0],
+                                                         target_index=x.split('.')[1])) for x in selection_list]
+
+    return selection_list
 
 
 def get_in_betweens_from_shape_editor(as_index=True):
@@ -504,7 +520,8 @@ def remove_target(blend_shape, target):
     """
     check_blendshape(blend_shape=blend_shape)
 
-    cmds.removeMultiInstance('{}.{}'.format(blend_shape, target), b=True)
+    target_index = get_target_index(blend_shape=blend_shape, target=target)
+    mel.eval('blendShapeDeleteTargetGroup {} {}'.format(blend_shape, target_index))
 
 
 def remove_in_between(blend_shape, target, value):
@@ -559,18 +576,21 @@ def mirror_target(blend_shape, target):
         descriptor = target
         side = side_lib.left
         usage = usage_lib.corrective
-    mirror_target_name = '{}_{}_{}'.format(descriptor, side_lib.get_opposite_side(side), usage)
+    target_mirror_name = '{}_{}_{}'.format(descriptor, side_lib.get_opposite_side(side), usage)
 
     # Get target data
     target_data = get_target_data(blend_shape=blend_shape, target=target)
 
     # Set target data in the mirror target
-    set_target_data(blend_shape=blend_shape, target=mirror_target_name, target_data=target_data)
+    set_target_data(blend_shape=blend_shape, target=target_mirror_name, target_data=target_data)
 
     # Mirror target
     get_symmetry = cmds.symmetricModelling(query=True, symmetry=True)
-    target_index = get_target_index(blend_shape, mirror_target_name)
+
+    target_index = get_target_index(blend_shape, target_mirror_name)
+
     cmds.blendShape(blend_shape, edit=True, symmetryAxis='x', symmetrySpace=1, flipTarget=[0, target_index])
+
     if get_symmetry:
         cmds.symmetricModelling(symmetry=True)
     else:
@@ -598,7 +618,7 @@ def mirror_target(blend_shape, target):
                                                    edit=True,
                                                    regenerate=True,
                                                    target=get_target_index(blend_shape=blend_shape,
-                                                                           target=mirror_target_name))[0]
+                                                                           target=target_mirror_name))[0]
             else:
                 target_rebuild = cmds.sculptTarget(blend_shape,
                                                    edit=True,
@@ -610,7 +630,7 @@ def mirror_target(blend_shape, target):
                                                    edit=True,
                                                    regenerate=True,
                                                    target=get_target_index(blend_shape=blend_shape,
-                                                                           target=mirror_target_name),
+                                                                           target=target_mirror_name),
                                                    inbetweenWeight=target_value)[0]
 
             target_cv_list = cmds.ls('{}.{}[*]'.format(target_rebuild, component_type), flatten=True)
@@ -629,7 +649,8 @@ def mirror_target(blend_shape, target):
 
             cmds.delete(target_rebuild)
             cmds.delete(mirror_rebuild)
-
+    
+    logging.info(f'{target} has been transfered and flipped to --> {target_mirror_name}')
 
 def copy_target_connection(source=None, destination_list=None, *args):
     """
@@ -684,31 +705,40 @@ def transfer_blend_shape(source=None, destination=None, *args):
     :param source: str
     :param destination: str
     """
-    if not source and not destination:
+    if not source and not destination: # If the inputs are None
         blendshape_list = get_blend_shapes_from_shape_editor()
 
-        if len(blendshape_list) > 0:
+        if len(blendshape_list) >= 2: # If there is blendShapes selected in the shapeEditor
             source = blendshape_list[0]
             destination = blendshape_list[1]
-        else:
-            source = cmds.ls(selection=True)[0]
-            destination = cmds.ls(selection=True)[1]
+        else: # if the inputs are None and we dont have blendShapes selected in the shapeEditor then
+            selection_list = cmds.ls(selection=True)
+            if selection_list:
+                source = selection_list[0]
+                destination = selection_list[1]
 
-            if cmds.objectType(source, isType='transform'):
-                source = get_blend_shape(source)
-            if cmds.objectType(destination, isType='transform'):
-                destination = get_blend_shape(destination)
+                if cmds.objectType(source, isType='transform'):
+                    source = get_blend_shape(source)
+                if cmds.objectType(destination, isType='transform'):
+                    if get_blend_shape(destination):
+                        destination = get_blend_shape(destination)
+                    else:
+                        destination = create_blend_shape(node=destination)
+            else:
+                logging.error('select two geometries (source with blendShape and target)' +
+                              'or select blendShapes in the shapeEditor')
+                return
 
     # Create the source base geometry
-    source_base = cmds.rename(cmds.listRelatives(cmds.createNode('mesh'), parent=True)[0],
-                              '{}Base_{}_geo'.format(source.split('_')[0], source.split('_')[1]))
+    source_base = cmds.rename(cmds.listRelatives(cmds.createNode('mesh'), parent=True)[0], 
+                              '{}Base'.format(source))
     source_base_shape = cmds.listRelatives(source_base, shapes=True, noIntermediate=True)[0]
 
     cmds.connectAttr('{}.originalGeometry[0]'.format(source), '{}.inMesh'.format(source_base_shape))
 
     # Create the destination base geometry
-    destination_base = cmds.rename(cmds.listRelatives(cmds.createNode('mesh'), parent=True)[0],
-                                   '{}Base_{}_geo'.format(destination.split('_')[0], destination.split('_')[1]))
+    destination_base = cmds.rename(cmds.listRelatives(cmds.createNode('mesh'), parent=True)[0], 
+                                   '{}Base'.format(destination))
     destination_base_shape = cmds.listRelatives(destination_base, shapes=True, noIntermediate=True)[0]
 
     cmds.connectAttr('{}.originalGeometry[0]'.format(destination), '{}.inMesh'.format(destination_base_shape))
