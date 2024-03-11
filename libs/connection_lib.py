@@ -12,10 +12,12 @@ logging = logging.getLogger(__name__)
 
 def connect_3_axis(driver, driven, attr):
     """
-    connect attribute's x,y and z
-    :param driver: str
-    :param driven: str
-    :param attr: str
+    Connect the 3 axis
+
+    Args:
+        driver (str): name of the driver
+        driven (str): name of the driven
+        attr (str): name of the attribute
     """
     for axis in ['X', 'Y', 'Z']:
         cmds.connectAttr('{}.{}{}'.format(driver, attr, axis), '{}.{}{}'.format(driven, attr, axis), force=True)
@@ -23,36 +25,44 @@ def connect_3_axis(driver, driven, attr):
 
 def connect_translate(driver, driven):
     """
-    Connect translate
-    :param driver: str
-    :param driven: str
+    Connect the translation
+
+    Args:
+        driver (str): name of the driver
+        driven (str): name of the driven
     """
     connect_3_axis(driver, driven, 'translate')
 
 
 def connect_rotate(driver, driven):
     """
-    Connect rotation
-    :param driver: str
-    :param driven: str
+    Connect the rotation
+
+    Args:
+        driver (str): name of the driver
+        driven (str): name of the driven
     """
     connect_3_axis(driver, driven, 'rotate')
 
 
 def connect_scale(driver, driven):
     """
-    Connect scale
-    :param driver: str
-    :param driven: str
+    Connect the scale
+
+    Args:
+        driver (str): name of the driver
+        driven (str): name of the driven
     """
     connect_3_axis(driver, driven, 'scale')
 
 
 def connect_translate_rotate_scale(driver, driven):
     """
-    Connect translate, rotate and scale
-    :param driver: str
-    :param driven: str
+    Connect the translation, translation and scale
+
+    Args:
+        driver (str): name of the driver
+        driven (str): name of the driven
     """
     connect_translate(driver, driven)
     connect_rotate(driver, driven)
@@ -61,10 +71,14 @@ def connect_translate_rotate_scale(driver, driven):
 
 def format_constraint_name(driven, usage):
     """
-    Get constraint's name
-    :param driven: str
-    :param usage: str
-    :return: constraint's name
+    Format the name of the constraint
+
+    Args:
+        driven (str): name of the driven
+        usage (str): usage of the constraint
+
+    Returns:
+        str: constraint name format
     """
     node_desc, node_side, node_usage = driven.split('_')
     return '{}{}_{}_{}'.format(node_desc, node_usage.capitalize(), node_side, usage)
@@ -72,12 +86,14 @@ def format_constraint_name(driven, usage):
 
 def create_parent_constraint(driver, driven, *args, **kwargs):
     """
-    Create a parent constraint
-    :param driver: str
-    :param driven: str
-    :param args: maintain shape_offset, etc
-    :param kwargs: maintain shape_offset, etc
-    :return: parent constraint
+    Create a parentConstraint
+
+    Args:
+        driver (str): name of the driver
+        driven (str): name of the driven
+
+    Returns:
+        str: parentConstraint name
     """
     return cmds.parentConstraint(driver,
                                  driven,
@@ -87,12 +103,14 @@ def create_parent_constraint(driver, driven, *args, **kwargs):
 
 def create_orient_constraint(driver, driven, *args, **kwargs):
     """
-    Create a orient constraint
-    :param driver: str
-    :param driven: str
-    :param args: maintain shape_offset, etc
-    :param kwargs: maintain shape_offset, etc
-    :return: orient constraint
+    Create a orientConstraint
+
+    Args:
+        driver (str): name of the driver
+        driven (str): name of the driven
+
+    Returns:
+        str: orientConstraint name
     """
     cns = cmds.orientConstraint(driver,
                                 driven,
@@ -103,12 +121,14 @@ def create_orient_constraint(driver, driven, *args, **kwargs):
 
 def create_point_constraint(driver, driven, *args, **kwargs):
     """
-    Create a point constraint
-    :param driver: str
-    :param driven: str
-    :param args: maintain shape_offset, etc
-    :param kwargs: maintain shape_offset, etc
-    :return: point constraint
+    Create a pointConstraint
+
+    Args:
+        driver (str): name of the driver
+        driven (str): name of the driven
+
+    Returns:
+        str: pointConstraint name
     """
     cns = cmds.pointConstraint(driver,
                                driven,
@@ -119,12 +139,14 @@ def create_point_constraint(driver, driven, *args, **kwargs):
 
 def create_scale_constraint(driver, driven, *args, **kwargs):
     """
-    Create a scale constraint
-    :param driver: str
-    :param driven: str
-    :param args: maintain shape_offset, etc
-    :param kwargs: maintain shape_offset, etc
-    :return: scale constraint
+    Create a scaleConstraint
+
+    Args:
+        driver (str): name of the driver
+        driven (str): name of the driven
+
+    Returns:
+        str: scaleConstraint name
     """
     cns = cmds.scaleConstraint(driver,
                                driven,
@@ -135,12 +157,14 @@ def create_scale_constraint(driver, driven, *args, **kwargs):
 
 def create_aim_constraint(driver, driven, *args, **kwargs):
     """
-    Create a aim constraint
-    :param driver: str
-    :param driven: str
-    :param args: maintain shape_offset, etc
-    :param kwargs: maintain shape_offset, etc
-    :return: aim constraint
+    Create a aimConstraint
+
+    Args:
+        driver (str): name of the driver
+        driven (str): name of the driven
+
+    Returns:
+        str: aimConstraint name
     """
     cns = cmds.aimConstraint(driver,
                              driven,
@@ -151,12 +175,14 @@ def create_aim_constraint(driver, driven, *args, **kwargs):
 
 def create_pole_constraint(driver, driven, *args, **kwargs):
     """
-    Create a pole vector constraint
-    :param driver: str
-    :param driven: str
-    :param args: maintain shape_offset, etc
-    :param kwargs: maintain shape_offset, etc
-    :return: pole vector constraint
+    Create a poleVectorConstraint
+
+    Args:
+        driver (str): name of the driver
+        driven (str): name of the driven
+
+    Returns:
+        str: poleVectorConstraint name
     """
     cns = cmds.poleVectorConstraint(driver,
                                     driven,
@@ -166,6 +192,14 @@ def create_pole_constraint(driver, driven, *args, **kwargs):
 
 
 def create_pole_with_matrices(driver, driven, start_joint):
+    """
+    Create a pole vector constraint but with matrix nodes
+
+    Args:
+        driver (str): name of the driver
+        driven (str): name of the driven
+        start_joint (str): name of the start joint
+    """
     start_descriptor, start_side, start_usage = start_joint.split('_')
     start_usage_capitalize = '{}{}'.format(start_usage[0].upper(), start_usage[1:])
 
@@ -222,14 +256,18 @@ def connect_offset_parent_matrix(driver, driven,
                                  world=True):
     """
     Connect driver to the offsetParentMatrix of the driven
-    :param translate: bool
-    :param rotate: bool
-    :param scale: bool
-    :param shear: bool
-    :param driver: str
-    :param driven: str
-    :param world: bool
-    :return multMatrix node
+
+    Args:
+        driver (str): name of the driver
+        driven (str): name of the driven
+        translate (bool, optional): connect translate. Defaults to True.
+        rotate (bool, optional): connect rotate. Defaults to True.
+        scale (bool, optional): connect scale. Defaults to True.
+        shear (bool, optional): connect shear. Defaults to True.
+        world (bool, optional): True == worldMatrix. Defaults to True.
+
+    Returns:
+        str: multMatrix node name
     """
     if len(driven.split('_')) != 3:
         desc = driven
@@ -281,10 +319,12 @@ def connect_offset_parent_matrix(driver, driven,
 
 
 def connect_matrix_to_attribute(driver, driven_and_attr):
-    """
-    connect driver worldMatrix to an attribute, the result matrix will be the identity matrix
-    :param driver: str
-    :param driven_and_attr: str, e.g. rootOutputs_c_grp.root_c_ctr
+    """    
+    Connect driver worldMatrix to an attribute, the result matrix will be the identity matrix
+
+    Args:
+        driver (str): name of the driver
+        driven_and_attr (str): E.G. 'rootOutputs_c_grp.root_c_ctr'
     """
     node, attr = driven_and_attr.split('.')
     descriptor, side, usage = node.split('_')
@@ -304,9 +344,11 @@ def connect_matrix_to_attribute(driver, driven_and_attr):
 
 def connect_matrix_from_attribute(driver_and_attr, driven):
     """
-    connect an attribute to the offsetParentMatrix of the driven
-    :param driver_and_attr: str, e.g. rootOutputs_c_grp.root_c_ctr
-    :param driven: str
+    Connect an attribute to the offsetParentMatrix of the driven
+
+    Args:
+        driver_and_attr (str): E.G. 'rootOutputs_c_grp.root_c_ctr'
+        driven (str): name of the driven
     """
     descriptor, side, usage = driven.split('_')
     mult_matrix = '{}{}_{}_{}'.format(descriptor, usage.capitalize(), side, usage_lib.mult_matrix)
@@ -332,9 +374,11 @@ def connect_matrix_from_attribute(driver_and_attr, driven):
 
 def transform_to_offset_parent_matrix(node, world_space=False, *args):
     """
-    set matrix in the offsetParentMatrix and set transform to default
-    :param node: str
-    :param world_space: bool
+    Set matrix in the offsetParentMatrix and set transform to default
+
+    Args:
+        node (str): name of the node
+        world_space (bool, optional): True == worldSpace. Defaults to False.
     """
     if not node:
         node = cmds.ls(selection=True)[0]
@@ -355,9 +399,11 @@ def transform_to_offset_parent_matrix(node, world_space=False, *args):
 
 def offset_parent_matrix_to_transform(node, world_space=True, *args):
     """
-    set matrix in the transform and set offsetParentMatrix to default
-    :param node: str
-    :param world_space: bool
+    Set matrix in the transform and set offsetParentMatrix to default
+
+    Args:
+        node (str): name of the node
+        world_space (bool, optional): True == worldSpace. Defaults to True.
     """
     if not node:
         node = cmds.ls(selection=True)[0]
@@ -378,9 +424,12 @@ def offset_parent_matrix_to_transform(node, world_space=True, *args):
 def connect_point_matrix_mult_to_a_cv(driver, crv_and_cv):
     """
     connect only the position from a worldMatrix to a cv
-    :param driver: str
-    :param crv_and_cv: str, e.g. upArm_l_crvShape.cv[0]
+    
+    Args:
+        driver (str): name of the driver
+        crv_and_cv (str): E.G. 'upArm_l_crvShape.cv[0]'
     """
+
     crv = crv_and_cv.split('.')[0]
     cv = crv_and_cv.split('[')[-1].split(']')[0]
 
@@ -407,8 +456,14 @@ def connect_point_matrix_mult_to_a_cv(driver, crv_and_cv):
     cmds.connectAttr('{}.output'.format(point_matrix_mult), '{}.controlPoints[{}]'.format(crv, cv))
 
 
-def create_uvpin(nurbs,
-                 nodes):
+def create_uvpin(nurbs, node_list):
+    """
+    Create an uvPin
+
+    Args:
+        nurbs (str): name of the nurbs
+        node_list (list): list of nodes we want to attach to the uvPin
+    """
     descriptor, side = nurbs.split('_')[:2]
 
     uvpin_node = cmds.createNode('uvPin', name='{}_{}_{}'.format(descriptor, side, usage_lib.uvpin))
@@ -419,7 +474,7 @@ def create_uvpin(nurbs,
 
     cmds.connectAttr('{}.worldSpace[0]'.format(nurbs), '{}.deformedGeometry'.format(uvpin_node))
     index = 0
-    for node in nodes:
+    for node in node_list:
         transform_temp = cmds.createNode('transform')
         cmds.xform(transform_temp, worldSpace=True, matrix=cmds.xform(node, query=True, worldSpace=True, matrix=True))
         cpos_temp = cmds.createNode('closestPointOnSurface')
@@ -446,15 +501,19 @@ def create_follow(base,
                   pos=False,
                   default_value=True):
     """
-    create a follow, if rot or pos is True, the follow will be split
-    :param follow_name: str, if true use it as name
-    :param base: str, node or node + Attribute
-    :param driver: str, node or node + Attribute
-    :param driven: str
-    :param pos: bool
-    :param rot: bool
-    :param default_value: bool
-    :return blendMatrix output
+    Create a follow, if rot or pos is True, the follow will be split
+
+    Args:
+        base (_type_): name of the base. It can be 'node' or 'node.attribute'
+        driver (_type_): name of the driver. It can be 'node' or 'node.attribute'
+        driven (_type_): name of the driven
+        follow_name (_type_, optional): name of the follow. Defaults to None.
+        rot (bool, optional): follow only rotation. Defaults to False.
+        pos (bool, optional): follow only position. Defaults to False.
+        default_value (bool, optional): follow value by default. Defaults to True.
+
+    Returns:
+        str: blendMatrix output
     """
     driven_descriptor, driven_side, driven_usage = driven.split('_')
 

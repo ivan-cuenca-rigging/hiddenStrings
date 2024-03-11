@@ -11,9 +11,18 @@ logging = logging.getLogger(__name__)
 
 
 class Helper(node_lib.Helper):
+    """
+    guide Helper class
+
+    Args:
+        name (str): name of the guide
+    """
     def __init__(self, name):
         """
-        :param name: str
+        Initializes an instance of guide Helper
+
+        Args:
+            name (str): name of the guide
         """
         super(Helper, self).__init__(name)
         self.name = name
@@ -34,23 +43,29 @@ class Helper(node_lib.Helper):
     # ---------- Set Methods ----------
     def set_shape_color(self, color_key='yellow'):
         """
-        Override control's color
-        :param color_key: str, check valid colors in the lib
+        Override the control's color
+
+        Args:
+            color_key (str, optional): check valid colors in the spline_lib. Defaults to 'yellow'.
         """
         spline_lib.set_override_color([self.name], color_key=color_key)
 
     def set_shape(self, shape_name='sphere', shape_scale=0.25):
         """
-        Set guide's shape
-        :param shape_name: float
-        :param shape_scale: str, from libs/spline_shapes
+        Set the guide shape
+
+        Args:
+            shape_name (str): name of the shape node. defaults to 'sphere'
+            shape_scale (float, optional): _description_. Defaults to 1.
         """
         spline_lib.set_shape(node=self.name, shape_name=shape_name, shape_scale=shape_scale)
 
     def set_draw_label(self, value):
         """
-        break the incoming connection from guides_grp and set the draw label
-        :param value: bool
+        Break the incoming connection from guides_grp and set the draw label
+
+        Args:
+            value (int): 0 == bone, 1 == multi-child as box, 2 == None, 3 == joint
         """
         cmds.setAttr('{}.drawLabel'.format(self.name), value)
 
@@ -59,12 +74,15 @@ class Helper(node_lib.Helper):
                guide_shape_scale=0.25,
                parent=None):
         """
-        Create a guide
-        :param guide_shape_scale: float, scale of the guide's shape
-        :param parent: string
-        :return: guide's name
-        """
+        Creathe the guide
 
+        Args:
+            guide_shape_scale (float, optional): scale of the guide shape. Defaults to 0.25.
+            parent (str, optional): name of the guide's parent. Defaults to None.
+
+        Returns:
+            str: name of the guide
+        """
         # Check if exists
         if cmds.objExists(self.name):
             cmds.error('the {} already exists in the scene'.format(self.name))

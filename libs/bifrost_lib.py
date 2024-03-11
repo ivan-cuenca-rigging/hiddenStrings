@@ -21,9 +21,11 @@ bifrost_path = r'{}/autodesk/Bifrost/compounds'.format(os.path.dirname(
 def copy_bifrost_compound(source_file, destination_dir, force=True):
     """
     Copy bifrost compounds from folder to folder
-    :param source_file: string
-    :param destination_dir: string
-    :param force: bool
+
+    Args:
+        source_file (str): source file path
+        destination_dir (str): destination folder path
+        force (bool, optional): if the file is protected it will force it. Defaults to True.
     """
     destination_file = r'{}/{}'.format(destination_dir, source_file)
 
@@ -44,9 +46,11 @@ def copy_bifrost_compound(source_file, destination_dir, force=True):
 def copy_bifrost_compounds(source_dir, destination_dir, force=True):
     """
     Copy bifrost compounds from folder to folder
-    :param source_dir: string
-    :param destination_dir: string
-    :param force: bool
+
+    Args:
+        source_dir (str): source folder path
+        destination_dir (str): destination folder path
+        force (bool, optional): if the files are protected it will force them. Defaults to True.
     """
     compound_file_list = [x for x in os.listdir(source_dir) if x.endswith('.json')]
 
@@ -71,7 +75,12 @@ def copy_bifrost_compounds(source_dir, destination_dir, force=True):
 def import_compound(compound_namespace, compound_name):
     """
     Import compound into maya scene
-    :param compound_namespace: str
-    :param compound_name: str
+
+    Args:
+        compound_namespace (str): name of the namespace
+        compound_name (str): name of the compound
+
+    Returns:
+        str: name of the bifrost node imported
     """
     return mel.eval('bifrostGraph -importGraphAsShape "{}::{}"'.format(compound_namespace, compound_name))

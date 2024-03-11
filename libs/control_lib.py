@@ -11,9 +11,18 @@ logging = logging.getLogger(__name__)
 
 
 class Helper(node_lib.Helper, attribute_lib.Helper):
+    """
+    control Helper class
+
+    Args:
+        name (str): name of the control
+    """
     def __init__(self, name):
         """
-        :param name: str
+        Initializes an instance of control's Helper
+
+        Args:
+            name (str): name of the control
         """
         super(Helper, self).__init__(name)
 
@@ -32,24 +41,30 @@ class Helper(node_lib.Helper, attribute_lib.Helper):
     # ---------- Get and Set Methods ----------
     def get_shape(self):
         """
-        get the shapes' node
-        :return: shapes' list
+        Get the shape of the node
+
+        Returns:
+            list: list of the shapes
         """
         return spline_lib.get_shapes(self.name)
 
     def set_shape(self, shape_name, offset, shape_scale=1):
         """
-        Set a new shape for the control
-        :param shape_name: str, spline node name
-        :param offset: dict, E.g. shape_offset[ty]=1
-        :param shape_scale: float
+        Set the control shape
+
+        Args:
+            shape_name (str): name of the shape node
+            offset (dict): E.G. {translateY:1}
+            shape_scale (float, optional): _description_. Defaults to 1.
         """
         spline_lib.set_shape(node=self.name, shape_name=shape_name, shape_scale=shape_scale, shape_offset=offset)
 
     def set_shape_color(self, color_key='yellow'):
         """
-        Override control's color
-        :param color_key: str, check valid colors in the lib
+        Override the control's color
+
+        Args:
+            color_key (str, optional): check valid colors in the spline_lib. Defaults to 'yellow'.
         """
         spline_lib.set_override_color([self.name], color_key=color_key)
 
@@ -66,18 +81,22 @@ class Helper(node_lib.Helper, attribute_lib.Helper):
                shape_offset=False,
                color_key='yellow'):
         """
-        Create a control
-        :param as_joint: bool, if yes the control will be a joint if not, it will be a transform node
-        :param zero: bool, if yes it will create a zero group
-        :param parent: str, control's parent
-        :param matrix: matrix, control's matrix
-        :param matrix_translation: bool, if true only translation will be used
-        :param matrix_rotation: bool, if true only rotation will be used
-        :param shape: str, spline node's name
-        :param shape_scale: float
-        :param shape_offset: dict, E.g. shape_offset=dict(); shape_offset['translateY'] = 1
-        :param color_key: str, check color in the lib
-        :return: control's name
+        Create the control
+
+        Args:
+            as_joint (bool, optional): True == control will be a joint else: will be a transform node. Defaults to True.
+            zero (bool, optional): create zero node. Defaults to False.
+            parent (_type_, optional): parent of the control. Defaults to None.
+            matrix (_type_, optional): matrix of the control. Defaults to None.
+            matrix_translation (bool, optional): True == only translation will be used. Defaults to False.
+            matrix_rotation (bool, optional): True == only rotation will be used. Defaults to False.
+            shape (_type_, optional): name of the spline node. Defaults to None.
+            shape_scale (float, optional): scale of the control shape. Defaults to 1.
+            shape_offset (dict, optional): E.G. {'translateY': 1}. Defaults to False.
+            color_key (str, optional): check color in the spline_lib. Defaults to 'yellow'.
+
+        Returns:
+            str: name of the control
         """
         # Check if the control already exists
         if cmds.objExists(self.name):

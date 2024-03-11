@@ -13,8 +13,10 @@ logging = logging.getLogger(__name__)
 
 def check_blendshape(blend_shape):
     """
-    Check if the blendShape node exists and if it is a blendShape
-    :param blend_shape: str
+    Check if the blendshape node exists and if it is a blendShape
+
+    Args:
+        blend_shape (str): name of the blendshape
     """
     if not cmds.objExists(blend_shape):
         cmds.error('{} does not exists in the scene'.format(blend_shape))
@@ -24,10 +26,14 @@ def check_blendshape(blend_shape):
 
 def check_target(blend_shape, target):
     """
-    Check if the blendS shape target already exists
-    :param blend_shape: str
-    :param target: str
-    :return: bool
+    Check if the blendshape target already exists
+
+    Args:
+        blend_shape (str): name of the blendshape
+        target (str): name of the target
+
+    Returns:
+        bool: True == target exists
     """
     check_blendshape(blend_shape=blend_shape)
 
@@ -40,11 +46,15 @@ def check_target(blend_shape, target):
 
 def check_in_between(blend_shape, target, value):
     """
-    Check if the blendS shape target in-between already exists
-    :param blend_shape: str
-    :param target: str
-    :param value: float
-    :return: bool
+    Check if the blendshape target in-between already exists
+
+    Args:
+        blend_shape (str): name of the blendshape
+        target (str): name of the target
+        value (float): value of the in-between
+
+    Returns:
+        bool: True == in-between exists
     """
     target_index = get_target_index(blend_shape=blend_shape, target=target)
     target_data = cmds.listAttr('{}.inputTarget[0].inputTargetGroup[{}]'.format(blend_shape, target_index), multi=True)
@@ -65,9 +75,13 @@ def check_in_between(blend_shape, target, value):
 
 def get_blend_shape_name(node):
     """
-    Format the blend_shape_name
-    :param node: str
-    :return: blendShape name
+    Format the blendshape name giving a node
+
+    Args:
+        node (str): node name
+
+    Returns:
+        str: blendshape name formatted
     """
     if not node:
         logging.error('Invalid input for node')
@@ -83,9 +97,13 @@ def get_blend_shape_name(node):
 
 def get_blend_shape(node):
     """
-    Find blendShape attached to the node
-    :param node: str
-    :return: blendshape
+    Get blendShape attached to the node
+
+    Args:
+        node (str): name of the node
+
+    Returns:
+        str: blendshape node name
     """
     blend_shape = None
     inputs_list = cmds.listHistory(node, interestLevel=1, pruneDagObjects=True)
@@ -99,8 +117,12 @@ def get_blend_shape(node):
 def get_blend_shape_node(blend_shape):
     """
     Get the node deformed by the blendShape
-    :param blend_shape: str
-    :return: node
+
+    Args:
+        blend_shape (str): name of the blendshape
+
+    Returns:
+        str: node name
     """
     node_shape = cmds.blendShape(blend_shape, query=True, geometry=True)[0]
     node = cmds.listRelatives(node_shape, parent=True)[0]
@@ -110,8 +132,12 @@ def get_blend_shape_node(blend_shape):
 def get_blend_shape_index(blend_shape):
     """
     Get the blendShape index
-    :param blend_shape: string
-    return index
+
+    Args:
+        blend_shape (str): name of the blendshape
+
+    Returns:
+        str: blendshape index in the shapeEditor
     """
     return cmds.listConnections('{}.midLayerParent'.format(blend_shape), plugs=True)[0].split('[')[-1].split(']')[0]
 
@@ -119,7 +145,12 @@ def get_blend_shape_index(blend_shape):
 def get_blendshape_target_list(blend_shape):
     """
     Get the blendshape targets names
-    :param blend_shape
+
+    Args:
+        blend_shape (str): name of the blendshape
+
+    Returns:
+        list: get the blendshape target list
     """
     target_list = cmds.aliasAttr(blend_shape, query=True)
     if target_list:
@@ -131,9 +162,13 @@ def get_blendshape_target_list(blend_shape):
 def get_target_name(blend_shape, target_index):
     """
     Get the target's name
-    :param blend_shape: str
-    :param target_index: int
-    :return: target name
+
+    Args:
+        blend_shape (str): name of the blendshape
+        target_index (float): number of the target
+
+    Returns:
+        str: target's name
     """
     target_list = cmds.aliasAttr(blend_shape, query=True)
     target_dict = dict()
@@ -147,9 +182,13 @@ def get_target_name(blend_shape, target_index):
 def get_target_values(blend_shape, target):
     """
     Get the values of the in-betweens of a target (include the 1.0 value)
-    :param blend_shape: str
-    :param target: str
-    :return: target values list
+
+    Args:
+        blend_shape (str): name of the blendshape
+        target (str): target name
+
+    Returns:
+        list: values of the in-betweens, including the 1.0
     """
     check_blendshape(blend_shape=blend_shape)
 
@@ -170,8 +209,13 @@ def get_target_values(blend_shape, target):
 def get_target_index(blend_shape, target):
     """
     Get the index of a blendshape target
-    :param blend_shape: str
-    :param target: str
+
+    Args:
+        blend_shape (str): name of the blendshape
+        target (str): name of the target
+
+    Returns:
+        int: index of the target
     """
     check_blendshape(blend_shape=blend_shape)
    
@@ -190,7 +234,12 @@ def get_target_index(blend_shape, target):
 def get_next_target_index(blend_shape):
     """
     Get the next target index of a blendshape
-    :param blend_shape: str
+
+    Args:
+        blend_shape (str): name of the blendshape
+
+    Returns:
+        int: next available target index of a blendshape
     """
     check_blendshape(blend_shape=blend_shape)
 
@@ -212,11 +261,13 @@ def get_in_between_value(blend_shape, target, in_between):
     """
     Get the in between value
 
-    :param str blend_shape: name of the blendshape
-    :param str target: name of the target
-    :param str in_between: name of the in between
+    Args:
+        blend_shape (str): name of the blendshape
+        target (str): name of the target
+        in_between (str): in_between name
 
-    return in between value
+    Returns:
+        float: in-between value
     """
     for value in get_target_values(blend_shape=blend_shape, target=target):
         in_between_name = cmds.getAttr('{}.inbetweenInfoGroup[{}].inbetweenInfo[5{}].inbetweenTargetName'.format(
@@ -229,7 +280,9 @@ def get_in_between_value(blend_shape, target, in_between):
 def get_blend_shapes_from_shape_editor():
     """
     Get blendShapes from the shape editor
-    return blendShape list [blendShape1, blendShape2, ...]
+
+    Returns:
+        list: [blendShape1, blendShape2, ...]
     """
     return mel.eval('getShapeEditorTreeviewSelection(1)')
 
@@ -237,8 +290,12 @@ def get_blend_shapes_from_shape_editor():
 def get_targets_from_shape_editor(as_index=True):
     """
     Get targets from the shape editor
-    :param as_index: bool
-    return target list as_index -> [blendShape1.0, blendShape1.1, ...] not as_index [blendShape1.target, ...]
+
+    Args:
+        as_index (bool, optional): if we need the targets as index. Defaults to True.
+
+    Returns:
+        list: as_index == [blendShape1.0, blendShape1.1, ...] else [blendShape1.target, ...]
     """
     selection_list = mel.eval('getShapeEditorTreeviewSelection(4)')
     if not as_index:
@@ -252,8 +309,12 @@ def get_targets_from_shape_editor(as_index=True):
 def get_in_betweens_from_shape_editor(as_index=True):
     """
     Get in-between targets from the shape editor
-    :param as_index: bool
-    return target list [blendShape1.0.5500, blendShape1.0.5300, ...]
+
+    Args:
+        as_index (bool, optional): if we need the in-between as index. Defaults to True.
+
+    Returns:
+        list: [blendShape1.0.5500, blendShape1.0.5300, ...]
     """
     selection_list = mel.eval("getShapeEditorTreeviewSelection(16)")
     if not as_index:
@@ -273,8 +334,12 @@ def get_in_betweens_from_shape_editor(as_index=True):
 def get_blend_shape_data(blend_shape):
     """
     Get blendshape data, including target in-between values and deltas
-    :param blend_shape: str
-    :return: blend_shape_data
+
+    Args:
+        blend_shape (str): name of the blendshape
+
+    Returns:
+        dict: blendshape data
     """
     check_blendshape(blend_shape=blend_shape)
 
@@ -296,9 +361,13 @@ def get_blend_shape_data(blend_shape):
 def get_target_data(blend_shape, target):
     """
     Get target data, including in-betweens values and deltas
-    :param blend_shape: str
-    :param target: str
-    :return: target_data
+
+    Args:
+        blend_shape (str): name of the blendshape
+        target (str): name of the target
+
+    Returns:
+        dict: target data
     """
     target_dict = dict()
 
@@ -333,9 +402,11 @@ def get_target_data(blend_shape, target):
 
 def set_blendshape_data(blend_shape, blend_shape_data):
     """
-    set blendShape data including targets, in-betweens values and deltas
-    :param blend_shape: str
-    :param blend_shape_data: dict
+    Set blendShape data including targets, in-betweens values and deltas
+
+    Args:
+        blend_shape (str): name of the blendshape
+        blend_shape_data (dict): blendshape data dict from get_blend_shape_data
     """
     for target in blend_shape_data['targets']:
         set_target_data(blend_shape=blend_shape, target=target, target_data=blend_shape_data['targets'][target])
@@ -343,10 +414,12 @@ def set_blendshape_data(blend_shape, blend_shape_data):
 
 def set_target_data(blend_shape, target, target_data):
     """
-    set target data including in-betweens values and deltas
-    :param blend_shape: str
-    :param target: str
-    :param target_data: dict
+    Set target data including in-betweens values and deltas
+
+    Args:
+        blend_shape (str): name of the blendshape
+        target (str): name of the target
+        target_data (dict): blendshape target data dict from the get_target_data
     """
     if not check_target(blend_shape=blend_shape, target=target):
         add_target(blend_shape=blend_shape, target=target)
@@ -395,9 +468,13 @@ def set_target_data(blend_shape, target, target_data):
 
 def rename_blend_shape(blend_shape):
     """
-    Rename blendShape name
-    :param blend_shape: str
-    :return: blendShape name
+    Rename a blendshape with the get_blendshape_name value
+
+    Args:
+        blend_shape (str): name of the blendshape
+
+    Returns:
+        str: new name of the blendshape
     """
     node_shape = cmds.blendShape(blend_shape, query=True, geometry=True)[0]
     node = cmds.listRelatives(node_shape, parent=True)[0]
@@ -416,11 +493,15 @@ def rename_all_blend_shapes():
 
 def rename_target(blend_shape, target, new_name):
     """
-    Rename target name
-    :param blend_shape: str
-    :param target: str
-    :param new_name: str
-    :return: target name
+    Rename a blendshape target
+
+    Args:
+        blend_shape (str): name of the blendshape
+        target (str): name of the target
+        new_name (str): new name for the target
+
+    Returns:
+        str: new target name
     """
     if new_name != target:
         cmds.aliasAttr(new_name, '{}.{}'.format(blend_shape, target))
@@ -430,12 +511,16 @@ def rename_target(blend_shape, target, new_name):
 
 def rename_in_between(blend_shape, target, in_between, new_name):
     """
-    Rename in between name
-    :param blend_shape: str
-    :param target: str
-    :param in_between: str
-    :param new_name: str
-    :return: in between name
+    Rename an in-between target
+
+    Args:
+        blend_shape (str): name of the blendshape
+        target (str): name of the target
+        in_between (str): name of the in-between
+        new_name (str): new name for the in-betwee ntarget
+
+    Returns:
+        str: new in-between target
     """
     target_index = get_target_index(blend_shape, target)
     in_between_value = str(get_in_between_value(blend_shape=blend_shape, target=target, in_between=in_between))
@@ -450,10 +535,14 @@ def rename_in_between(blend_shape, target, in_between, new_name):
 
 def create_blend_shape(node, target_list=None):
     """
-    create a blendShape
-    :param node: str, geometry, nurbs, curve, etc
-    :param target_list: list, if None it will create a blendshape without targets
-    :return: blendShape
+    Create a blendshape
+
+    Args:
+        node (str): name of the node
+        target_list (list, optional): list of targets, None == blendshape without targets. Defaults to None.
+
+    Returns:
+        str: name of the blendshape
     """
     blend_shape = cmds.blendShape(node, topologyCheck=False, name=get_blend_shape_name(node))[0]
     if target_list:
@@ -466,9 +555,13 @@ def create_blend_shape(node, target_list=None):
 def add_target(blend_shape, target):
     """
     Add target to an existing blendShape
-    :param blend_shape: str
-    :param target: str
-    :return: target
+
+    Args:
+        blend_shape (str): name of the blendshape
+        target (str): name of the new target
+
+    Returns:
+        str: target name
     """
     check_blendshape(blend_shape=blend_shape)
     node = get_blend_shape_node(blend_shape=blend_shape)
@@ -489,11 +582,13 @@ def add_target(blend_shape, target):
 
 def add_in_between(blend_shape, existing_target, in_between_target, value):
     """
-    Add target to an existing blendShape
-    :param blend_shape: str
-    :param existing_target: str
-    :param in_between_target: str
-    :param value: float, 0 to 1
+    Add an in-between to a target
+
+    Args:
+        blend_shape (str): name of the blendshape
+        existing_target (str): name of the target
+        in_between_target (str): name of the in-between target
+        value (float): from 0 to 1
     """
     check_blendshape(blend_shape=blend_shape)
     value = float(value)
@@ -514,9 +609,11 @@ def add_in_between(blend_shape, existing_target, in_between_target, value):
 
 def remove_target(blend_shape, target):
     """
-    Remove target from an existing blendShape
-    :param blend_shape: str
-    :param target: str
+    Remove a target from its blendshape
+
+    Args:
+        blend_shape (str): name of the blendshape
+        target (str): name of the target
     """
     check_blendshape(blend_shape=blend_shape)
 
@@ -526,10 +623,12 @@ def remove_target(blend_shape, target):
 
 def remove_in_between(blend_shape, target, value):
     """
-    Remove in-between from an existing target
-    :param blend_shape: str
-    :param target: str
-    :param value: float
+    Remove an in-between from its target
+
+    Args:
+        blend_shape (str): name of the blendshape
+        target (str): name of the target
+        value (float): from 0 to 1. Value of the in-between
     """
     check_blendshape(blend_shape=blend_shape)
 
@@ -565,9 +664,11 @@ def edit_target_or_in_between(*args):
 
 def mirror_target(blend_shape, target):
     """
-    Mirror blendShape target (It only works with geometries for now)
-    :param blend_shape: str
-    :param target: str
+    Mirror blendShape target 
+
+    Args:
+        blend_shape (str): name of the blendshape
+        target (str): name of the target
     """
     # Get mirror target name
     if len(target.split('_')) == 3:
@@ -650,13 +751,15 @@ def mirror_target(blend_shape, target):
             cmds.delete(target_rebuild)
             cmds.delete(mirror_rebuild)
     
-    logging.info(f'{target} has been transfered and flipped to --> {target_mirror_name}')
+    logging.info('{} has been transfered and flipped to --> {}'.format(target, target_mirror_name))
 
 def copy_target_connection(source=None, destination_list=None, *args):
     """
-    copy blendShape target's connections
-    :param source: str, blendShape.target
-    :param destination_list: list, [blendShape.target, ...]
+    Copy blendShape target's connections
+
+    Args:
+        source (str, optional): name of the source target. None == selection 0. Defaults to None.
+        destination_list (str, optional): name of the destination target. None == selection 1. Defaults to None.
     """
     if not source and not destination_list:
         target_selection_list = get_targets_from_shape_editor(as_index=False)
@@ -671,10 +774,12 @@ def copy_target_connection(source=None, destination_list=None, *args):
 
 
 def copy_blendshape_connections(source=None, destination_list=None, *args):
-    """
-    copy blendShape targets' connections
-    :param source: str, blendShape
-    :param destination_list: list, [blendShape1, ...]
+    """_summary_
+    Copy blendShape targets' connections
+
+    Args:
+        source (str, optional): name of the source blendshape. None == selection 0. Defaults to None.
+        destination_list (list, optional): [blendShape1, ...]. None == selection 1, 2, 3.... Defaults to None.
     """
     if not source and not destination_list:
         blendshape_list = get_blend_shapes_from_shape_editor()
@@ -701,9 +806,11 @@ def copy_blendshape_connections(source=None, destination_list=None, *args):
 
 def transfer_blend_shape(source=None, destination=None, *args):
     """
-    Transfer blendShapes
-    :param source: str
-    :param destination: str
+    Transfer blendshape from source to destination
+
+    Args:
+        source (str, optional): name of the source blendshape. None == selection 0. Defaults to None.
+        destination (str, optional): name of the destination blendshape. None == selection 1. Defaults to None.
     """
     if not source and not destination: # If the inputs are None
         blendshape_list = get_blend_shapes_from_shape_editor()
@@ -798,7 +905,9 @@ def transfer_blend_shape(source=None, destination=None, *args):
 def order_shape_editor_blend_shapes(blend_shape_list):
     """
     Re-order the blend shapes in the shape editor
-    :param blend_shape_list: list
+
+    Args:
+        blend_shape_list (list): new blendshape order
     """
     # Shape editor index order
     blend_shape_index_order = cmds.getAttr('shapeEditorManager.blendShapeDirectory[0].childIndices')
@@ -828,11 +937,13 @@ def automatic_corrective(geometry_name='test_c_geo',
                          create_sdk=True):
     """
     Creates a blendshape target with a delta mush
-    :param geometry_name: str
-    :param control_name: str
-    :param attr_name: str
-    :param attr_value: float
-    :param create_sdk: bool
+
+    Args:
+        geometry_name (str, optional): name of the geometry. Defaults to 'test_c_geo'.
+        control_name (str, optional): name of the control. Defaults to 'test_c_ctr'.
+        attr_name (str, optional): name of the attribute. Defaults to 'rotateZ'.
+        attr_value (int, optional): value of the attribute. Defaults to -90.
+        create_sdk (bool, optional): Create set driven key curve. Defaults to True.
     """
     if len(control_name.split('_')) == 3:
         control_descriptor, control_side = control_name.split('_')[:2]

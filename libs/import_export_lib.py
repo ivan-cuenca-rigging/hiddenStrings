@@ -14,9 +14,14 @@ logging = logging.getLogger(__name__)
 
 def export_selection(file_name, path):
     """
-    Export selection to json
-    :param file_name: str
-    :param path: str
+    Expport selection to json
+
+    Args:
+        file_name (str): name of the file
+        path (str): export file folder
+
+    Returns:
+        list: selection list exported to the file
     """
     if not os.path.exists(path):
         os.makedirs(path)
@@ -34,8 +39,13 @@ def export_selection(file_name, path):
 
 def import_selection(path):
     """
-    import selection to json
-    :param path: str
+    Import selection from json
+
+    Args:
+        path (str): full path of the file to import
+
+    Returns:
+        list: selection list imported from the file
     """
     file_name = os.path.basename(path).split('.json')[0]
     path = os.path.dirname(path)
@@ -51,12 +61,14 @@ def import_selection(path):
 
 def export_nodes_and_connections(file_name, path, export_nodes=True, export_edges=False, export_connections=True):
     """
-    Export nodes and connections to .ma file
-    :param file_name: str
-    :param path: str
-    :param export_nodes: bool
-    :param export_edges: bool
-    :param export_connections: bool
+    Export nodes and connections to an .ma file
+
+    Args:
+        file_name (str): name of the file
+        path (str): export file folder
+        export_nodes (bool, optional): True == export nodes. Defaults to True.
+        export_edges (bool, optional): True == export edges. Defaults to False.
+        export_connections (bool, optional): True == export connections. Defaults to True.
     """
     node_list = cmds.ls(sl=True)
     cmds.file(r'{}/{}.ma'.format(path, file_name), type='mayaAscii', exportSelectedStrict=True, force=True)
@@ -126,11 +138,13 @@ def export_nodes_and_connections(file_name, path, export_nodes=True, export_edge
 def import_nodes_and_connections(path, import_nodes=True, import_connections=True, search_for=None, replace_with=None):
     """
     Import connections from mel file
-    :param path: str
-    :param import_nodes: bool
-    :param import_connections: bool
-    :param search_for: str; use "," for more than once
-    :param replace_with: str; use "," for more than once
+
+    Args:
+        path (_type_): full path of the file to import
+        import_nodes (bool, optional): True == import nodes. Defaults to True.
+        import_connections (bool, optional): True == import connections. Defaults to True.
+        search_for (_type_, optional): search string. Use "," for more than once. Defaults to None.
+        replace_with (_type_, optional): replace string. Use "," for more than once. Defaults to None.
     """
     if search_for:
         search_and_replace_in_file(path, search_for=search_for, replace_with=replace_with)
@@ -173,14 +187,25 @@ def import_nodes_and_connections(path, import_nodes=True, import_connections=Tru
 
 
 def import_obj(path):
+    """
+    Import obj
+
+    Args:
+        path (str): full path of the file to import
+
+    Returns:
+        str: file path
+    """
     return cmds.file(path, type='OBJ', i=True, force=True, returnNewNodes=True)  # i = import
 
 
 def export_blend_shape(node, path):
     """
     Export blendShape of the node given
-    :param node: str
-    :param path: str
+
+    Args:
+        node (str): node of the node deformed by the blendshape we want to export
+        path (str): export file folder
     """
     if not cmds.objExists(node):
         cmds.error('{} does not exists in the scene'.format(node))
@@ -201,8 +226,10 @@ def export_blend_shape(node, path):
 def export_blend_shapes(node_list, path):
     """
     Export blendShapes of the nodes given
-    :param node_list: list
-    :param path: str
+
+    Args:
+        node_list (list): list of nodes deformed by the blendshapes we want to export
+        path (str): export file folder
     """
     for node in node_list:
         export_blend_shape(node=node, path=path)
@@ -211,8 +238,10 @@ def export_blend_shapes(node_list, path):
 def import_blend_shape(node, path):
     """
     Import blendShape from path
-    :param node: str
-    :param path: str
+
+    Args:
+        node (str): node affected by the blendshape imported
+        path (str): full file path to import
     """
     file_name = os.path.basename(path).split('.json')[0]
     path = os.path.dirname(path)
@@ -233,7 +262,9 @@ def import_blend_shape(node, path):
 def import_blend_shapes(path):
     """
     Import all json blendShapes from folder
-    :param path: string
+
+    Args:
+        path (str): folder path to import
     """
     file_list = [x for x in os.listdir(path) if x.endswith('.json')]
     for blend_shape_file in file_list:
