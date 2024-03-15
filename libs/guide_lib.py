@@ -31,7 +31,7 @@ class Helper(node_lib.Helper):
         self.guides_grp = 'guides_{}_{}'.format(side_lib.center, usage_lib.group)
         self.vis_labels_attribute = 'visLabels'
 
-    #
+
     # ---------- Checks Methods ----------
     def check_usage(self):
         """
@@ -39,6 +39,7 @@ class Helper(node_lib.Helper):
         """
         if self.get_usage() not in usage_lib.guide_valid_usages:
             logging.info('this guide has not a valid usage, use "{}".'.format(usage_lib.guide_valid_usages))
+
 
     # ---------- Set Methods ----------
     def set_shape_color(self, color_key='yellow'):
@@ -50,6 +51,7 @@ class Helper(node_lib.Helper):
         """
         spline_lib.set_override_color([self.name], color_key=color_key)
 
+
     def set_shape(self, shape_name='sphere', shape_scale=0.25):
         """
         Set the guide shape
@@ -60,6 +62,7 @@ class Helper(node_lib.Helper):
         """
         spline_lib.set_shape(node=self.name, shape_name=shape_name, shape_scale=shape_scale)
 
+
     def set_draw_label(self, value):
         """
         Break the incoming connection from guides_grp and set the draw label
@@ -68,6 +71,7 @@ class Helper(node_lib.Helper):
             value (int): 0 == bone, 1 == multi-child as box, 2 == None, 3 == joint
         """
         cmds.setAttr('{}.drawLabel'.format(self.name), value)
+
 
     # ---------- Create Methods ----------
     def create(self,
@@ -107,6 +111,7 @@ class Helper(node_lib.Helper):
 
         return self.name
 
+
     # ---------- Connect Methods ----------
     def connect_to_opposite_side(self):
         if self.side == side_lib.center:
@@ -127,6 +132,7 @@ class Helper(node_lib.Helper):
             cmds.setAttr('{}.matrixIn[1]'.format(mult_matrix), math_lib.identity_matrix_x_negative, type='matrix')
 
             cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.offsetParentMatrix'.format(self.name))
+
 
     def connect_to_opposite_side_with_parent(self, parent_node):
         if self.side == side_lib.center:

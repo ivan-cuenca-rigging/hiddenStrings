@@ -1,7 +1,3 @@
-"""
-Usages for all the nodes in maya
-"""
-
 # Control usages
 control = 'ctr'
 control_valid_usages = [control]
@@ -30,7 +26,6 @@ aim_constraint = 'aicns'
 pole_vector_constraint = 'pvcns'
 constraint_valid_usages = [parent_constraint, orient_constraint, point_constraint,
                            scale_constraint, aim_constraint, pole_vector_constraint]
-
 
 geometry = 'geo'
 trigger = 'trg'
@@ -110,4 +105,13 @@ valid_usages = [control,
 
 
 def get_usage_capitalize(usage):
+    """
+    Get the usage capitalized
+
+    Args:
+        usage (str): usage to capitalize
+
+    Returns:
+        str: usage capitalized
+    """
     return '{}{}'.format(usage[0].upper(), usage[1:])

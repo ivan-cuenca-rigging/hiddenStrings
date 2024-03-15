@@ -102,6 +102,9 @@ def unload_hotkeys():
 def load_markingMenu(click_input):
     """
     load marking menu
+
+    Args:
+        click_input (int): click input. 1 -> left click, 2 -> middle click, 3 -> right click
     """
     from hiddenStrings.ui import marking_menu
 
@@ -111,6 +114,9 @@ def load_markingMenu(click_input):
 def unload_markingMenu(click_input):
     """
     Unload marking menu
+
+    Args:
+        click_input (int): click input. 1 -> left click, 2 -> middle click, 3 -> right click
     """
     from hiddenStrings.ui import marking_menu
 

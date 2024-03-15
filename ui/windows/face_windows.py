@@ -7,11 +7,20 @@ from hiddenStrings.libs import window_lib
 
 
 class EarWindow(window_lib.Helper):
+    """
+    Create the ear window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the ear option window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of EarWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(EarWindow, self).__init__(title='Ear Guide Options', size=(450, 175))
 
@@ -44,6 +53,7 @@ class EarWindow(window_lib.Helper):
                                        (self.hook, 'top', 5, self.base)]
                         )
 
+
     def apply_command(self, *args):
         """
         Apply button command
@@ -72,11 +82,20 @@ class EarWindow(window_lib.Helper):
 
 
 class CheekWindow(window_lib.Helper):
+    """
+    Create the cheek window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the ear option window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of CheekWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(CheekWindow, self).__init__(title='Cheek Guide Options', size=(450, 175))
 
@@ -108,6 +127,7 @@ class CheekWindow(window_lib.Helper):
                                        (self.base, 'top', 5, self.connect_to_opposite),
                                        (self.hook, 'top', 5, self.base)]
                         )
+
 
     def apply_command(self, *args):
         """

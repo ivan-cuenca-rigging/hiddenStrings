@@ -11,6 +11,9 @@ logging = logging.getLogger(__name__)
 
 
 def set_labels():
+    """
+    Set the joints label for mirror and transfer skin tools
+    """
     joint_list = cmds.ls(type='joint')
 
     for jnt in joint_list:
@@ -74,10 +77,14 @@ def set_skin_pose(*args):
 def format_skin_cluster_name(node,
                              skin_index=1):
     """
-    Format the skin_cluster_name
-    :param node: str
-    :param skin_index: int
-    :return: skinCluster name
+    Format the skinCluster name
+
+    Args:
+        node (str): node's name
+        skin_index (int): number of the skin to format
+    
+    Returns:
+        str: skinCluster name
     """
     if len(node.split('_')) != 3:
         return '{}{}_{}'.format(node, str(skin_index).zfill(1), usage_lib.skin_cluster)
@@ -91,8 +98,12 @@ def format_skin_cluster_name(node,
 def rename_skin_cluster(skin_cluster):
     """
     Rename skinCluster name
-    :param skin_cluster: str
-    :return: skinCluster name
+    
+    Args:
+        skin_cluster (str): skin cluster to rename
+    
+    Returns:
+        str: skinCluster name
     """
     node_shape = cmds.skinCluster(skin_cluster, query=True, geometry=True)[0]
     node = cmds.listRelatives(node_shape, parent=True)[0]
@@ -118,11 +129,15 @@ def create_skin_cluster(node,
                         joints,
                         skin_index=1):
     """
-    create skinCluster by default
-    :param joints: list
-    :param node: str, geometry, nurbs, curve, etc
-    :param skin_index: int
-    :return: skinCluster
+    Create skinCluster by default
+
+    Args:
+        joints (list): list of joints to bind
+        node (str):, geometry, nurbs, curve, etc
+        skin_index (int): index of the skin. Defaults to 1.
+    
+    Returns:
+        str: skinCluster
     """
     if skin_index == 1:
         skin_cluster = cmds.skinCluster(joints, node,
@@ -165,8 +180,12 @@ def create_skin_cluster(node,
 def get_skin_cluster_list(node):
     """
     Find skinClusters attached to the node
-    :param node: str
-    :return: skinCluster list
+
+    Args:
+        node (str): node's name
+    
+    Returns:
+        list: skinClusters list
     """
     skin_cluster_list = list()
     inputs_list = cmds.listHistory(node, interestLevel=1, pruneDagObjects=True)
@@ -182,9 +201,13 @@ def get_skin_cluster_list(node):
 def get_skin_cluster_index(node, index=1):
     """
     Find the skinCluster index
-    :param node: str
-    :param index: int. -1 (last), 1, 2, 3
-    :return: skinCluster
+
+    Args:
+        node (str): node's name
+        index (int):. -1 (last), 1, 2, 3. Defaults to 1.
+    
+    Returns:
+        str: skinCluster
     """
     if index >= 1:
         index = index - 1
@@ -197,11 +220,13 @@ def get_skin_cluster_index(node, index=1):
 def transfer_skin(source, target, source_skin_index=1, target_skin_index=1, surface_association='closestComponent'):
     """
     Transfer skin from one object to another
-    :param source: str
-    :param target: str
-    :param source_skin_index: int. -1 (last), 1, 2, 3
-    :param target_skin_index: int. -1 (last), 1, 2, 3
-    :param surface_association: closestPoint or closestComponent
+
+    Args:
+        source (str): source node
+        target (str): target node
+        source_skin_index (int):. -1 (last), 1, 2, 3. Defaults to 1.
+        target_skin_index (int):. -1 (last), 1, 2, 3. Defaults to 1.
+        surface_association (str): closestPoint or closestComponent. Defaults to 'closestComponent'.
     """
     source_skin_cluster = get_skin_cluster_index(node=source, index=source_skin_index)
     if not source_skin_cluster:
@@ -233,9 +258,11 @@ def transfer_skin(source, target, source_skin_index=1, target_skin_index=1, surf
 def add_joint_to_skin_cluster(joint_name, skin_cluster_name, prebind_name=None):
     """
     Add a joint to an existing skinCluster
-    :param prebind_name: str
-    :param joint_name: str
-    :param skin_cluster_name: str
+
+    Args:
+        prebind_name (str):name of the prebind node
+        joint_name (str): name of the joint to include
+        skin_cluster_name (str): name of the skinCluster
     """
     # Checks
     if not cmds.objExists(joint_name):

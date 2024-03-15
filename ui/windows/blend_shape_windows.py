@@ -10,11 +10,20 @@ from hiddenStrings.libs import window_lib, import_export_lib, trigger_lib, blend
 
 
 class ExportBlendShapeWindow(window_lib.Helper):
+    """
+    Create the export blendShape window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the export blendShape window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of ExportBlendShapeWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(ExportBlendShapeWindow, self).__init__(title='Export blendShape Options', size=(450, 130))
         export_path = '{}/blendShapes'.format(os.path.dirname(cmds.file(query=True, sceneName=True)))
@@ -30,6 +39,7 @@ class ExportBlendShapeWindow(window_lib.Helper):
 
                         attachControl=[(self.file_search, 'left', 5, self.export_path)])
 
+
     def apply_command(self, *args):
         """
         Apply button command
@@ -41,6 +51,7 @@ class ExportBlendShapeWindow(window_lib.Helper):
 
         import_export_lib.export_blend_shapes(node_list=cmds.ls(selection=True), path=export_path)
 
+
     def file_dialog_command(self, *args):
         """
         Open the explorer window to set the path
@@ -49,17 +60,30 @@ class ExportBlendShapeWindow(window_lib.Helper):
         if folder_path:
             cmds.textFieldGrp(self.export_path, edit=True, text=folder_path[0])
 
+
     def bottom_layout(self):
+        """
+        Create the bottom layout
+        """
         add_button, apply_button, close_button = super(ExportBlendShapeWindow, self).bottom_layout()
         cmds.button(add_button, edit=True, label='Export')
 
 
 class ImportBlendShapeWindow(window_lib.Helper):
+    """
+    Create the import blendShape window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the import blendShape window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of ImportBlendShapeWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(ImportBlendShapeWindow, self).__init__(title='Import blendShape Options', size=(450, 150))
         self.import_folder = cmds.checkBoxGrp(label='Import folder: ', value1=False)
@@ -77,6 +101,7 @@ class ImportBlendShapeWindow(window_lib.Helper):
                                        (self.file_search, 'top', 5, self.import_folder),
                                        (self.file_search, 'left', 5, self.import_path)])
 
+
     def apply_command(self, *args):
         """
         Apply button command
@@ -91,6 +116,7 @@ class ImportBlendShapeWindow(window_lib.Helper):
             node = cmds.ls(sl=True)[0]
             import_export_lib.import_blend_shape(node=node, path=import_path)
 
+
     def file_dialog_command(self, *args):
         """
         Open the explorer window to set the path
@@ -103,19 +129,32 @@ class ImportBlendShapeWindow(window_lib.Helper):
         if folder_path:
             cmds.textFieldGrp(self.import_path, edit=True, text=folder_path[0])
 
+
     def bottom_layout(self):
+        """
+        Create the bottom layout
+        """
         add_button, apply_button, close_button = super(ImportBlendShapeWindow, self).bottom_layout()
         cmds.button(add_button, edit=True, label='Import')
 
 
 class CreateAngleWindow(window_lib.Helper):
+    """
+    Create thye PoseReader: Angle window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the import blendShape window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of CreateAngleWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
-        super(CreateAngleWindow, self).__init__(title='Create Bary Options', size=(450, 105))
+        super(CreateAngleWindow, self).__init__(title='PoseReader: Angle Options', size=(450, 105))
 
         self.parent = cmds.textFieldGrp(label='Parent: ')
         self.get_parent = cmds.iconTextButton(image='addClip.png', command=partial(self.get_from_scene,
@@ -133,6 +172,7 @@ class CreateAngleWindow(window_lib.Helper):
                                        (self.get_driver, 'left', 5, self.driver),
                                        (self.get_parent, 'left', 5, self.parent)])
 
+
     def apply_command(self, *args):
         """
         Apply button command
@@ -143,19 +183,38 @@ class CreateAngleWindow(window_lib.Helper):
 
         trigger_lib.create_angle_trigger(parent_node=parent, driver_node=driver)
 
+
     @staticmethod
     def get_from_scene(text_field, *args):
-        cmds.textFieldGrp(text_field, edit=True, text=cmds.ls(selection=True)[0])
+        """
+        Get text filed value from the scene
+
+        Args:
+            text_field (str): name of the textField
+
+        Returns:
+            str: textField text
+        """
+        return cmds.textFieldGrp(text_field, edit=True, text=cmds.ls(selection=True)[0])
 
 
 class CreateBaryWindow(window_lib.Helper):
+    """
+    Create the PoseReader: Bary window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the import blendShape window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of CreateBaryWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
-        super(CreateBaryWindow, self).__init__(title='Create Bary Options', size=(450, 185))
+        super(CreateBaryWindow, self).__init__(title='PoseReader: Bary Options', size=(450, 185))
 
         self.descriptor = cmds.textFieldGrp(label='Descriptor: ', text='bary')
 
@@ -226,15 +285,33 @@ class CreateBaryWindow(window_lib.Helper):
 
     @staticmethod
     def get_from_scene(text_field, *args):
-        cmds.textFieldGrp(text_field, edit=True, text=cmds.ls(selection=True)[0])
+        """
+        Get text filed value from the scene
+
+        Args:
+            text_field (str): name of the textField
+        
+        Returns:
+            str: textField text
+        """
+        return cmds.textFieldGrp(text_field, edit=True, text=cmds.ls(selection=True)[0])
 
 
 class AutomaticCorrectiveWindow(window_lib.Helper):
+    """
+    Create the automatic corrective window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the import blendShape window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of AutomaticCorrectiveWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(AutomaticCorrectiveWindow, self).__init__(title='Create automatic corrective Options', size=(450, 185))
 
@@ -264,7 +341,11 @@ class AutomaticCorrectiveWindow(window_lib.Helper):
                                        (self.attribute_value, 'top', 5, self.attribute_name),
                                        (self.create_sdk, 'top', 5, self.attribute_value)])
 
+
     def apply_command(self, *args):
+        """
+        Apply button command
+        """
         geometry = cmds.textFieldGrp(self.geometry, query=True, text=True)
 
         control_list = cmds.ls(cmds.textFieldGrp(self.control, query=True, text=True))
@@ -282,20 +363,39 @@ class AutomaticCorrectiveWindow(window_lib.Helper):
                                                  attr_value=attribute_value,
                                                  create_sdk=create_sdk)
 
+
     @staticmethod
     def get_from_scene(text_field, *args):
-        cmds.textFieldGrp(text_field, edit=True, text=cmds.ls(selection=True)[0])
+        """
+        Get text filed value from the scene
+
+        Args:
+            text_field (str): name of the textField
+        
+        Returns:
+            str: textField text
+        """
+        return cmds.textFieldGrp(text_field, edit=True, text=cmds.ls(selection=True)[0])
 
 
-class multiplyVertexValues(window_lib.Helper):
+class MultiplyVertexValues(window_lib.Helper):
+    """
+    Create set vertex position multiplied by a value window, by 0 will remove its deformation
+    
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create set vertex position multiplied by a value window, by 0 will remove its deformation
+        Initializes an instance of MultiplyVertexValues
         
-        :param title: str, title of the window
-        :param size: list, width and height
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
-        super(multiplyVertexValues, self).__init__(title='Multiply vertex values', size=(300, 210))
+        super(MultiplyVertexValues, self).__init__(
+            title='Multiply vertex values', size=(300, 210))
         
         self.axes_check_box = cmds.checkBoxGrp(label='Axes: ', label1='All', value1=True,
                                                onCommand=self.set_axis_enable,
@@ -357,13 +457,24 @@ class multiplyVertexValues(window_lib.Helper):
             ],
         )
 
+
     def set_axis_enable(self, *args):
+        """
+        Toggle the axis
+        """
         if cmds.checkBoxGrp(self.axes_check_box, query=True, enable=True, value1=True):
             cmds.checkBoxGrp(self.axis_check_box, edit=True, enable=False)
         else:
             cmds.checkBoxGrp(self.axis_check_box, edit=True, enable=True)
 
+
     def run(self, value, *args):
+        """
+        multiply vertex values code
+
+        Args:
+            value (float): value to be multiply by
+        """
         axes = str()
         if cmds.checkBoxGrp(self.axes_check_box, query=True, value1=True):
             axes = 'xyz'
@@ -383,11 +494,12 @@ class multiplyVertexValues(window_lib.Helper):
             for axis in axes.lower():
                 vtx_value = cmds.getAttr('{}.pnts[{}].pnt{}'.format(geo, vtx_num, axis))
                 cmds.setAttr('{}.pnts[{}].pnt{}'.format(geo, vtx_num, axis), vtx_value*value)
-    
-    def test():
-        print("test")
+
 
     def apply_command(self, *args):
+        """
+        Apply command button
+        """
         value = cmds.floatFieldGrp(self.value_field, query=True, value1=True)
 
         self.run(value=value)

@@ -7,11 +7,24 @@ from hiddenStrings.libs import usage_lib
 
 def create_nurbs_from_points(descriptor,
                              side,
-                             points,
+                             points_list,
                              width=0.2,
                              axis='X'):
+    """
+    Create a nurbs with the points given
+
+    Args:
+        descriptor (str): descriptor
+        side (str): side
+        points_list (list): list of points
+        width (float, optional): width of the nurbs. Defaults to 0.2.
+        axis (str, optional): axis of the nurbs. Defaults to 'X'.
+
+    Returns:
+        str: nurbs transform
+    """
     positions = list()
-    for point in points:
+    for point in points_list:
         positions.append(cmds.xform(point, query=True, worldSpace=True, translation=True))
 
     crv_0 = cmds.curve(p=positions, degree=3)
@@ -21,10 +34,6 @@ def create_nurbs_from_points(descriptor,
 
     nurbs_transform = cmds.loft(crv_0, crv_1, degree=3, constructionHistory=False)
     nurbs_transform = cmds.rename(nurbs_transform, '{}_{}_{}'.format(descriptor, side, usage_lib.nurbs))
-
-    # cmds.rebuildSurface(nurbs_transform, constructionHistory=False, replaceOriginal=True, rebuildType=0,
-    #                     keepRange=False, keepControlPoints=False, direction=2,
-    #                     spansU=1, degreeU=1, spansV=int(len(points)), degreeV=3)
 
     cmds.delete(crv_0, crv_1)
 

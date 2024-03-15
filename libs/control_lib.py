@@ -30,6 +30,7 @@ class Helper(node_lib.Helper, attribute_lib.Helper):
         self.check_usage()
         self.check_side()
 
+
     # ---------- Checks Methods ----------
     def check_usage(self):
         """
@@ -37,6 +38,7 @@ class Helper(node_lib.Helper, attribute_lib.Helper):
         """
         if self.get_usage() not in usage_lib.control_valid_usages:
             logging.info('this control has not a valid usage, use "{}".'.format(usage_lib.control_valid_usages))
+
 
     # ---------- Get and Set Methods ----------
     def get_shape(self):
@@ -47,6 +49,7 @@ class Helper(node_lib.Helper, attribute_lib.Helper):
             list: list of the shapes
         """
         return spline_lib.get_shapes(self.name)
+
 
     def set_shape(self, shape_name, offset, shape_scale=1):
         """
@@ -59,6 +62,7 @@ class Helper(node_lib.Helper, attribute_lib.Helper):
         """
         spline_lib.set_shape(node=self.name, shape_name=shape_name, shape_scale=shape_scale, shape_offset=offset)
 
+
     def set_shape_color(self, color_key='yellow'):
         """
         Override the control's color
@@ -67,6 +71,7 @@ class Helper(node_lib.Helper, attribute_lib.Helper):
             color_key (str, optional): check valid colors in the spline_lib. Defaults to 'yellow'.
         """
         spline_lib.set_override_color([self.name], color_key=color_key)
+
 
     # ---------- Create Method ----------
     def create(self,

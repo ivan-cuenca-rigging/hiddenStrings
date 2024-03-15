@@ -11,11 +11,20 @@ from hiddenStrings.libs import window_lib, spline_lib, side_lib, usage_lib, impo
 
 
 class RenamerWindow(window_lib.Helper):
+    """
+    Create the renamer window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the renamer window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of RenamerWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(RenamerWindow, self).__init__(title='Renamer', size=(300, 210))
 
@@ -91,11 +100,13 @@ class RenamerWindow(window_lib.Helper):
                                        (separator02, 'top', 5, self.rename_button),
                                        (self.clean_button, 'top', 5, separator02)])
 
+
     def bottom_layout(self, *args):
         """
         Override bottom layout
         """
         pass
+
 
     def search_and_replace(self, node):
         """
@@ -105,6 +116,7 @@ class RenamerWindow(window_lib.Helper):
 
         cmds.rename(node, node.split('|')[-1].replace(cmds.textFieldGrp(self.search_for, query=True, text=True),
                                                       cmds.textFieldGrp(self.replace_with, query=True, text=True)))
+
 
     def search_and_replace_command(self, *args):
         """
@@ -156,6 +168,7 @@ class RenamerWindow(window_lib.Helper):
 
         for node in selection_list:
             self.search_and_replace(node)
+
 
     def rename_command(self, *args):
         """
@@ -275,6 +288,7 @@ class RenamerWindow(window_lib.Helper):
                                                                         in_between=in_between_name,
                         new_name="{}{}".format(in_between_name, suffix))
 
+
     def clean_command(self, *args):
         """
         Clean all fields of the window
@@ -286,11 +300,31 @@ class RenamerWindow(window_lib.Helper):
         cmds.textFieldGrp(self.suffix, edit=True, text='')
         cmds.textFieldGrp(self.increment, edit=True, text='')
 
+
     @staticmethod
     def increment_character(character):
+        """
+        Increments the character letter
+
+        Args:
+            character (str): character letter
+
+        Returns:
+            str: next character
+        """
         return chr(ord(character) + 1) if character != 'Z' else 'A'
 
+
     def increment_string(self, string_character):
+        """
+        Increments the string, number or character
+
+        Args:
+            string_character (str): character as string
+
+        Returns:
+            str: next string character
+        """
         if string_character.isdigit():
             new_string = str(int(string_character) + 1).zfill(len(string_character))
         else:
@@ -302,11 +336,20 @@ class RenamerWindow(window_lib.Helper):
 
 
 class ShapeManagerWindow(window_lib.Helper):
+    """
+    Create the shape manager window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the Shape manager window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of ShapeManagerWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(ShapeManagerWindow, self).__init__(title='Shape Manager', size=(450, 510))
 
@@ -353,11 +396,13 @@ class ShapeManagerWindow(window_lib.Helper):
                                        (self.color_override_layout, 'top', 10, self.merge_button),
                                        (self.default_color, 'top', 10, self.color_override_layout)])
 
+
     def bottom_layout(self, *args):
         """
         Override bottom layout
         """
         pass
+
 
     def shapes_items_layout(self, *args):
         """
@@ -380,6 +425,7 @@ class ShapeManagerWindow(window_lib.Helper):
 
         cmds.setParent(self.main_layout)
 
+
     def color_override_items_layout(self, *args):
         """
         Color override layout
@@ -398,11 +444,14 @@ class ShapeManagerWindow(window_lib.Helper):
 
         return color_override_layout
 
+
     def import_shape(self, export_name):
         """
         If there is not a selection import the shape
         If there is a selection replace the shape
-        :param export_name: str
+
+        Args:
+            export_name (str): name to export
         """
         node = cmds.ls(selection=True)
 
@@ -432,6 +481,7 @@ class ShapeManagerWindow(window_lib.Helper):
 
             cmds.select(node)
 
+
     def delete_shape_command(self, *args):
         """
         Delete shape name from folder (data and image)
@@ -451,6 +501,7 @@ class ShapeManagerWindow(window_lib.Helper):
 
         self.refresh_shapes()
 
+
     @staticmethod
     def merge_shape_command(*args):
         """
@@ -467,6 +518,7 @@ class ShapeManagerWindow(window_lib.Helper):
 
         cmds.select(node)
 
+
     @staticmethod
     def transfer_spline_command(*args):
         """
@@ -478,7 +530,11 @@ class ShapeManagerWindow(window_lib.Helper):
             if node != selection_list[0]:
                 spline_lib.transfer_shape(source=selection_list[0], target=node)
 
+
     def save_screenshot(self, *args):
+        """
+        Save a screenShot
+        """
         path = r'{}/images'.format(self.shapes_path)
         export_name = cmds.textFieldGrp(self.export_name, query=True, text=True)
 
@@ -489,6 +545,7 @@ class ShapeManagerWindow(window_lib.Helper):
 
         cmds.playblast(completeFilename=path_with_file, forceOverwrite=True, format='image', width=200, height=200,
                        showOrnaments=False, startTime=1, endTime=1, viewer=False)
+
 
     def export_shape_command(self, *args):
         """
@@ -509,6 +566,7 @@ class ShapeManagerWindow(window_lib.Helper):
         cmds.rename('{}_{}_{}'.format(export_name, side_lib.center, usage_lib.spline), spline_name)
         self.refresh_shapes()
 
+
     def refresh_shapes(self, *args):
         """
         Delete de shapes layout children and rebuilt it
@@ -520,11 +578,14 @@ class ShapeManagerWindow(window_lib.Helper):
 
         self.shapes_items_layout()
 
+
     @staticmethod
     def is_shape_overwrite_locked(export_name, *args):
         """
         Check if the spline shape can be overwritten or not, builder splines are locked
-        :param export_name: str
+        
+        Args:
+            export_name (str): name to export
         """
         shapes_locked_list = ['circle',
                               'cube',

@@ -47,8 +47,12 @@ colors_dict = {'default': 0,
 def get_spl_data(spl):
     """
     Get the spline data
-    :param spl: str
-    :return: spline data
+    
+    Args:
+        spl (str): spline
+    
+    Returns:
+        dict: spline data
     """
     crv_list = cmds.listRelatives(spl, shapes=True)
     spline_data = dict()
@@ -81,10 +85,14 @@ def get_spl_data(spl):
 def create_spl_from_data(spl_name, spl_data, spl_scale=1):
     """
     Create a spline with the data given
-    :param spl_name: str
-    :param spl_data: dict
-    :param spl_scale: float
-    :return: spline
+
+    Args:
+        spl_name (str): spline name
+        spl_data (dict): spline data
+        spl_scale (float): spline scale
+
+    Returns:
+        str: spline
     """
     spline = cmds.createNode('transform', name=spl_name)
     for crv in spl_data:
@@ -104,7 +112,9 @@ def create_spl_from_data(spl_name, spl_data, spl_scale=1):
 def delete_shapes(node):
     """
     Delete the node's shapes
-    :param node: str
+
+    Args:
+        node (str): node's name
     """
     shapes_list = cmds.listRelatives(node, children=True, shapes=True)
     if shapes_list:
@@ -114,8 +124,12 @@ def delete_shapes(node):
 def get_shapes(node):
     """
     Get node's shapes
-    :param node: str
-    :return: node's shapes
+
+    Args:
+        node (str): node's name
+
+    Returns:
+        list: node's shapes
     """
     return cmds.listRelatives(node, children=True, shapes=True)
 
@@ -123,10 +137,12 @@ def get_shapes(node):
 def set_shape(node, shape_name, shape_scale=1, shape_offset=None):
     """
     Set node's shape
-    :param node: str
-    :param shape_name: str, from libs/spline_shapes
-    :param shape_scale: float
-    :param shape_offset: dict, E.g. offset=dict(); offset['translateY'] = 1
+
+    Args:
+        node (str): node's name
+        shape_name (str): from spline_shapes
+        shape_scale (float): scale of the shape. Defaults to 1.
+        shape_offset (dict):, E.G. {'translateY': 1}. Defaults to 1.
     """
     temp_spl = create_spl_from_data('temp_c_spl',
                                     spl_data=import_export_lib.import_data_from_json(file_name=shape_name,
@@ -141,10 +157,14 @@ def set_shape(node, shape_name, shape_scale=1, shape_offset=None):
 def replace_shape(node, shape_transform, keep_shapes=False):
     """
     Replace the node's shapes
-    :param node: str
-    :param shape_transform: str
-    :param keep_shapes: bool
-    :return: new shape
+
+    Args:
+        node (str): node's name
+        shape_transform (str): shape transform
+        keep_shapes (bool): True == new shape will be added instead of replacing the existings one. Defaults to False
+
+    Returns:
+        list: new shapes list
     """
     if not keep_shapes:
         delete_shapes(node)
@@ -176,8 +196,10 @@ def replace_shape(node, shape_transform, keep_shapes=False):
 def transfer_shape(source, target):
     """
     Transfer shape from source to target
-    :param source: str
-    :param target: str
+
+    Args:
+        source (str): source node
+        target (str): target node
     """
     # Get spline shape
     spline_data = get_spl_data(spl=source)
@@ -204,8 +226,10 @@ def transfer_shape(source, target):
 def set_override_color(splines_list=None, color_key='red'):
     """
     override the spline color
-    :param splines_list: list
-    :param color_key: str, check valid color keys
+
+    Args:
+        splines_list (list): list of splines
+        color_key (str): check valid color keys in the spline_lib
     """
     if not splines_list:
         splines_list = cmds.ls(sl=True)
@@ -232,16 +256,48 @@ def set_override_color(splines_list=None, color_key='red'):
 
 
 def get_override_color(spl):
+    """
+    Get the override attribute value
+
+    Args:
+        spl (str): name of the spline
+
+    Returns:
+        int: spline.overrideColor value
+    """
     spl_shape = cmds.listRelatives(spl, shapes=True)[0]
     return cmds.getAttr('{}.overrideColor'.format(spl_shape))
 
 
 def create_curve_from_a_to_b(name, a, b, n, degree=3):
+    """
+    Create a spline curve from a to b
+
+    Args:
+        name (str): name of the new spline
+        a (str): name of the a node
+        b (str): name of the b node
+        n (_type_): number of control vertex
+        degree (int, optional): degree of the spline. Defaults to 3.
+
+    Returns:
+        str: spline's name
+    """
     cvs_pos_lists = list(math_lib.get_n_positions_from_a_to_b(a, b, n))
     return cmds.curve(p=cvs_pos_lists, name=name, degree=degree)
 
 
 def attach_curve_from_a_to_b(a, b):
+    """
+    Create a spline with two controls points, one attached to a and another attached to b
+
+    Args:
+        a (str): a node's name
+        b (str): b node's name
+
+    Returns:
+        str: spline
+    """
     a_nh = node_lib.Helper(a)
     b_nh = node_lib.Helper(b)
 

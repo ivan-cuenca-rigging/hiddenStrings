@@ -18,14 +18,18 @@ def create_morph_deformer(driver,
                           create_component_tag=True):
     """
     Create a morph deformer connection
-    :param driver: str
-    :param driven_list: list
-    :param morph_mode: int
-    :param morph_space: int
-    :param use_component_lookup: bool
-    :param live_component_match: bool
-    :param create_component_tag: bool
-    :return: morph deformer
+
+    Args:
+        driver (str): name of the driver
+        driven_list (list): list of driven nodes
+        morph_mode (int, optional): 0 == absolute, 1 == relative, 2 == surface, 3 == retarget, 4 == mirror. Defaults to 1.
+        morph_space (int, optional): 0 == object space, 1== world space. Defaults to 1.
+        use_component_lookup (bool, optional): use component lookup attribute. Defaults to True.
+        live_component_match (bool, optional): keep the component match connected. Defaults to False.
+        create_component_tag (bool, optional): create the component tag. Defaults to True.
+
+    Returns:
+        str: morph's node
     """
     # CHECKS
     deformation_use_component_tags_value = cmds.optionVar(query='deformationUseComponentTags')
@@ -113,8 +117,13 @@ def create_component_tag_comparing_two_geometries(driver,
                                                   driven):
     """
     Create a component tag in the driver geometry
-    :param driver: str
-    :param driven: str
+
+    Args:
+        driver (str): name of the driver
+        driven (str): name of the driven
+
+    Raises:
+        RuntimeError: both nodes must be geometries
     """
     # Maya imports
     from maya import cmds

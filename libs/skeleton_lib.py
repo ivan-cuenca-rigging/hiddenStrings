@@ -11,14 +11,24 @@ logging = logging.getLogger(__name__)
 
 
 class Helper(node_lib.Helper):
+    """
+    Skeleton Helper class
+
+    Args:
+        name (str): name of the joint
+    """
     def __init__(self, name):
         """
-        :param name: str
+        Initializes an instance of skeleton Helper
+
+        Args:
+            name (str): name of the joint
         """
         super(Helper, self).__init__(name)
         self.name = name
         self.check_usage()
         self.check_side()
+
 
     # ---------- Checks Methods----------
     def check_usage(self):
@@ -28,21 +38,25 @@ class Helper(node_lib.Helper):
         if self.get_usage() not in usage_lib.skeleton_valid_usages:
             logging.info('this control has not a valid usage, {}.'.format(usage_lib.skeleton_valid_usages))
 
+
     # ---------- Create Method ----------
     def create(self,
                zero=False,
                parent=None,
                matrix=None,
                matrix_translation=False,
-               matrix_rotation=False, ):
+               matrix_rotation=False):
         """
         Create a skeleton
-        :param zero: bool, if yes it will create a zero group
-        :param parent: str, control's parent
-        :param matrix: skeleton, control's matrix
-        :param matrix_translation: bool, if true only translation will be used
-        :param matrix_rotation: bool, if true only rotation will be used
-        :return: skeleton's name
+
+        Args:
+            zero (bool): if yes it will create a zero group. Defaults to False.
+            parent (str): control's parent. Defaults to None.
+            matrix (skeleton): control's matrix. Defaults to None.
+            matrix_translation (bool): if true only translation will be used. Defaults to False.
+            matrix_rotation (bool): if true only rotation will be used. Defaults to False.
+        Returns:
+            str: joint name
         """
         if cmds.objExists(self.name):
             cmds.error('the {} already exists in the scene'.format(self.name))
@@ -65,9 +79,11 @@ class Helper(node_lib.Helper):
 
 def set_joint_label(node, other_type_override=False):
     """
-    set the joint's label
-    :param node: str
-    :param other_type_override: str
+    Set the joint's label
+
+    Args:
+        node (str): node's name
+        other_type_override (str): other type value. Defaults to False
     """
     descriptor, side, usage = node.split('_')
 
@@ -87,8 +103,10 @@ def set_joint_label(node, other_type_override=False):
 
 def set_joint_guide_label(node):
     """
-    set the joint's guide label
-    :param node: str
+    Set the joint's guide label
+
+    Args:
+        node (str): node's name
     """
     set_joint_label(node=node, other_type_override=node)
 
@@ -101,13 +119,17 @@ def create_skeleton_chain_from_a_to_b(descriptor,
                                       joint_usage=usage_lib.skin_joint):
     """
     Create a skeleton chain between two points
-    :param descriptor: str
-    :param a: str
-    :param b: str
-    :param joints_number: int
-    :param joint_parent: str
-    :param joint_usage: str
-    return joint chain list
+
+    Args:
+        descriptor (str): descriptor
+        a (str): node a
+        b (str): node b
+        joints_number (int): number of joints from a to b
+        joint_parent (str): joint's parent
+        joint_usage (str): joints usage
+    
+    Returns:
+        list: joints list
     """
     a_descriptor, a_side, a_usage = a.split('_')
     skin_joint_parent = joint_parent
@@ -146,12 +168,14 @@ def create_push_joint(parent_node, driver_node,
                       structural_parent='pushJoints_c_grp'):
     """
     Create a pushJoint system
-    :param parent_node: str
-    :param driver_node: str
-    :param suffix: str
-    :param forbidden_word: str
-    :param rotation_axis: str; X, -X, Y, -Y, Z or -Z
-    :param structural_parent: str
+
+    Args:
+        parent_node (str): base node
+        driver_node (str): driver node
+        suffix (str): suffix value. Defaults to ''.
+        forbidden_word (str): if we want to avoid any word in the name. Defaults to '01'.
+        rotation_axis (str): 'X', '-X', 'Y', '-Y', 'Z' or '-Z'Defaults to 'Y'.
+        structural_parent (str): parent node. Defaults to 'pushJoints_c_grp'.
     """
     if len(parent_node.split('_')) == 3:
         parent_descriptor, parent_side, parent_usage = parent_node.split('_')
@@ -299,9 +323,12 @@ def create_local_skeleton(skeleton_grp,
                           world_control='center_c_ctr'):
     """
     Create a local joint for each skeleton joint
-    :param skeleton_grp: str
-    :param world_control: str
-    return list of local joints
+
+    Args:
+        skeleton_grp (str): skeleton group
+        world_control (str): world base control. Defaults to 'center_c_ctr'.
+    Returns:
+        list: local joints list
     """
     if cmds.listRelatives(skeleton_grp, allDescendents=True):
         skeleton_group_nh = node_lib.Helper(skeleton_grp)

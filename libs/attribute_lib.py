@@ -23,6 +23,7 @@ class Helper(object):
         """
         self.name = name
 
+
     # ---------- Checks Methods ----------
     def check_attribute_exists(self, attribute_name):
         """
@@ -39,6 +40,7 @@ class Helper(object):
         else:
             return False
 
+
     # ---------- Set methods ----------
     def lock_attribute(self, attribute_name, lock=True):
         """
@@ -51,6 +53,7 @@ class Helper(object):
         if cmds.getAttr('{}.{}'.format(self.name, attribute_name), settable=True):
             cmds.setAttr('{}.{}'.format(self.name, attribute_name), lock=lock)
 
+
     def lock_attributes(self, attributes_list, lock=True):
         """
         Lock a list of the attributes given
@@ -62,6 +65,7 @@ class Helper(object):
         for attr in attributes_list:
             self.lock_attribute(attr, lock=lock)
 
+
     def hide_attribute(self, attribute_name, hide=True):
         """
         Hide the attribute given
@@ -71,6 +75,7 @@ class Helper(object):
             hide (bool, optional): True == hide. Defaults to True.
         """
         cmds.setAttr('{}.{}'.format(self.name, attribute_name), keyable=not hide, channelBox=not hide)
+
 
     def hide_attributes(self, attributes_list, hide=True):
         """
@@ -82,6 +87,7 @@ class Helper(object):
         """
         for attr in attributes_list:
             self.hide_attribute(attr, hide=hide)
+
 
     def lock_and_hide_attribute(self, attribute_name, lock=True, hide=True):
         """
@@ -95,6 +101,7 @@ class Helper(object):
         self.lock_attribute(attribute_name, lock)
         self.hide_attribute(attribute_name, hide)
 
+
     def lock_and_hide_attributes(self, attributes_list, lock=True, hide=True):
         """
         Lock and hide a list of the attributes given
@@ -107,6 +114,7 @@ class Helper(object):
         for attr in attributes_list:
             self.lock_and_hide_attribute(attr, lock, hide)
 
+
     def keyable_attribute(self, attribute_name, keyable=True):
         """
         Change the attribute property between keyable and not keyable
@@ -117,9 +125,11 @@ class Helper(object):
         """
         cmds.setAttr('{}.{}'.format(self.name, attribute_name), keyable=keyable, channelBox=not keyable)
 
+
     def set_default_value(self, attr, value):
         cmds.addAttr('{}.{}'.format(self.name, attr), edit=True, defaultValue=value)
         cmds.setAttr('{}.{}'.format(self.name, attr), value)
+
 
     # ---------- Add attributes Methods ----------
     def add_attribute(self, attribute_name, keyable=True, **kwargs):
@@ -141,6 +151,7 @@ class Helper(object):
 
         return attribute_name
 
+
     def add_separator_attribute(self, separator_name):
         """
         Add a separator in the attribute list
@@ -159,6 +170,7 @@ class Helper(object):
 
         return separator_name
 
+
     def add_float_attribute(self, attribute_name, keyable=True, **kwargs):
         """
         Add a float attribute
@@ -171,6 +183,7 @@ class Helper(object):
             str: name of the attribute
         """
         return self.add_attribute(attribute_name, attributeType='float', keyable=keyable, **kwargs)
+
 
     def add_int_attribute(self, attribute_name, keyable=True, **kwargs):
         """
@@ -185,6 +198,7 @@ class Helper(object):
         """
         return self.add_attribute(attribute_name, attributeType='long', keyable=keyable, **kwargs)
 
+
     def add_bool_attribute(self, attribute_name, keyable=True, **kwargs):
         """
         Add a bool attribute
@@ -197,6 +211,7 @@ class Helper(object):
             str: name of the attribute
         """
         return self.add_attribute(attribute_name, attributeType='bool', keyable=keyable, **kwargs)
+
 
     def add_enum_attribute(self, attribute_name, states, keyable=True, **kwargs):
         """
@@ -217,6 +232,7 @@ class Helper(object):
         """
         return self.add_attribute(attribute_name, attributeType='enum', enumName=states, keyable=keyable, **kwargs)
 
+
     def add_proxy_attribute(self, attribute_name, node_attribute_proxy):
         """
         Args:
@@ -230,6 +246,7 @@ class Helper(object):
 
         return attribute_name
 
+
     def add_matrix_attribute(self, attribute_name, **kwargs):
         """
         Add a matrix attribute
@@ -241,6 +258,7 @@ class Helper(object):
             str: name of the attribute
         """
         return self.add_attribute(attribute_name, attributeType='matrix', **kwargs)
+
 
     def add_string_attribute(self, attribute_name, text):
         """
@@ -256,6 +274,7 @@ class Helper(object):
         self.add_attribute(attribute_name, dataType='string')
         cmds.setAttr('{}.{}'.format(self.name, attribute_name), text, type='string')
         return attribute_name
+
 
     # ---------- Get attributes Methods ----------
     def get_user_defined_attributes(self):

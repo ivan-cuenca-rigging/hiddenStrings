@@ -34,7 +34,8 @@
 # You can find my contact email and more at https://github.com/ivan-cuenca-rigging
 #
 # VERSIONS:
-# 1.00 - Feb 23, 2023 - Initial Release.
+# 1 - Feb 23, 2023 - Initial Release.
+# 2 - Mar 24, 2024 - transfer shape between curves and nurbs updated.
 #
 # please... do not delete the text above
 # ----------------------------------------------------------------------------------------------------------------------
@@ -65,12 +66,15 @@ helpFlagLong = "-help"
 
 class PluginCommand(OpenMaya.MPxCommand):
     """
+    TransferShape pluginCommand class
+
     Transfer the shape of a mesh, nurbs, curve or lattice from first selection to the second selection.
     Both nodes must have the same number of components
-    source, s : string
-    target, t : string
-    worldSpace, ws : Bool
-    help, h : Bool
+
+    source, s (str): source node
+    target, t (str): target node
+    worldSpace, ws (bool): True == worldSpace, False == objectSpace
+    help, h (bool): help information
     """
     def __init__(self):
         OpenMaya.MPxCommand.__init__(self)
@@ -86,6 +90,7 @@ class PluginCommand(OpenMaya.MPxCommand):
         self.source_object_type = None
         self.target_object_type = None
         self.target_points_store = None
+
 
     def parse_arguments(self, *args):
         """
@@ -116,6 +121,7 @@ class PluginCommand(OpenMaya.MPxCommand):
 
         if args_data.isFlagSet(worldSpaceFlag):
             self.world_space = args_data.flagArgumentBool(worldSpaceFlag, 0)
+
 
     def doIt(self, *args):
         """
@@ -157,16 +163,20 @@ class PluginCommand(OpenMaya.MPxCommand):
         if self.source_object_type == 'lattice':
             self.transfer_lattice_shape()
 
+
     def redoIt(self):
         """
         Re-do the command
+
         press "G" in maya
         """
         self.doIt()
 
+
     def undoIt(self):
         """
         Un-do the command
+        
         press "Ctrl+Z" in maya
         """
         if self.source_object_type == 'mesh':
@@ -178,15 +188,20 @@ class PluginCommand(OpenMaya.MPxCommand):
         if self.source_object_type == 'lattice':
             self.transfer_lattice_shape(source_points=self.target_points_store)
 
+
     def isUndoable(self):
         """
         Without this, the above redoIt and undoIt will not be called
         """
         return True
 
+
     def transfer_mesh_shape(self, source_points=None):
         """
         Transfer mesh shape
+
+        Args:
+            source_points (bool): for the undo feature, I store the points position before we apply the transfer. Defaults to None
         """
         source = OpenMaya.MFnMesh(self.source)
         target = OpenMaya.MFnMesh(self.target)
@@ -205,6 +220,9 @@ class PluginCommand(OpenMaya.MPxCommand):
     def transfer_nurbs_shape(self, source_points=None):
         """
         Transfer nurbs shape
+
+        Args:
+            source_points (bool): for the undo feature, I store the points position before we apply the transfer. Defaults to None
         """
         # I've tried with OpenMaya but it seems it does not work when working with blendshapes in edit mode
         if self.world_space:
@@ -241,6 +259,9 @@ class PluginCommand(OpenMaya.MPxCommand):
     def transfer_curve_shape(self, source_points=None):
         """
         Transfer curve shape
+
+        Args:
+            source_points (bool): for the undo feature, I store the points position before we apply the transfer. Defaults to None
         """
         # I've tried with OpenMaya but it seems it does not work when working with blendshapes in edit mode
         if self.world_space:
@@ -277,6 +298,9 @@ class PluginCommand(OpenMaya.MPxCommand):
     def transfer_lattice_shape(self, source_points=None):
         """
         Transfer lattice shape
+
+        Args:
+            source_points (bool): undo feature argument, I use this to apply the shape stored. Defaults to None
         """
         if self.world_space:
             world_space = True
@@ -329,11 +353,13 @@ class PluginCommand(OpenMaya.MPxCommand):
         print('--------------------------------------------------------------------------------')
         print('--------------------------------------------------------------------------------')
 
+
 def command_creator():
     """
     Create the command
     """
     return PluginCommand()
+
 
 def syntax_creator():
     """
@@ -349,6 +375,7 @@ def syntax_creator():
 
     return syntax
 
+
 def maya_useNewAPI():
     """
     The presence of this function tells Maya that the plugin produces, and
@@ -357,6 +384,7 @@ def maya_useNewAPI():
     some hours wasted because of this :)
     """
     pass
+
 
 def initializePlugin(plugin):
     """
@@ -374,6 +402,7 @@ def initializePlugin(plugin):
         m_plugin.registerCommand(command_name, command_creator, syntax_creator)
     except:  # noqa: E722
         sys.stderr.write('Failed to register command: {}'.format(command_name))
+
 
 def uninitializePlugin(plugin):
     """

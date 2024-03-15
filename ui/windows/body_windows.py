@@ -7,11 +7,20 @@ from hiddenStrings.libs import window_lib
 
 
 class ArmWindow(window_lib.Helper):
+    """
+    Create the arm window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the arm option window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of ArmWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(ArmWindow, self).__init__(title='Arm Guides Options', size=(450, 450))
 
@@ -104,6 +113,7 @@ class ArmWindow(window_lib.Helper):
                         attachPosition=[(self.name, 'top', 0, 5)]
                         )
 
+
     def apply_command(self, *args):
         """
         Apply button command
@@ -158,7 +168,11 @@ class ArmWindow(window_lib.Helper):
                                  skin_start_mid_joints_number_default_value=skin_start_mid_joints_number,
                                  skin_mid_end_joints_number_default_value=skin_mid_end_joints_number)
 
+
     def set_finger_list_enable(self, *args):
+        """
+        Set the finger list textField enable
+        """
         if cmds.textFieldGrp(self.fingers_list, query=True, enable=True):
             cmds.textFieldGrp(self.fingers_list, edit=True, enable=False)
             cmds.textFieldGrp(self.roll_finger_exclude_list, edit=True, enable=False)
@@ -168,11 +182,20 @@ class ArmWindow(window_lib.Helper):
 
 
 class LegWindow(window_lib.Helper):
+    """
+    Create the leg window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the leg option window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of LegWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(LegWindow, self).__init__(title='Leg Guides Options', size=(450, 450))
 
@@ -265,6 +288,7 @@ class LegWindow(window_lib.Helper):
                         attachPosition=[(self.name, 'top', 0, 5)]
                         )
 
+
     def apply_command(self, *args):
         """
         Apply button command
@@ -319,7 +343,11 @@ class LegWindow(window_lib.Helper):
                                  skin_start_mid_joints_number_default_value=skin_start_mid_joints_number,
                                  skin_mid_end_joints_number_default_value=skin_mid_end_joints_number)
 
+
     def set_finger_list_enable(self, *args):
+        """
+        Set the finger list textField enable
+        """
         if cmds.textFieldGrp(self.fingers_list, query=True, enable=True):
             cmds.textFieldGrp(self.fingers_list, edit=True, enable=False)
             cmds.textFieldGrp(self.roll_finger_exclude_list, edit=True, enable=False)
@@ -329,11 +357,20 @@ class LegWindow(window_lib.Helper):
 
 
 class NeckWindow(window_lib.Helper):
+    """
+    Create the neck window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the neck option window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of NeckWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(NeckWindow, self).__init__(title='Neck Guides Options', size=(450, 450))
 
@@ -432,6 +469,7 @@ class NeckWindow(window_lib.Helper):
                                         (self.end_ik_world_rotation, 'bottom', 0, 5)]
                         )
 
+
     def apply_command(self, *args):
         """
         Apply button command
@@ -486,11 +524,20 @@ class NeckWindow(window_lib.Helper):
 
 
 class RootWindow(window_lib.Helper):
+    """
+    Create the root window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the root option window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of RootWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(RootWindow, self).__init__(title='Root Guides Options', size=(450, 100))
 
@@ -503,6 +550,7 @@ class RootWindow(window_lib.Helper):
         cmds.formLayout(self.main_layout, edit=True,
                         attachForm=[(self.system_orientation, 'top', 10),
                                     (self.system_orientation, 'left', 25)])
+
 
     def apply_command(self, *args):
         """
@@ -519,11 +567,20 @@ class RootWindow(window_lib.Helper):
 
 
 class SpineWindow(window_lib.Helper):
+    """
+    Create the spine window
+    
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the spine option window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of SpineWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(SpineWindow, self).__init__(title='Spine Guides Options', size=(450, 450))
 
@@ -622,6 +679,7 @@ class SpineWindow(window_lib.Helper):
                         attachPosition=[(self.name, 'top', 0, 5),
                                         (self.end_ik_world_rotation, 'bottom', 0, 5)]
                         )
+
 
     def apply_command(self, *args):
         """

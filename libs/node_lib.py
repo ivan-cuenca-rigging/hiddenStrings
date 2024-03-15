@@ -12,9 +12,18 @@ logging = logging.getLogger(__name__)
 
 
 class Helper(attribute_lib.Helper):
+    """
+    Node Helper class
+
+    Args:
+        name (str): name of the node
+    """
     def __init__(self, name):
         """
-        :param name: str
+        Initializes an instance of node Helper
+
+        Args:
+            name (str): name of the node
         """
         super(Helper, self).__init__(name)
         self.name = name
@@ -26,13 +35,15 @@ class Helper(attribute_lib.Helper):
         self.check_side()
         self.check_node_type()
 
+
     # ---------- Checks Methods ----------
     def check_tokens_len(self):
         """
-        check if the name has 3 tokens {descriptor}_{side}_{usage}
+        Check if the name has 3 tokens {descriptor}_{side}_{usage}
         """
         if len(self.name_tokens) != 3:  # Check that the name has 3 tokens
             cmds.error('the name must have 3 tokens')
+
 
     def check_side(self):
         """
@@ -41,6 +52,7 @@ class Helper(attribute_lib.Helper):
         if self.side not in side_lib.valid_sides:
             cmds.error('the name must have a valid side, {}'.format(side_lib.valid_sides))
 
+
     def check_usage(self):
         """
         Check if the usage is a valid usage
@@ -48,94 +60,135 @@ class Helper(attribute_lib.Helper):
         if self.usage not in usage_lib.valid_usages:
             cmds.error('the name must have a valid usage, {}'.format(usage_lib.valid_usages))
 
+
     def check_node_type(self):
         """
-        if the node exists, check the node type
-        :return: node type
+        If the node exists, check the node type
+        
+        Returns:
+            str: node type
         """
         if cmds.objExists(self.name):  # If exist get the node type
             self.node_type = cmds.nodeType(self.name)
 
         return self.node_type
 
+
     # ---------- Naming Methods ----------
     def get_name(self):
         """
         Get node's name
-        :return: name
+        
+        Returns:
+            str: name
         """
         return self.name
+
 
     def set_name(self, new_name):
         """
         Set node's name
-        :param new_name: str
+        
+        Args:
+            new_name (str): new name
         """
         self.name = cmds.rename(self.name, new_name)
+
 
     def get_descriptor(self):
         """
         Get node's descriptor
-        :return: descriptor
+
+        Returns:
+            str: descriptor
         """
         return self.name_tokens[0]
+
 
     def get_descriptor_capitalize(self):
         """
         Get node's descriptor capitalize
-        :return: descriptor capitalize
+
+        Returns:
+            str: descriptor capitalize
         """
         return '{}{}'.format(self.get_descriptor()[0].upper(), self.get_descriptor()[1:])
+
 
     def set_descriptor(self, new_descriptor):
         """
         Set node's descriptor
-        :param new_descriptor: str
+
+        Args:
+            new_descriptor (str): new descriptor
         """
         self.name = cmds.rename(self.name, '{}_{}_{}'.format(new_descriptor, self.name_tokens[1], self.name_tokens[2]))
+
 
     def get_side(self):
         """
         Get node's side
-        :return: side
+
+        Returns:
+            str: side
         """
         return self.name_tokens[1]
+
 
     def set_side(self, new_side):
         """
         Set node's side
-        :param new_side: str
+        
+        Args:
+            new_side (str): new side
         """
         self.name = cmds.rename(self.name, '{}_{}_{}'.format(self.name_tokens[0], new_side, self.name_tokens[2]))
+
 
     def get_usage(self):
         """
         Get node's usage
-        :return: usage
+
+        Returns:
+            str: usage
         """
         return self.name_tokens[2]
+
 
     def get_usage_capitalize(self):
         """
         Get node's usage capitalize
-        :return: usage capitalize
+
+        Returns:
+            str: usage capitalize
         """
         return '{}{}'.format(self.get_usage()[0].upper(), self.get_usage()[1:])
+
 
     def set_usage(self, new_usage):
         """
         set node's name
-        :param new_usage: str
+        
+        Args:
+            new_usage (str): new usage
         """
         self.name = cmds.rename(self.name, '{}_{}_{}'.format(self.name_tokens[0], self.name_tokens[1], new_usage))
 
+
     def get_node_type(self):
+        """
+        Get the node type
+
+        Returns:
+            str: node type
+        """
         return cmds.nodeType(self.name)
+
 
     # ---------- Position Methods ----------
     def set_to_zero(self):
         """
-        set transform and user defined attributes to default
+        Set transform and user defined attributes to default
         """
         ud_attrs_l = cmds.listAttr(self.name, ud=True, settable=True)
         for attr in ['translate', 'rotate', 'scale']:
@@ -154,27 +207,36 @@ class Helper(attribute_lib.Helper):
             for axis in ['X', 'Y', 'Z']:
                 cmds.setAttr('{}.jointOrient{}'.format(self.name, axis), 0)
 
+
     def get_matrix(self):
         """
         Get node's matrix
-        :return: matrix
+
+        Returns:
+            matrix: node's matrix
         """
         return cmds.xform(self.name, query=True, worldSpace=True, matrix=True)
+
 
     def set_matrix(self, point):
         """
         Set node's matrix
-        :param point: str
+        
+        Args:
+            point (str): point
         """
         point_matrix = cmds.xform(point, query=True, worldSpace=True, matrix=True)
         cmds.xform(self.name, worldSpace=True, matrix=point_matrix)
 
+
     def set_offset_parent_matrix(self, point, translation=False, rotation=False):
         """
         Set node's shape_offset parent matrix
-        :param point: str
-        :param translation: bool
-        :param rotation: bool
+        
+        Args:
+            point (str): point
+            translation (bool): only translation. Defaults to False.
+            rotation (bool): only rotation. Defaults to False.
         """
         if type(point) == list:
             point_matrix = point
@@ -204,19 +266,25 @@ class Helper(attribute_lib.Helper):
 
         cmds.setAttr('{}.offsetParentMatrix'.format(self.name), point_matrix, type='matrix')
 
+
     def get_position(self):
         """
         Get node's position
-        :return: translate values
+
+        Returns:
+            list: translate (x, y, z) values
         """
         return cmds.xform(self.name, query=True, worldSpace=True, translation=True)
+
 
     def set_position(self, x, y, z):
         """
         Set node's position
-        :param x: float
-        :param y: float
-        :param z: float
+
+        Args:
+            x (float): new x value
+            y (float): new y value
+            z (float): new z value
         """
         if x:
             cmds.setAttr('{}.translateX'.format(self.name), x)
@@ -225,10 +293,13 @@ class Helper(attribute_lib.Helper):
         if z:
             cmds.setAttr('{}.translateZ'.format(self.name), z)
 
+
     def set_position_from_point(self, point):
         """
         Set node's position from point
-        :param point: str
+
+        Args:
+            point (str): point
         """
         if isinstance(point, list):
             point_position = point
@@ -236,20 +307,26 @@ class Helper(attribute_lib.Helper):
             point_position = cmds.xform(point, query=True, worldSpace=True, translation=True)
         cmds.xform(self.name, worldSpace=True, translation=point_position)
 
+
     def get_rotation(self):
         """
         Get node's rotation
-        :return: rotation values
+
+        Returns:
+            list: rotation (x, y, z) values
         """
         return cmds.xform(self.name, query=True, worldSpace=True, rotation=True)
+
 
     def set_rotation(self, xyz=None, x=None, y=None, z=None):
         """
         Set node's rotation
-        :param xyz: float
-        :param x: float
-        :param y: float
-        :param z: float
+
+        Args:
+            xyz (float): new xyz value. Defaults to None.
+            x (float): new x value. Defaults to None.
+            y (float): new y value. Defaults to None.
+            z (float): new z value. Defaults to None.
         """
         if xyz:
             for index, axis in enumerate('XYZ'):
@@ -261,27 +338,36 @@ class Helper(attribute_lib.Helper):
         if z:
             cmds.setAttr('{}.rotateZ'.format(self.name), z)
 
+
     def set_rotation_from_point(self, point):
         """
         Set node's rotation from point
-        :param point: str
+
+        Args:
+            point (str): point
         """
         point_rotation = cmds.xform(point, query=True, worldSpace=True, rotation=True)
         cmds.xform(self.name, worldSpace=True, rotation=point_rotation)
 
+
     def get_scale(self):
         """
         Get node's scale
-        :return: scale values
+
+        Returns:
+            list: scale (x, y, z) values
         """
         return cmds.xform(self.name, query=True, worldSpace=True, scale=True)
+
 
     def set_scale(self, x, y, z):
         """
         Set node's scale
-        :param x: float
-        :param y: float
-        :param z: float
+
+        Args:
+            x (float): new x value
+            y (float): new y value
+            z (float): new z value
         """
         if x:
             cmds.setAttr('{}.scaleX'.format(self.name), x)
@@ -290,20 +376,24 @@ class Helper(attribute_lib.Helper):
         if z:
             cmds.setAttr('{}.scaleZ'.format(self.name), z)
 
+
     def set_scale_from_point(self, point):
         """
         Set node's scale from point
-        :param point: str
+
+        Args:
+            point (str): point
         """
         point_rotation = cmds.xform(point, query=True, worldSpace=True, scale=True)
         cmds.xform(self.name, worldSpace=True, scale=point_rotation)
 
+
     def aim_to(self, point, aim_vector='x', up_vector='z'):
         """
         Aim node's to the point
-        :param point: str
-        :param aim_vector: str, 'x', 'y', 'z', '-x', '-y' or '-z'
-        :param up_vector: str, 'x', 'y', 'z', '-x', '-y' or '-z'
+            point (str):
+            aim_vector (str): 'x', 'y', 'z', '-x', '-y' or '-z'. Defaults to 'x'
+            up_vector (str): 'x', 'y', 'z', '-x', '-y' or '-z'. Defaults to 'z'
         """
         vector_dict = {'x': (1, 0, 0),
                        'y': (0, 1, 0),
@@ -319,11 +409,14 @@ class Helper(attribute_lib.Helper):
                                        worldUpType='vector',
                                        worldUpVector=up_vector))
 
+
     # ---------- Hierarchy methods ----------
     def get_structural_parent(self):
         """
         Get node's parent
-        :return: structural parent
+
+        Returns:
+            str: structural parent
         """
         structural_parent = cmds.listRelatives(self.name, parent=True)
         if structural_parent:
@@ -332,10 +425,13 @@ class Helper(attribute_lib.Helper):
             logging.info('It is a child of the parent "world".')
         return structural_parent
 
+
     def get_structural_parent_list(self):
         """
         Get node's parent list
-        :return: structural parent list
+
+        Returns:
+            list: structural parent list
         """
         structural_parent_list = cmds.listRelatives(self.name, fullPath=True, parent=True)
         if structural_parent_list:
@@ -343,10 +439,13 @@ class Helper(attribute_lib.Helper):
 
         return structural_parent_list
 
+
     def get_zero(self):
         """
         Get node's zero's name if it exists
-        :return: zero's name
+
+        Returns:
+            str: zero's name
         """
         zero = None
         zero_name = '{}{}_{}_zero'.format(self.get_descriptor(), self.get_usage().capitalize(), self.get_side())
@@ -354,18 +453,26 @@ class Helper(attribute_lib.Helper):
             zero = zero_name
         return zero
 
+
     def create_zero(self):
         """
         Create an structural parent with the zero's usage
-        :return:
+
+        Returns:
+            str: zero name
         """
         return self.create_structural_parent(usage=usage_lib.zero)
+
 
     def create_structural_parent(self, usage):
         """
         Create structural parent
-        :param usage: str
-        :return: structural parent
+        
+        Args:
+            usage (str): usage
+
+        Returns:
+            str: structural parent
         """
         point_matrix = self.get_matrix()
         parent_name = '{}{}_{}_{}'.format(self.get_descriptor(), self.get_usage().capitalize(), self.get_side(), usage)
@@ -380,10 +487,13 @@ class Helper(attribute_lib.Helper):
 
         return new_structural_parent
 
+
     def set_parent(self, parent):
         """
         set node's parent
-        :param parent: str
+
+        Args:
+            parent (str): parent name
         """
         if self.get_zero():
             cmds.parent(self.get_zero(), parent)
@@ -395,19 +505,25 @@ class Helper(attribute_lib.Helper):
                     cmds.setAttr('{}.jointOrient{}'.format(self.name, axis), 0)
                 cmds.xform(self.name, worldSpace=True, rotation=node_rotation)
 
+
     def set_parent_matrix(self, point):
         """
         Set node's parent's matrix
-        :param point: str
+
+        Args:
+            point (str): point
         """
         structural_parent = self.get_structural_parent()
         point_matrix = cmds.xform(point, query=True, worldSpace=True, matrix=True)
         cmds.xform(structural_parent, worldSpace=True, matrix=point_matrix)
 
+
     def set_parent_position(self, point):
         """
         set node's parent's position
-        :param point: str
+
+        Args:
+            point (str): point
         """
         structural_parent = self.get_structural_parent()
         if isinstance(point, str):
@@ -416,12 +532,15 @@ class Helper(attribute_lib.Helper):
         else:
             cmds.xform(structural_parent, worldSpace=True, translation=point)
 
+
     def parent_aim_to(self, point, aim_vector='x', up_vector='z'):
         """
         Aim the node's parent to the point
-        :param point: str
-        :param aim_vector: str, 'x', 'y', 'z', '-x', '-y' or '-z'
-        :param up_vector: str, 'x', 'y', 'z', '-x', '-y' or '-z'
+
+        Args:
+            point (str): point
+            aim_vector (str): 'x', 'y', 'z', '-x', '-y' or '-z'. Defaults to 'x'
+            up_vector (str): 'x', 'y', 'z', '-x', '-y' or '-z'. Defaults to 'z'
         """
         structural_parent = self.get_structural_parent()
         vector_dict = {'x': (1, 0, 0),
@@ -438,8 +557,10 @@ class Helper(attribute_lib.Helper):
                                        worldUpType='vector',
                                        worldUpVector=up_vector))
 
+
     def __repr__(self):
         """
-        :return: name
+        Returns:
+            str: name
         """
         return self.name

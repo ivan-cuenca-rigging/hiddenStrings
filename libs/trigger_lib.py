@@ -14,10 +14,12 @@ def create_bary_trigger(descriptor='bary', side=side_lib.center,
                         driver_node=None):
     """
     Create a bary trigger with bifrost
-    :param descriptor: str
-    :param side: str
-    :param parent_node: str
-    :param driver_node: str
+
+    Args:
+        descriptor (str): descriptor. Defaults to 'bary'.
+        side (str): side
+        parent_node (str): parent node. Defaults to None.
+        driver_node (str): driver node. Defaults to None.
     """
     bary_grp = cmds.createNode('transform', name='{}{}_{}_{}'.format(descriptor,
                                                                      usage_lib.get_usage_capitalize(usage_lib.trigger),
@@ -97,10 +99,12 @@ def create_angle_trigger(parent_node, driver_node,
                          structural_parent='triggers_c_grp'):
     """
     Create an angle trigger system
-    :param parent_node: str
-    :param driver_node: str
-    :param forbidden_word: str
-    :param structural_parent: str
+
+    Args:
+    parent_node (str): parent node
+    driver_node (str): driver node
+    forbidden_word (str): forbidden words to avoid in the name. Defaults to '01'.
+    structural_parent (str): structutal parent node. Defaults to 'triggers_c_grp'.
     """
     # Splitting names for renaming all the nodes
     if len(parent_node.split('_')) == 3:

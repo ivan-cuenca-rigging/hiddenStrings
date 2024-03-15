@@ -17,6 +17,16 @@ identity_matrix_x_negative = [-1, 0, 0, 0,
 
 
 def distance_from_a_to_b(a, b):
+    """
+    Get distance between two nodes
+
+    Args:
+        a (str): dag node
+        b (str): dag node
+
+    Returns:
+        float: distance
+    """
     a_pos = cmds.xform(a, query=True, worldSpace=True, translation=True)
     b_pos = cmds.xform(b, query=True, worldSpace=True, translation=True)
 
@@ -25,11 +35,15 @@ def distance_from_a_to_b(a, b):
 
 def get_n_positions_from_a_to_b(a, b, n):
     """
-    Get a number of positions from a to b
-    :param a: str
-    :param b: str
-    :param n: int
-    :return: list of points
+    Get a number of positions between two points
+
+    Args:
+        a (str): dag node
+        b (str): dag node
+        n (int): number of positions
+
+    Returns:
+        list: list of positions (translations)
     """
     awp = a
     bwp = b
@@ -44,11 +58,15 @@ def get_n_positions_from_a_to_b(a, b, n):
 
 def get_n_matrices_from_a_to_b(a, b, n):
     """
-    Get a number of matrices from a to b
-    :param a: str
-    :param b: str
-    :param n: int
-    :return: list of matrices
+    Get a number of matrices between two points
+
+    Args:
+        a (str): dag node
+        b (str): dag node
+        n (int): number of positions
+
+    Returns:
+        list: list of matrices
     """
     position_list = get_n_positions_from_a_to_b(a, b, n)
     a_rotation = cmds.xform(a, query=True, worldSpace=True, rotation=True)
@@ -69,11 +87,15 @@ def get_n_matrices_from_a_to_b(a, b, n):
 
 def get_percentage_positions_from_a_to_b(a, b, percentage_values=None):
     """
-    Get a number of position from a to b in percentages
-    :param a: str
-    :param b: str
-    :param percentage_values: list, 0 to 1
-    :return: list of points
+    Get a number of positions between two points given percentages
+
+    Args:
+        a (str): dag node
+        b (str): dag node
+        percentage_values (list): percentages. Defaults to None.
+
+    Returns:
+        list: list of positions (translations)
     """
     if percentage_values is None:
         percentage_values = [0, 0.25, 0.5, 0.75, 1]
@@ -95,11 +117,15 @@ def get_percentage_positions_from_a_to_b(a, b, percentage_values=None):
 
 def get_percentage_matrices_from_a_to_b(a, b, percentage_values=None):
     """
-    Get a number of matrices from a to b in percentages
-    :param a: str
-    :param b: str
-    :param percentage_values: list, 0 to 1
-    :return: list of matrices
+    Get a number of positions between two points given percentages
+
+    Args:
+        a (str): dag node
+        b (str): dag node
+        percentage_values (list): percentages. Defaults to None.
+
+    Returns:
+        list: list of matrices
     """
     position_list = get_percentage_positions_from_a_to_b(a, b, percentage_values)
     a_rotation = cmds.xform(a, query=True, worldSpace=True, rotation=True)
@@ -120,9 +146,13 @@ def get_percentage_matrices_from_a_to_b(a, b, percentage_values=None):
 
 def inverse_matrix(matrix_a):
     """
-    Returns the inverse of the matrix given
-    :param matrix_a: matrix
-    :return: inverse matrix
+    Get the inverse matrix of the matrix given
+
+    Args:
+        matrix_a (matrix): matrix
+
+    Returns:
+        matrix: inverse matrix
     """
     matrix_result = identity_matrix
 
@@ -158,10 +188,14 @@ def inverse_matrix(matrix_a):
 
 def multiply_matrices_4_by_4(matrix_a, matrix_b):
     """
-    multiply 2 matrices
-    :param matrix_a: matrix
-    :param matrix_b: matrix
-    :return: matrix result
+    Multiply 2 matrices
+
+    Args:
+        matrix_a (matrix): matrix
+        matrix_b (matrix): matrix
+
+    Returns:
+        matrix: matrix result
     """
     a_rows = list()
     b_rows = list()

@@ -277,6 +277,7 @@ def get_in_between_value(blend_shape, target, in_between):
         if in_between_name == in_between:
             return value
 
+
 def get_blend_shapes_from_shape_editor():
     """
     Get blendShapes from the shape editor
@@ -533,6 +534,7 @@ def rename_in_between(blend_shape, target, in_between, new_name):
 
     return new_name
 
+
 def create_blend_shape(node, target_list=None):
     """
     Create a blendshape
@@ -752,6 +754,7 @@ def mirror_target(blend_shape, target):
             cmds.delete(mirror_rebuild)
     
     logging.info('{} has been transfered and flipped to --> {}'.format(target, target_mirror_name))
+
 
 def copy_target_connection(source=None, destination_list=None, *args):
     """

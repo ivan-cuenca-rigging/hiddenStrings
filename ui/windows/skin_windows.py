@@ -10,11 +10,20 @@ from hiddenStrings.libs import window_lib, import_export_lib, skeleton_lib, skin
 
 
 class ExportSkinWindow(window_lib.Helper):
+    """
+    Create the export skin window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the export skin window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of ExportSkinWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(ExportSkinWindow, self).__init__(title='Export Skin Options', size=(450, 130))
 
@@ -39,6 +48,7 @@ class ExportSkinWindow(window_lib.Helper):
                                        (self.file_search, 'top', 5, self.skin_index),
                                        (self.file_search, 'left', 5, self.export_path)])
 
+
     def apply_command(self, *args):
         """
         Apply button command
@@ -54,6 +64,7 @@ class ExportSkinWindow(window_lib.Helper):
                 import_export_lib.export_skin_clusters(node_list=selection_list, path=export_path,
                                                        skin_index=skin_index)
 
+
     def file_dialog_command(self, *args):
         """
         Open the explorer window to set the path
@@ -61,6 +72,7 @@ class ExportSkinWindow(window_lib.Helper):
         folder_path = cmds.fileDialog2(dialogStyle=2, fileMode=2)
         if folder_path:
             cmds.textFieldGrp(self.export_path, edit=True, text=folder_path[0])
+
 
     def set_skin_index_enable(self, *args):
         """
@@ -71,17 +83,30 @@ class ExportSkinWindow(window_lib.Helper):
         else:
             cmds.intFieldGrp(self.skin_index, edit=True, enable=True)
 
+
     def bottom_layout(self):
+        """
+        Create the bottom layout
+        """
         add_button, apply_button, close_button = super(ExportSkinWindow, self).bottom_layout()
         cmds.button(add_button, edit=True, label='Export')
 
 
 class ImportSkinWindow(window_lib.Helper):
+    """
+    Create the import skin window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the import skin window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of ImportSkinWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(ImportSkinWindow, self).__init__(title='Import Skin Options', size=(450, 225))
 
@@ -116,6 +141,7 @@ class ImportSkinWindow(window_lib.Helper):
                                        (self.file_search, 'top', 5, self.replace_with),
                                        (self.file_search, 'left', 5, self.import_path)])
 
+
     def apply_command(self, *args):
         """
         Apply button command
@@ -139,6 +165,7 @@ class ImportSkinWindow(window_lib.Helper):
                                                   skin_index=skin_index, import_method=import_method,
                                                   search_for=search_for, replace_with=replace_with)
 
+
     def file_dialog_command(self, *args):
         """
         Open the explorer window to set the path
@@ -151,6 +178,7 @@ class ImportSkinWindow(window_lib.Helper):
         if folder_path:
             cmds.textFieldGrp(self.import_path, edit=True, text=folder_path[0])
 
+
     def set_skin_index_enable(self, *args):
         """
         Change skin_index enable
@@ -160,17 +188,30 @@ class ImportSkinWindow(window_lib.Helper):
         else:
             cmds.intFieldGrp(self.skin_index, edit=True, enable=True)
 
+
     def bottom_layout(self):
+        """
+        Create the bottom layout
+        """
         add_button, apply_button, close_button = super(ImportSkinWindow, self).bottom_layout()
         cmds.button(add_button, edit=True, label='Import')
 
 
 class PushJointWindow(window_lib.Helper):
+    """
+    Create the push joint window
+    
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the renamer window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of PushJointWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(PushJointWindow, self).__init__(title='Push Joint', size=(450, 215))
 
@@ -211,6 +252,7 @@ class PushJointWindow(window_lib.Helper):
                                        (self.rotation_axis, 'top', 5, self.forbidden_word),
                                        (self.structural_parent, 'top', 5, self.rotation_axis)])
 
+
     def apply_command(self, *args):
         parent_node = cmds.textFieldGrp(self.parent_node, query=True, text=True)
 
@@ -232,17 +274,27 @@ class PushJointWindow(window_lib.Helper):
                                        rotation_axis=rotation_axis,
                                        structural_parent=structural_parent)
 
+
     @staticmethod
     def get_from_scene(text_field, *args):
         cmds.textFieldGrp(text_field, edit=True, text=cmds.ls(selection=True)[0])
 
 
 class TransferSkinWindow(window_lib.Helper):
+    """ 
+    Create the transfer skin window
+    
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the import skin window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of TransferSkinWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(TransferSkinWindow, self).__init__(title='Import Skin Options', size=(450, 150))
 
@@ -262,6 +314,7 @@ class TransferSkinWindow(window_lib.Helper):
 
                         attachControl=[(self.target_skin_index, 'top', 5, self.source_skin_index),
                                        (self.transfer_method, 'top', 5, self.target_skin_index)])
+
 
     def apply_command(self, *args):
         """

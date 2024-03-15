@@ -240,7 +240,7 @@ def import_blend_shape(node, path):
     Import blendShape from path
 
     Args:
-        node (str): node affected by the blendshape imported
+        node (str): node that receives the blendshape
         path (str): full file path to import
     """
     file_name = os.path.basename(path).split('.json')[0]
@@ -279,10 +279,12 @@ def import_blend_shapes(path):
 
 def export_skin_cluster(node, path, skin_index=1):
     """
-    Export skinCluster index of the node given if index == None then all index will be exported
-    :param node: str
-    :param path: str
-    :param skin_index: int. -1 (last), 1, 2, 3
+    Export node skinCluster/s
+    
+    Args:
+        node (str): node with a skinCluster
+        path (str): export file folder
+        skin_index (int): index of the skin, if None all the skinClusters will be exported. Defaults to 1.
     """
     if skin_index:
         skin_cluster = skin_lib.rename_skin_cluster(skin_lib.get_skin_cluster_index(node, skin_index))
@@ -314,10 +316,12 @@ def export_skin_cluster(node, path, skin_index=1):
 
 def export_skin_clusters(node_list, path, skin_index=1):
     """
-    export all skinClusters
-    :param node_list: list
-    :param path: string
-    :param skin_index: int. -1 (last), 1, 2, 3
+    Export all skinClusters
+
+    Args:
+        node_list (list): list of nodes with the skinClusters we want to export
+        path (str): export folder path
+        skin_index (int): index of the skin, if None all the skinClusters will be exported. Defaults to 1.
     """
     for node in node_list:
         export_skin_cluster(node=node, path=path, skin_index=skin_index)
@@ -326,13 +330,14 @@ def export_skin_clusters(node_list, path, skin_index=1):
 def import_skin_cluster(node, path, skin_index=1, import_method='index', search_for=None, replace_with=None):
     """
     Import skinCluster from path
-    :param node: str
-    :param path: str
-    :param skin_index: int. -1 (last), 1, 2, 3
-    :param import_method: index or nearest
-    :param search_for: str; use "," for more than once
-    :param replace_with: str; use "," for more than once
-    :return:
+
+    Args:
+        node (str): node that receives the skinCluster
+        path (str): full path of the skinCluster to import
+        skin_index (int): index of the skin, if None all the skinClusters will be exported. Defaults to 1.
+        import_method (str): index or nearest. Defaults to 'index'.
+        search_for (str): search string. Use ',' for more than once
+        replace_with (str): replace string. Use ',' for more than once
     """
     skin_cluster = skin_lib.get_skin_cluster_index(node, skin_index)
     file_name = os.path.basename(path)
@@ -409,8 +414,10 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index', search_
 def import_skin_clusters(path, import_method='index'):
     """
     Import all json skinClusters from folder
-    :param path: string
-    :param import_method: string, index or nearest
+
+    Args:
+        path (str): 
+        import_method (str): can be 'index' or 'nearest'
     """
     file_list = [x for x in os.listdir(path) if x.endswith('.json')]
     for skin_file in file_list:
@@ -430,13 +437,17 @@ def import_skin_clusters(path, import_method='index'):
 def export_data_to_json(data, file_name, file_path, relative_path=True, use_indent=True, compact=False):
     """
     export data to a json file
-    :param data: str, list, dict
-    :param file_name: str
-    :param file_path: str
-    :param relative_path: bool
-    :param use_indent: bool
-    :param compact: bool
-    :return: file path name with ".json"
+
+    Args:
+        data (str): data to export
+        file_name (str): file name
+        file_path (str): file folder path
+        relative_path (bool): relative to the file. Defaults to True
+        use_indent (bool): indentation. Defaults to True
+        compact (bool): for huge files. Defaults to False
+
+    Returns: 
+        str: file path name with ".json"
     """
     if relative_path:
         module_path = os.path.dirname(os.path.dirname(__file__))
@@ -458,10 +469,14 @@ def export_data_to_json(data, file_name, file_path, relative_path=True, use_inde
 def import_data_from_json(file_name, file_path, relative_path=True):
     """
     Import data from a json file
-    :param file_name: str
-    :param file_path: str
-    :param relative_path: bool
-    :return: data
+
+    Args:
+        file_name (str): file name
+        file_path (str): file folder path
+        relative_path (bool): relative to the file. Defaults to True
+
+    Returns:
+        str: data imported
     """
     if relative_path:
         script_path = os.path.dirname(os.path.dirname(__file__))
@@ -478,10 +493,14 @@ def import_data_from_json(file_name, file_path, relative_path=True):
 def search_and_replace_in_file(path, search_for, replace_with):
     """
     Replace words in the file
-    :param path: str
-    :param search_for: str; use "," for more than once
-    :param replace_with: str; use "," for more than once
-    return path
+
+    Args:
+        path (str): path
+        search_for (str): search string. Use ',' for more than once
+        replace_with (str): replace string. Use ',' for more than once
+
+    Returns:
+        str: path
     """
 
     search_for = search_for.split(',')

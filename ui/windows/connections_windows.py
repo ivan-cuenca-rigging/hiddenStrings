@@ -8,11 +8,20 @@ from hiddenStrings.libs import connection_lib, window_lib, import_export_lib
 
 
 class ConnectOffsetParentMatrixWindow(window_lib.Helper):
+    """
+    Create the connect offset parent matrix window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the connectOffsetParentMatrix option window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of ConnectOffsetParentMatrixWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(ConnectOffsetParentMatrixWindow, self).__init__(title='connect offset parent matrix Options',
                                                               size=(450, 150))
@@ -30,6 +39,7 @@ class ConnectOffsetParentMatrixWindow(window_lib.Helper):
                         attachControl=[(self.rotate, 'top', 5, self.translate),
                                        (self.scale, 'top', 5, self.rotate),
                                        (self.shear, 'top', 5, self.scale)])
+
 
     def apply_command(self, *args):
         """
@@ -53,11 +63,20 @@ class ConnectOffsetParentMatrixWindow(window_lib.Helper):
 
 
 class ConnectTranslateWindow(window_lib.Helper):
+    """
+    Create the connect translate window
+    
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the ConnectTranslateMenu option window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of ConnectTranslateWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(ConnectTranslateWindow, self).__init__(title='connect translate Options', size=(450, 125))
 
@@ -74,6 +93,7 @@ class ConnectTranslateWindow(window_lib.Helper):
                                     (self.translate_axis, 'left', 142)],
 
                         attachControl=[(self.translate_axis, 'top', 5, self.translate)])
+
 
     def apply_command(self, *args):
         """
@@ -95,7 +115,11 @@ class ConnectTranslateWindow(window_lib.Helper):
         if translate or translate_z:
                 cmds.connectAttr('{}.translateZ'.format(sel[0]), '{}.translateZ'.format(sel[1]), force=True)
 
+
     def set_translate_axis_enable(self, *args):
+        """
+        Set the translate axis checkboxes enable
+        """
         if cmds.checkBoxGrp(self.translate, query=True, enable=True, value1=True):
             cmds.checkBoxGrp(self.translate_axis, edit=True, enable=False)
         else:
@@ -103,11 +127,20 @@ class ConnectTranslateWindow(window_lib.Helper):
 
 
 class ConnectRotateWindow(window_lib.Helper):
+    """
+    Create the connect rotate window
+    
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the ConnectRotateMenu option window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of ConnectRotateWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(ConnectRotateWindow, self).__init__(title='connect scale Options', size=(450, 125))
 
@@ -124,6 +157,7 @@ class ConnectRotateWindow(window_lib.Helper):
                                     (self.rotate_axis, 'left', 142)],
 
                         attachControl=[(self.rotate_axis, 'top', 5, self.rotate)])
+
 
     def apply_command(self, *args):
         """
@@ -145,7 +179,11 @@ class ConnectRotateWindow(window_lib.Helper):
         if rotate or  rotate_z:
             cmds.connectAttr('{}.rotateZ'.format(sel[0]), '{}.rotateZ'.format(sel[1]), force=True)
 
+
     def set_rotate_axis_enable(self, *args):
+        """
+        Set the rotate axis checkboxes enable
+        """
         if cmds.checkBoxGrp(self.rotate, query=True, enable=True, value1=True):
             cmds.checkBoxGrp(self.rotate_axis, edit=True, enable=False)
         else:
@@ -153,11 +191,20 @@ class ConnectRotateWindow(window_lib.Helper):
 
 
 class ConnectScaleWindow(window_lib.Helper):
+    """
+    Create connect scale window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create connect scale option Window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of ConnectScaleWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(ConnectScaleWindow, self).__init__(title='connect scale Options', size=(450, 125))
 
@@ -174,6 +221,7 @@ class ConnectScaleWindow(window_lib.Helper):
                                     (self.scale_axis, 'left', 142)],
 
                         attachControl=[(self.scale_axis, 'top', 5, self.scale)])
+
 
     def apply_command(self, *args):
         """
@@ -194,7 +242,11 @@ class ConnectScaleWindow(window_lib.Helper):
         if scale or scale_z:
             cmds.connectAttr('{}.scaleZ'.format(sel[0]), '{}.scaleZ'.format(sel[1]), force=True)
 
+
     def set_scale_axis_enable(self, *args):
+        """
+        Set the scale axis checkboxes enable
+        """
         if cmds.checkBoxGrp(self.scale, query=True, enable=True, value1=True):
             cmds.checkBoxGrp(self.scale_axis, edit=True, enable=False)
         else:
@@ -202,11 +254,20 @@ class ConnectScaleWindow(window_lib.Helper):
 
 
 class ConnectTranslateRotateScaleWindow(window_lib.Helper):
+    """
+    Create the connect translate rotate scale window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the ConnectTranslateRotateScale option window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of ConnectTranslateRotateScaleWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(ConnectTranslateRotateScaleWindow, self).__init__(title='connect translate rotate scale Options',
                                                                 size=(450, 200))
@@ -242,6 +303,7 @@ class ConnectTranslateRotateScaleWindow(window_lib.Helper):
                                        (self.rotate_axis, 'top', 5, self.rotate),
                                        (self.scale, 'top', 5, self.rotate_axis),
                                        (self.scale_axis, 'top', 5, self.scale)])
+
 
     def apply_command(self, *args):
         """
@@ -287,19 +349,31 @@ class ConnectTranslateRotateScaleWindow(window_lib.Helper):
         if scale or scale_z:
             cmds.connectAttr('{}.scaleZ'.format(sel[0]), '{}.scaleZ'.format(sel[1]), force=True)
 
+
     def set_translate_axis_enable(self, *args):
+        """
+        Set the translate axis checkboxes enable
+        """
         if cmds.checkBoxGrp(self.translate, query=True, enable=True, value1=True):
             cmds.checkBoxGrp(self.translate_axis, edit=True, enable=False)
         else:
             cmds.checkBoxGrp(self.translate_axis, edit=True, enable=True)
 
+
     def set_rotate_axis_enable(self, *args):
+        """
+        Set the rotate axis checkboxes enable
+        """
         if cmds.checkBoxGrp(self.rotate, query=True, enable=True, value1=True):
             cmds.checkBoxGrp(self.rotate_axis, edit=True, enable=False)
         else:
             cmds.checkBoxGrp(self.rotate_axis, edit=True, enable=True)
 
+
     def set_scale_axis_enable(self, *args):
+        """
+        Set the scale axis checkboxes enable
+        """
         if cmds.checkBoxGrp(self.scale, query=True, enable=True, value1=True):
             cmds.checkBoxGrp(self.scale_axis, edit=True, enable=False)
         else:
@@ -307,11 +381,20 @@ class ConnectTranslateRotateScaleWindow(window_lib.Helper):
 
 
 class ExportNodesAndConnectionsWindow(window_lib.Helper):
+    """
+    Create export nodes and connections window
+    
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the export nodes and connections window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of ExportNodesAndConnectionsWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(ExportNodesAndConnectionsWindow, self).__init__(title='Export nodes and connections Options',
                                                               size=(450, 130))
@@ -340,6 +423,7 @@ class ExportNodesAndConnectionsWindow(window_lib.Helper):
                                        (self.file_search, 'top', 20, self.export_nodes),
                                        (self.file_search, 'left', 5, self.export_path)])
 
+
     def apply_command(self, *args):
         """
         Apply button command
@@ -357,6 +441,7 @@ class ExportNodesAndConnectionsWindow(window_lib.Helper):
                                                        export_edges=export_edges,
                                                        export_connections=export_connections)
 
+
     def file_dialog_command(self, *args):
         """
         Open the explorer window to set the path
@@ -365,17 +450,30 @@ class ExportNodesAndConnectionsWindow(window_lib.Helper):
         if folder_path:
             cmds.textFieldGrp(self.export_path, edit=True, text=folder_path[0])
 
+
     def bottom_layout(self):
+        """
+        Create the bottom layout
+        """
         add_button, apply_button, close_button = super(ExportNodesAndConnectionsWindow, self).bottom_layout()
         cmds.button(add_button, edit=True, label='Export')
 
 
 class ImportNodesAndConnectionsWindow(window_lib.Helper):
+    """
+    Create import nodes and connections window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
     def __init__(self, *args):
         """
-        Create the import nodes and connections window
-        :param title: str, title of the window
-        :param size: list, width and height
+        Initializes an instance of ImportNodesAndConnectionsWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
         """
         super(ImportNodesAndConnectionsWindow, self).__init__(title='Import nodes and connections Options',
                                                               size=(450, 160))
@@ -409,6 +507,7 @@ class ImportNodesAndConnectionsWindow(window_lib.Helper):
                                        (self.file_search, 'top', 5, self.replace_with),
                                        (self.file_search, 'left', 5, self.import_path)])
 
+
     def apply_command(self, *args):
         """
         Apply button command
@@ -428,6 +527,7 @@ class ImportNodesAndConnectionsWindow(window_lib.Helper):
                                                        search_for=search_for,
                                                        replace_with=replace_with)
 
+
     def file_dialog_command(self, *args):
         """
         Open the explorer window to set the path
@@ -436,6 +536,10 @@ class ImportNodesAndConnectionsWindow(window_lib.Helper):
         if folder_path:
             cmds.textFieldGrp(self.import_path, edit=True, text=folder_path[0])
 
+
     def bottom_layout(self):
+        """
+        Create the bottom layout
+        """
         add_button, apply_button, close_button = super(ImportNodesAndConnectionsWindow, self).bottom_layout()
         cmds.button(add_button, edit=True, label='Import')

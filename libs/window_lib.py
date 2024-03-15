@@ -14,11 +14,22 @@ logging = logging.getLogger(__name__)
 
 
 class Helper(object):
+    """
+    Window Helper class
+
+    Create a default window with the 3 buttons on the bottom (add, apply, close)
+
+    Args:
+        title (str): tittle of the window
+        size (list): (width, height). Defaults to (400, 400)
+    """
     def __init__(self, title, size=(400, 400), *args):
         """
-        Create a default window with the 3 buttons on the bottom (add, apply, close)
-        :param title: str, tittle of the window
-        :param size: list, width and height
+        Initializes an instance of window Helper
+
+        Args:
+            title (str): tittle of the window
+            size (list): (width, height). Defaults to (400, 400)
         """
         self.window = ''.join([x.capitalize() for x in title.split(' ')])
         self.window = '{}_window'.format(self.window)
@@ -48,7 +59,8 @@ class Helper(object):
         q_icon = QIcon(icon_path)
         window_widget.setWindowIcon(q_icon)
 
-    def bottom_layout(self,):
+
+    def bottom_layout(self):
         """
         Create the bottom layout (add, apply and close buttons)
         """
@@ -77,9 +89,10 @@ class Helper(object):
                         )
         return add_button, apply_button, close_button
 
+
     def open_window(self):
         """
-        open a window with the settings given
+        Open a window with the settings given
         """
         if cmds.window(self.window, exists=True):
             cmds.windowPref(self.window, remove=True)
@@ -89,6 +102,7 @@ class Helper(object):
 
         return self.window
 
+
     def add_command(self, *args):
         """
         Add button command
@@ -96,11 +110,13 @@ class Helper(object):
         self.apply_command()
         self.close_window()
 
+
     def apply_command(self, *args):
         """
         Apply button command
         """
         logging.info('{} need an Apply Command.'.format(self.title))
+
 
     def close_window(self, *args):
         """

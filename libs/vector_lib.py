@@ -8,9 +8,13 @@ from hiddenStrings.libs import side_lib, usage_lib
 def create_pma_vector_from_a_to_b(a, b):
     """
     Create a plus minus average (vector) for a to b in worldSpace
-    :param a: str
-    :param b: str
-    return plusMinusAverage
+
+    Args:
+        a (str): a node's name
+        b (str): b node's name
+    
+    Returns:
+        str: plusMinusAverage node
     """
     if len(a.split('_')) == 3:
         desc_a, side_a, usage_a = a.split('_')
@@ -48,9 +52,13 @@ def create_pma_vector_from_a_to_b(a, b):
 def create_angle_between_two_pma_nodes(a, b):
     """
     create an angle between node between two plus minus average
-    :param a: str
-    :param b: str
-    return angle between angle attribute
+
+    Args:
+        a (str): a node's name
+        b (str): b node's name
+    
+    Returns:
+        float: angleBetween.angle value
     """
     if len(a.split('_')) == 3:
         desc_a, side_a, usage_a = a.split('_')
