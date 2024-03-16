@@ -8,7 +8,9 @@ from maya import cmds
 # Project imports
 from hiddenStrings import module_utils
 from hiddenStrings import config as hiddenStrings_config
-from hiddenStrings.libs import guide_lib, blend_shape_lib, connection_lib, skin_lib, import_export_lib, trigger_lib
+from hiddenStrings.libs import (guide_lib, blend_shape_lib, connection_lib, skin_lib,
+                                import_export_lib, trigger_lib , reference_lib)
+
 from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, skin_windows, tools_windows
 
 builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings_path))
@@ -253,6 +255,30 @@ class MarkingMenu(object):
         cmds.menuItem(parent=skin_menu, optionBox=True, command=skin_windows.ExportSkinWindow)
 
 
+    def reference_menu(self, menu_parent, radial_position):
+        """
+        Create the reference menu items
+
+        Args:
+            menu_parent (str): name of the menu parent
+            radial_position (str): radial position. 'N', 'NE', 'E', 'SE', 'S', 'SW', 'W' or 'NW'.
+        """
+        reference_menu = cmds.menuItem(parent=menu_parent, label='Reference', radialPosition=radial_position,
+                                       subMenu=True)
+
+        cmds.menuItem(parent=reference_menu, label='Reference Editor', radialPosition='N',  
+                      command=cmds.ReferenceEditor)
+
+        cmds.menuItem(parent=reference_menu, label='Reload reference', radialPosition='E',  
+                      command=reference_lib.reload_reference)
+
+        cmds.menuItem(parent=reference_menu, label='Replace reference', radialPosition='S',  
+                      command=reference_lib.replace_reference_window)
+
+        cmds.menuItem(parent=reference_menu, label='Remove reference', radialPosition='W',  
+                      command=reference_lib.remove_reference)
+
+
     def connections_menu(self, menu_parent, radial_position):
         """
         Create the connection menu items
@@ -316,8 +342,7 @@ class MarkingMenu(object):
                       command=connections_windows.ExportNodesAndConnectionsWindow)
 
 
-    @staticmethod
-    def maya_editors_menu(menu_parent, radial_position):
+    def maya_editors_menu(self, menu_parent, radial_position):
         """
         Create the maya editors menu items
 
@@ -340,8 +365,7 @@ class MarkingMenu(object):
         cmds.menuItem(parent=maya_editors_menu, label='Graph Editor', radialPosition='E',
                       command=cmds.GraphEditor)
 
-        cmds.menuItem(parent=maya_editors_menu, label='Reference Editor', radialPosition='N',
-                      command=cmds.ReferenceEditor)
+        self.reference_menu(menu_parent=maya_editors_menu, radial_position='N')
 
         cmds.menuItem(parent=maya_editors_menu, label='Component Editor', radialPosition='SW',
                       command=cmds.ComponentEditor)
