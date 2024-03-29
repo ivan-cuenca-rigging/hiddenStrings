@@ -1,11 +1,17 @@
 # Imports
-from PySide2.QtGui import QIcon
-from shiboken2 import wrapInstance
-from PySide2.QtWidgets import QWidget
 import logging
 
 # Maya imports
 from maya import cmds, OpenMayaUI
+
+if int(cmds.about(version=True)) >= 2025:
+    from PySide6.QtGui import QIcon
+    from shiboken6 import wrapInstance
+    from PySide6.QtWidgets import QWidget
+else:
+    from PySide2.QtGui import QIcon
+    from shiboken2 import wrapInstance
+    from PySide2.QtWidgets import QWidget
 
 # Project imports
 from hiddenStrings import module_utils

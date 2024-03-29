@@ -42,7 +42,7 @@ hiddenStrings © 2023 by Iván Cuenca Ruiz is licensed under Attribution-NonComm
 
 ## REQUIREMENTS ##
 
-Maya 2023 
+Tested in Maya 2023 and 2025
 
 Python 3
 
@@ -55,7 +55,7 @@ Python 3
 2. Rename main folder to `hiddenStrings`
 
 3. Save the main folder in your maya folder:
-   "C:/Users/userName/Documents/maya/2023/scripts"
+   "C:/Users/userName/Documents/maya/scripts"
 
 4. Run this code in maya as python:
 

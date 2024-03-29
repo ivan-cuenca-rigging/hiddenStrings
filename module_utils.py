@@ -44,8 +44,10 @@ def set_user_setup():
     """
     create and set the userSetup.py
     """
-    scripts_path = os.path.dirname(os.path.dirname(__file__))
-    user_setup_file_path = r'{}/userSetup.py'.format(scripts_path)
+    maya_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    maya_version = cmds.about(version=True)
+
+    user_setup_file_path = r'{}/{}/scripts/userSetup.py'.format(maya_path, maya_version)
     # Check if the userSetup.py exists
     if not os.path.exists(user_setup_file_path):
         with open(user_setup_file_path, 'w'):
