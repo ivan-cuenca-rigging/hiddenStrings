@@ -269,10 +269,10 @@ class MarkingMenu(object):
         cmds.menuItem(parent=reference_menu, label='Reference Editor', radialPosition='N',  
                       command=cmds.ReferenceEditor)
 
-        cmds.menuItem(parent=reference_menu, label='Reload reference', radialPosition='E',  
+        cmds.menuItem(parent=reference_menu, label='Reload reference', radialPosition='S',  
                       command=reference_lib.reload_reference)
 
-        cmds.menuItem(parent=reference_menu, label='Replace reference', radialPosition='S',  
+        cmds.menuItem(parent=reference_menu, label='Replace reference', radialPosition='E',  
                       command=reference_lib.replace_reference_window)
 
         cmds.menuItem(parent=reference_menu, label='Remove reference', radialPosition='W',  

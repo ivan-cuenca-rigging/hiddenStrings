@@ -139,39 +139,53 @@ def create_skin_cluster(node,
     Returns:
         str: skinCluster
     """
-    if skin_index == 1:
-        skin_cluster = cmds.skinCluster(joints, node,
-                                        toSelectedBones=True,
-                                        bindMethod=0,
-                                        removeUnusedInfluence=False,
-                                        includeHiddenSelections=True,
-                                        obeyMaxInfluences=False)[0]
-    else:
-        last_skin = skin_index - 1
-        last_skin_name = format_skin_cluster_name(node, last_skin)
-        if not cmds.objExists(last_skin_name):
-            cmds.error('{} does not exists, cannot create a {} skin index skinCluster'.format(last_skin_name,
-                                                                                              skin_index))
+    deformer_list = cmds.listHistory(node, pruneDagObjects=True)
+
+    if deformer_list:
+        node_shape = cmds.listRelatives(node, shapes=True, noIntermediate=True)[0]
+
+        output_geometry_connection = [x for x in cmds.listConnections(
+            '{}'.format(node_shape), plugs=True) if 'outputGeometry' in x][0]
+
+
+        node_connection = cmds.listConnections(output_geometry_connection, plugs=True)[0]
+        last_deformer = output_geometry_connection.split('.')[0]
+
+        connection_index = output_geometry_connection.split('[')[-1].split(']')[0]
+        original_geometry_connection = cmds.listConnections('{}.originalGeometry[{}]'.format(last_deformer,
+                                                                                             connection_index),
+                                                                                             plugs=True)[0]
+
         node_dup = cmds.duplicate(node)[0]
-        skin_cluster = cmds.skinCluster(joints, node_dup,
+
+        skin_cluster = cmds.skinCluster(joints,
+                                        node_dup,
                                         toSelectedBones=True,
                                         bindMethod=0,
                                         removeUnusedInfluence=False,
                                         includeHiddenSelections=True,
                                         obeyMaxInfluences=False)[0]
 
-        # Connect new skin between last skin and last skin connection
-        skin_connection = cmds.listConnections('{}.outputGeometry'.format(last_skin_name), plugs=True)[0]
+        # Connect new skin between last deform and node
+        cmds.connectAttr(original_geometry_connection,
+                            '{}.originalGeometry[0]'.format(skin_cluster), force=True)
+        cmds.connectAttr(output_geometry_connection,
+                            '{}.input[0].inputGeometry'.format(skin_cluster), force=True)
 
-        cmds.connectAttr('{}.originalGeometry'.format(last_skin_name),
-                         '{}.originalGeometry'.format(skin_cluster), force=True)
-        cmds.connectAttr('{}.outputGeometry[0]'.format(last_skin_name),
-                         '{}.input[0].inputGeometry'.format(skin_cluster), force=True)
-
-        cmds.connectAttr('{}.outputGeometry[0]'.format(skin_cluster), skin_connection, force=True)
+        cmds.connectAttr('{}.outputGeometry[0]'.format(skin_cluster), node_connection, force=True)
 
         cmds.delete(node_dup)
 
+    else:
+        skin_cluster = cmds.skinCluster(joints, 
+                                        node,
+                                        toSelectedBones=True,
+                                        bindMethod=0,
+                                        removeUnusedInfluence=False,
+                                        includeHiddenSelections=True,
+                                        obeyMaxInfluences=False)[0]
+        
+    # Rename skinCluster
     skin_cluster = cmds.rename(skin_cluster, format_skin_cluster_name(node, skin_index))
 
     return skin_cluster
