@@ -286,7 +286,17 @@ def add_joint_to_skin_cluster(joint_name, skin_cluster_name, prebind_name=None):
     if prebind_name:
         if not cmds.objExists(prebind_name):
             logging.error('{} does not exists in the scene'.format(prebind_name))
-
+    # Create a tmp skin to create some attributes in the joint
+    cube_temp = cmds.polyCube()[0]
+    cmds.skinCluster(joint_name,
+                     cube_temp,
+                     toSelectedBones=True,
+                     bindMethod=0,
+                     removeUnusedInfluence=False,
+                     includeHiddenSelections=True,
+                     obeyMaxInfluences=False)[0]
+    cmds.delete(cube_temp)
+    
     # Get next joint skin index for the skinCluster connections
     joint_index = str(len(cmds.listConnections('{}.matrix'.format(skin_cluster_name))))
 

@@ -157,11 +157,13 @@ class CreateAngleWindow(window_lib.Helper):
         super(CreateAngleWindow, self).__init__(title='PoseReader: Angle Options', size=(450, 105))
 
         self.parent = cmds.textFieldGrp(label='Parent: ')
-        self.get_parent = cmds.iconTextButton(image='addClip.png', command=partial(self.get_from_scene,
-                                                                                   text_field=self.parent))
+        self.get_parent = cmds.iconTextButton(image='addClip.png', 
+                                              command=partial(self.get_last_selection_and_set_text_field,
+                                                              text_field=self.parent))
         self.driver = cmds.textFieldGrp(label='Driver: ')
-        self.get_driver = cmds.iconTextButton(image='addClip.png', command=partial(self.get_from_scene,
-                                                                                   text_field=self.driver))
+        self.get_driver = cmds.iconTextButton(image='addClip.png', 
+                                              command=partial(self.get_last_selection_and_set_text_field,
+                                                              text_field=self.driver))
         # --------------------------------------------------------------------------------------------------------------
         cmds.formLayout(self.main_layout, edit=True,
                         attachForm=[(self.parent, 'top', 10),
@@ -182,20 +184,6 @@ class CreateAngleWindow(window_lib.Helper):
         driver = cmds.textFieldGrp(self.driver, query=True, text=True)
 
         trigger_lib.create_angle_trigger(parent_node=parent, driver_node=driver)
-
-
-    @staticmethod
-    def get_from_scene(text_field, *args):
-        """
-        Get text filed value from the scene
-
-        Args:
-            text_field (str): name of the textField
-
-        Returns:
-            str: textField text
-        """
-        return cmds.textFieldGrp(text_field, edit=True, text=cmds.ls(selection=True)[0])
 
 
 class CreateBaryWindow(window_lib.Helper):
@@ -226,11 +214,13 @@ class CreateBaryWindow(window_lib.Helper):
         cmds.optionMenu(self.side, edit=True, value='Center')
 
         self.parent = cmds.textFieldGrp(label='Parent: ')
-        self.get_parent = cmds.iconTextButton(image='addClip.png', command=partial(self.get_from_scene,
-                                                                                   text_field=self.parent))
+        self.get_parent = cmds.iconTextButton(image='addClip.png', 
+                                              command=partial(self.get_last_selection_and_set_text_field,
+                                                              text_field=self.parent))
         self.driver = cmds.textFieldGrp(label='Driver: ')
-        self.get_driver = cmds.iconTextButton(image='addClip.png', command=partial(self.get_from_scene,
-                                                                                   text_field=self.driver))
+        self.get_driver = cmds.iconTextButton(image='addClip.png', 
+                                              command=partial(self.get_last_selection_and_set_text_field,
+                                                              text_field=self.driver))
 
         # Driver axis
         self.driver_axis = cmds.optionMenu(label='Driver axis')
@@ -283,19 +273,6 @@ class CreateBaryWindow(window_lib.Helper):
                                         driver_node=driver,
                                         driver_axis=driver_axis)
 
-    @staticmethod
-    def get_from_scene(text_field, *args):
-        """
-        Get text filed value from the scene
-
-        Args:
-            text_field (str): name of the textField
-        
-        Returns:
-            str: textField text
-        """
-        return cmds.textFieldGrp(text_field, edit=True, text=cmds.ls(selection=True)[0])
-
 
 class AutomaticCorrectiveWindow(window_lib.Helper):
     """
@@ -316,12 +293,14 @@ class AutomaticCorrectiveWindow(window_lib.Helper):
         super(AutomaticCorrectiveWindow, self).__init__(title='Create automatic corrective Options', size=(450, 185))
 
         self.geometry = cmds.textFieldGrp(label='Geometry: ')
-        self.get_geometry = cmds.iconTextButton(image='addClip.png', command=partial(self.get_from_scene,
-                                                                                     text_field=self.geometry))
+        self.get_geometry = cmds.iconTextButton(image='addClip.png', 
+                                                command=partial(self.get_last_selection_and_set_text_field,
+                                                                text_field=self.geometry))
 
         self.control = cmds.textFieldGrp(label='Control: ')
-        self.get_control = cmds.iconTextButton(image='addClip.png', command=partial(self.get_from_scene,
-                                                                                    text_field=self.control))
+        self.get_control = cmds.iconTextButton(image='addClip.png', 
+                                               command=partial(self.get_last_selection_and_set_text_field,
+                                                               text_field=self.control))
 
         self.attribute_name = cmds.textFieldGrp(label='Attribute: ')
         self.attribute_value = cmds.textFieldGrp(label='Value: ')
@@ -362,20 +341,6 @@ class AutomaticCorrectiveWindow(window_lib.Helper):
                                                  attr_name=attribute_name,
                                                  attr_value=attribute_value,
                                                  create_sdk=create_sdk)
-
-
-    @staticmethod
-    def get_from_scene(text_field, *args):
-        """
-        Get text filed value from the scene
-
-        Args:
-            text_field (str): name of the textField
-        
-        Returns:
-            str: textField text
-        """
-        return cmds.textFieldGrp(text_field, edit=True, text=cmds.ls(selection=True)[0])
 
 
 class MultiplyVertexValues(window_lib.Helper):

@@ -404,10 +404,20 @@ class Helper(attribute_lib.Helper):
                        }
         aim_vector = vector_dict[aim_vector]
         up_vector = vector_dict[up_vector]
-        cmds.delete(cmds.aimConstraint(point, self.name, mo=False,
-                                       aimVector=aim_vector, upVector=up_vector,
-                                       worldUpType='vector',
-                                       worldUpVector=up_vector))
+        if len(point) == 3:
+            aim_to_ref = cmds.createNode('transform', name='temp')
+            cmds.xform(aim_to_ref, worldSpace=True, translation=point)
+            cmds.delete(cmds.aimConstraint(aim_to_ref, self.name, mo=False,
+                                           aimVector=aim_vector, upVector=up_vector,
+                                           worldUpType='vector',
+                                           worldUpVector=up_vector))
+            cmds.delete(aim_to_ref)
+
+        else:
+            cmds.delete(cmds.aimConstraint(point, self.name, mo=False,
+                                        aimVector=aim_vector, upVector=up_vector,
+                                        worldUpType='vector',
+                                        worldUpVector=up_vector))
 
 
     # ---------- Hierarchy methods ----------

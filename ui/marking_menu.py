@@ -8,7 +8,7 @@ from maya import cmds
 # Project imports
 from hiddenStrings import module_utils
 from hiddenStrings import config as hiddenStrings_config
-from hiddenStrings.libs import (guide_lib, blend_shape_lib, connection_lib, skin_lib,
+from hiddenStrings.libs import (guide_lib, blend_shape_lib, skeleton_lib, connection_lib, skin_lib,
                                 import_export_lib, trigger_lib , reference_lib)
 
 from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, skin_windows, tools_windows
@@ -16,7 +16,7 @@ from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, s
 builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings_path))
 if builder_exists:
     from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
-    from hiddenStrings.builder.modules.face import ear, cheek
+    from hiddenStrings.builder.modules.face import eye, ear, cheek
 
     from hiddenStrings.ui.windows import body_windows
     from hiddenStrings.ui.windows import face_windows
@@ -665,6 +665,10 @@ class MarkingMenu(object):
 
         cmds.menuItem(parent=builder_menu, label='Delete guides', command=guide_lib.delete_guides)
 
+        cmds.menuItem(parent=builder_menu, divider=True)
+
+        cmds.menuItem(parent=builder_menu, label='Show skeleton', command=skeleton_lib.show_skeleton)
+        cmds.menuItem(parent=builder_menu, label='Hide skeleton', command=skeleton_lib.hide_skeleton)
 
     def body_menu(self, menu_parent, radial_position):
         """
@@ -714,6 +718,10 @@ class MarkingMenu(object):
 
         cmds.menuItem(parent=face_guides_menu, label='             Face             ', enable=False)
         cmds.menuItem(parent=face_guides_menu, divider=True)
+
+        # Eyes guides
+        cmds.menuItem(parent=face_guides_menu, label='Eyes', command=self.create_eyes_guides)
+        cmds.menuItem(optionBox=True, command=face_windows.EyeWindow)
 
         # Brows guides
         cmds.menuItem(parent=face_guides_menu, label='Brows', enable=False)
@@ -870,9 +878,23 @@ class MarkingMenu(object):
         """
         Create the face guides template
         """
+        self.create_eyes_guides()
+
         self.create_ears_guides()
 
         self.create_cheeks_guides()
+
+
+    @staticmethod
+    def create_eyes_guides(*args):
+        """
+        Create the eyes guides command
+        """
+        eye_l_module = eye.Eye(side='l')
+        eye_r_module = eye.Eye(side='r')
+
+        eye_l_module.create_guides()
+        eye_r_module.create_guides(connect_to_opposite_value=True)
 
 
     @staticmethod

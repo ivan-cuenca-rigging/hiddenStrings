@@ -217,11 +217,13 @@ class PushJointWindow(window_lib.Helper):
 
         # Search and replace
         self.parent_node = cmds.textFieldGrp(label='Parent: ')
-        self.get_parent = cmds.iconTextButton(image='addClip.png', command=partial(self.get_from_scene,
-                                                                                   text_field=self.parent_node))
+        self.get_parent = cmds.iconTextButton(image='addClip.png', 
+                                              command=partial(self.get_last_selection_and_set_text_field,
+                                                              text_field=self.parent_node))
         self.driver_node = cmds.textFieldGrp(label='Driver: ')
-        self.get_driver = cmds.iconTextButton(image='addClip.png', command=partial(self.get_from_scene,
-                                                                                   text_field=self.driver_node))
+        self.get_driver = cmds.iconTextButton(image='addClip.png', 
+                                              command=partial(self.get_last_selection_and_set_text_field,
+                                                              text_field=self.driver_node))
         self.suffix = cmds.textFieldGrp(label='Suffix: ')
 
         self.forbidden_word = cmds.textFieldGrp(label='Forbidden word: ', text='01')
@@ -273,11 +275,6 @@ class PushJointWindow(window_lib.Helper):
                                        forbidden_word=forbidden_word,
                                        rotation_axis=rotation_axis,
                                        structural_parent=structural_parent)
-
-
-    @staticmethod
-    def get_from_scene(text_field, *args):
-        cmds.textFieldGrp(text_field, edit=True, text=cmds.ls(selection=True)[0])
 
 
 class TransferSkinWindow(window_lib.Helper):

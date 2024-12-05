@@ -65,7 +65,6 @@ class Helper(object):
         q_icon = QIcon(icon_path)
         window_widget.setWindowIcon(q_icon)
 
-
     def bottom_layout(self):
         """
         Create the bottom layout (add, apply and close buttons)
@@ -108,6 +107,29 @@ class Helper(object):
 
         return self.window
 
+    @staticmethod
+    def get_last_selection_and_set_text_field(text_field, *args):
+        """
+        Get the last selection in Maya and set the textField
+        """
+        if cmds.ls(selection=True):
+            text_value = str(cmds.ls(selection=True)[0])
+        else:
+            text_value = ''
+
+        return cmds.textFieldGrp(text_field, edit=True, text=text_value)
+
+    @staticmethod
+    def get_selection_and_set_text_field(text_field, *args):
+        """
+        Get the selection in Maya and set the textField
+        """
+        if cmds.ls(selection=True):
+            text_value = str(cmds.ls(selection=True, flatten=True))
+        else:
+            text_value = ''
+
+        return cmds.textFieldGrp(text_field, edit=True, text=text_value)
 
     def add_command(self, *args):
         """
@@ -116,13 +138,11 @@ class Helper(object):
         self.apply_command()
         self.close_window()
 
-
     def apply_command(self, *args):
         """
         Apply button command
         """
         logging.info('{} need an Apply Command.'.format(self.title))
-
 
     def close_window(self, *args):
         """

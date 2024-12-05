@@ -360,3 +360,24 @@ def create_local_skeleton(skeleton_grp,
             cmds.connectAttr('{}.matrixSum'.format(mult_mat), '{}.offsetParentMatrix'.format(skin_joint_local))
 
         return local_joint_list
+
+
+def show_skeleton(*args):
+    skeleton_grp_list = cmds.ls('*Skeleton_*_{}'.format(usage_lib.group))
+    if skeleton_grp_list:
+        for grp in skeleton_grp_list:
+            try:
+                cmds.setAttr('{}.visibility'.format(grp), 1)
+            except:
+                logging.info('{} visibility is locked or connected'.format(grp))
+
+
+def hide_skeleton(*args):
+    skeleton_grp_list = cmds.ls('*Skeleton_*_{}'.format(usage_lib.group))
+    if skeleton_grp_list:
+        for grp in skeleton_grp_list:
+            try:
+                cmds.setAttr('{}.visibility'.format(grp), 0)
+            except:
+                logging.info(
+                    '{} visibility is locked or connected'.format(grp))

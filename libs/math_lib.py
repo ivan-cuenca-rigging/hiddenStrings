@@ -33,6 +33,21 @@ def distance_from_a_to_b(a, b):
     return float(math.dist(a_pos, b_pos))
 
 
+def distance_from_a_to_b_xyz(a, b):
+    """
+    Get distance between two [x, y, z]
+
+    Args:
+        a (str): [x, y, z]
+        b (str): [x, y, z]
+
+    Returns:
+        float: distance
+    """
+    return float(math.dist(a, b))
+
+
+
 def get_n_positions_from_a_to_b(a, b, n):
     """
     Get a number of positions between two points
@@ -218,3 +233,18 @@ def multiply_matrices_4_by_4(matrix_a, matrix_b):
         matrix_result_clean.extend(matrix_result[index])
 
     return matrix_result_clean
+
+
+def get_center_pivot(input_list):
+    """
+    Get the center position of the nodes or components given
+
+    Args:
+        input_list (list): list of inputs
+
+    Returns:
+        center_pivot: [x, y, z]
+    """
+    x_min, y_min, z_min, x_max, y_max, z_max = cmds.exactWorldBoundingBox(input_list)
+
+    return [0.5*(x_min + x_max), 0.5*(y_min + y_max), 0.5*(z_min + z_max)]
