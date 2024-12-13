@@ -5,13 +5,15 @@ import logging
 from maya import cmds, OpenMayaUI
 
 if int(cmds.about(version=True)) >= 2025:
-    from PySide6.QtGui import QIcon
+    from PySide6.QtGui import QIcon, QPixmap
     from shiboken6 import wrapInstance
     from PySide6.QtWidgets import QWidget
+    from PySide6 import QtCore
 else:
-    from PySide2.QtGui import QIcon
+    from PySide2.QtGui import QIcon, QPixmap
     from shiboken2 import wrapInstance
     from PySide2.QtWidgets import QWidget
+    from PySide2 import QtCore
 
 # Project imports
 from hiddenStrings import module_utils
@@ -62,7 +64,7 @@ class Helper(object):
         window_q_widget = OpenMayaUI.MQtUtil.findWindow(self.window)
         window_widget = wrapInstance(int(window_q_widget), QWidget)
         icon_path = r'{}/icons/hiddenStrings.png'.format(module_utils.hidden_strings_path)
-        q_icon = QIcon(icon_path)
+        q_icon = QIcon(QPixmap(icon_path).scaled(QtCore.QSize(1024, 1024)))
         window_widget.setWindowIcon(q_icon)
 
     def bottom_layout(self):
