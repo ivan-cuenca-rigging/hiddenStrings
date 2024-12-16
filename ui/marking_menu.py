@@ -16,7 +16,7 @@ from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, s
 builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings_path))
 if builder_exists:
     from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
-    from hiddenStrings.builder.modules.face import eye, ear, cheek
+    from hiddenStrings.builder.modules.face import eyes, eye, ear, cheek
 
     from hiddenStrings.ui.windows import body_windows
     from hiddenStrings.ui.windows import face_windows
@@ -721,6 +721,10 @@ class MarkingMenu(object):
 
         # Eyes guides
         cmds.menuItem(parent=face_guides_menu, label='Eyes', command=self.create_eyes_guides)
+        cmds.menuItem(optionBox=True, command=face_windows.EyesWindow)
+
+        # Eye guides
+        cmds.menuItem(parent=face_guides_menu, label='Eye', command=self.create_eye_guides)
         cmds.menuItem(optionBox=True, command=face_windows.EyeWindow)
 
         # Brows guides
@@ -884,17 +888,22 @@ class MarkingMenu(object):
 
         self.create_cheeks_guides()
 
-
     @staticmethod
     def create_eyes_guides(*args):
         """
         Create the eyes guides command
         """
-        eye_l_module = eye.Eye(side='l')
-        eye_r_module = eye.Eye(side='r')
+        eyes_module = eyes.Eyes()
+        eyes_module.create_guides()
 
-        eye_l_module.create_guides()
-        eye_r_module.create_guides(connect_to_opposite_value=True)
+
+    @staticmethod
+    def create_eye_guides(*args):
+        """
+        Create the eyes guides command
+        """
+        eye_module = eye.Eye()
+        eye_module.create_guides()
 
 
     @staticmethod

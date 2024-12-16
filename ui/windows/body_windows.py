@@ -81,7 +81,7 @@ class ArmWindow(window_lib.Helper):
         # Layout
         cmds.formLayout(self.main_layout, edit=True,
 
-                        attachForm=[(self.name, 'top', 5),
+                        attachForm=[(self.name, 'top', 20),
                                     (self.side, 'left', 115),
                                     (separator01, 'left', 5), (separator01, 'right', 5),
                                     (systems_settings_text, 'left', 5), (systems_settings_text, 'right', 5),
@@ -108,9 +108,7 @@ class ArmWindow(window_lib.Helper):
                                        (separator02, 'top', 5, self.create_end_middle),
                                        (joints_settings_text, 'top', 5, separator02),
                                        (self.skin_start_mid_joints_number, 'top', 5, joints_settings_text),
-                                       (self.skin_mid_end_joints_number, 'top', 5, self.skin_start_mid_joints_number)],
-
-                        attachPosition=[(self.name, 'top', 0, 5)]
+                                       (self.skin_mid_end_joints_number, 'top', 5, self.skin_start_mid_joints_number)]
                         )
 
 
@@ -256,7 +254,7 @@ class LegWindow(window_lib.Helper):
         # Layout
         cmds.formLayout(self.main_layout, edit=True,
 
-                        attachForm=[(self.name, 'top', 5),
+                        attachForm=[(self.name, 'top', 20),
                                     (self.side, 'left', 115),
                                     (separator01, 'left', 5), (separator01, 'right', 5),
                                     (systems_settings_text, 'left', 5), (systems_settings_text, 'right', 5),
@@ -283,9 +281,7 @@ class LegWindow(window_lib.Helper):
                                        (separator02, 'top', 5, self.create_end_middle),
                                        (joints_settings_text, 'top', 5, separator02),
                                        (self.skin_start_mid_joints_number, 'top', 5, joints_settings_text),
-                                       (self.skin_mid_end_joints_number, 'top', 5, self.skin_start_mid_joints_number)],
-
-                        attachPosition=[(self.name, 'top', 0, 5)]
+                                       (self.skin_mid_end_joints_number, 'top', 5, self.skin_start_mid_joints_number)]
                         )
 
 
@@ -436,7 +432,7 @@ class NeckWindow(window_lib.Helper):
         # Layout
         cmds.formLayout(self.main_layout, edit=True,
 
-                        attachForm=[(self.name, 'top', 5),
+                        attachForm=[(self.name, 'top', 20),
                                     (separator01, 'left', 5), (separator01, 'right', 5),
                                     (joints_settings_text, 'left', 5), (joints_settings_text, 'right', 5),
                                     (self.side, 'left', 115),
@@ -445,8 +441,7 @@ class NeckWindow(window_lib.Helper):
                                     (separator03, 'left', 5), (separator03, 'right', 5),
                                     (ik_settings_text, 'left', 5), (ik_settings_text, 'right', 5),
                                     (self.start_ik_world_rotation, 'left', 39),
-                                    (self.end_ik_world_rotation, 'left', 43),
-                                    (self.end_ik_world_rotation, 'bottom', 5)],
+                                    (self.end_ik_world_rotation, 'left', 43)],
 
                         attachControl=[(self.side, 'top', 5, self.name),
                                        (self.base, 'top', 5, self.side),
@@ -463,10 +458,7 @@ class NeckWindow(window_lib.Helper):
                                        (ik_settings_text, 'top', 5, separator03),
                                        (self.create_ik_middle_system, 'top', 5, ik_settings_text),
                                        (self.start_ik_world_rotation, 'top', 5, self.create_ik_middle_system),
-                                       (self.end_ik_world_rotation, 'top', 5, self.start_ik_world_rotation)],
-
-                        attachPosition=[(self.name, 'top', 0, 5),
-                                        (self.end_ik_world_rotation, 'bottom', 0, 5)]
+                                       (self.end_ik_world_rotation, 'top', 5, self.start_ik_world_rotation)]
                         )
 
 
@@ -548,7 +540,7 @@ class RootWindow(window_lib.Helper):
 
         # --------------------------------------------------------------------------------------------------------------
         cmds.formLayout(self.main_layout, edit=True,
-                        attachForm=[(self.system_orientation, 'top', 10),
+                        attachForm=[(self.system_orientation, 'top', 20),
                                     (self.system_orientation, 'left', 25)])
 
 
@@ -647,7 +639,7 @@ class SpineWindow(window_lib.Helper):
         # --------------------------------------------------------------------------------------------------------------
         cmds.formLayout(self.main_layout, edit=True,
 
-                        attachForm=[(self.name, 'top', 5),
+                        attachForm=[(self.name, 'top', 20),
                                     (separator01, 'left', 5), (separator01, 'right', 5),
                                     (joints_settings_text, 'left', 5), (joints_settings_text, 'right', 5),
                                     (self.side, 'left', 115),
@@ -656,8 +648,7 @@ class SpineWindow(window_lib.Helper):
                                     (separator03, 'left', 5), (separator03, 'right', 5),
                                     (ik_settings_text, 'left', 5), (ik_settings_text, 'right', 5),
                                     (self.start_ik_world_rotation, 'left', 39),
-                                    (self.end_ik_world_rotation, 'left', 43),
-                                    (self.end_ik_world_rotation, 'bottom', 5)],
+                                    (self.end_ik_world_rotation, 'left', 43)],
 
                         attachControl=[(self.side, 'top', 5, self.name),
                                        (self.base, 'top', 5, self.side),
@@ -674,10 +665,7 @@ class SpineWindow(window_lib.Helper):
                                        (ik_settings_text, 'top', 5, separator03),
                                        (self.create_ik_middle_system, 'top', 5, ik_settings_text),
                                        (self.start_ik_world_rotation, 'top', 5, self.create_ik_middle_system),
-                                       (self.end_ik_world_rotation, 'top', 5, self.start_ik_world_rotation)],
-
-                        attachPosition=[(self.name, 'top', 0, 5),
-                                        (self.end_ik_world_rotation, 'bottom', 0, 5)]
+                                       (self.end_ik_world_rotation, 'top', 5, self.start_ik_world_rotation)]
                         )
 
 

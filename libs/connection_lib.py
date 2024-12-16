@@ -248,6 +248,43 @@ def create_pole_with_matrices(driver, driven, start_joint):
                      '{}.poleVector'.format(driven))
 
 
+def create_aim_matrix(input_matrix, 
+                      primary_target_matrix,
+                      driven,
+                      secondary_target_matrix=None,
+                      primary_input_axis=[0, 0, 1],
+                      secondary_input_axis=[0, 1, 0]):
+    """
+    Create aim matrix
+
+    Args:
+        input_matrix (str): node.attribute
+        primary_target_matrix (str): node.attribute
+        driven (str): node
+        secondary_target_matrix (str, optional): node.attribute. Defaults to None.
+        primary_input_axis (list, optional): aim vector. Defaults to (0, 0, 1).
+        secondary_input_axis (list, optional): up vector. Defaults to (0, 1, 0).
+    """
+    desc, side, usage = driven.split('.')[0].split('_')
+    aim_mat = cmds.createNode('aimMatrix', name='{}{}_{}_{}'.format(desc, usage.capitalize(), 
+                                                                    side, usage_lib.aim_matrix))
+    
+    cmds.connectAttr(input_matrix, '{}.inputMatrix'.format(aim_mat))
+    
+    cmds.connectAttr(primary_target_matrix, '{}.primaryTargetMatrix'.format(aim_mat))
+    cmds.setAttr('{}.primaryInputAxisX'.format(aim_mat), primary_input_axis[0])
+    cmds.setAttr('{}.primaryInputAxisY'.format(aim_mat), primary_input_axis[1])
+    cmds.setAttr('{}.primaryInputAxisZ'.format(aim_mat), primary_input_axis[2])
+
+    if secondary_target_matrix:
+        cmds.connectAttr(secondary_target_matrix, '{}.secondaryTargetMatrix'.format(aim_mat))
+    cmds.setAttr('{}.secondaryInputAxisX'.format(aim_mat), secondary_input_axis[0])
+    cmds.setAttr('{}.secondaryInputAxisY'.format(aim_mat), secondary_input_axis[1])
+    cmds.setAttr('{}.secondaryInputAxisZ'.format(aim_mat), secondary_input_axis[2])
+
+    cmds.connectAttr('{}.outputMatrix'.format(aim_mat), driven, force=True)
+
+
 def connect_offset_parent_matrix(driver, driven,
                                  translate=True,
                                  rotate=True,
@@ -349,6 +386,9 @@ def connect_matrix_from_attribute(driver_and_attr, driven):
     Args:
         driver_and_attr (str): E.G. 'rootOutputs_c_grp.root_c_ctr'
         driven (str): name of the driven
+
+    Returns:
+        str: mult_matrix
     """
     descriptor, side, usage = driven.split('_')
     mult_matrix = '{}{}_{}_{}'.format(descriptor, usage.capitalize(), side, usage_lib.mult_matrix)
@@ -370,6 +410,8 @@ def connect_matrix_from_attribute(driver_and_attr, driven):
         for axis in 'xyz':
             if cmds.getAttr('{}.{}{}'.format(driven, attr, axis), settable=True):
                 cmds.setAttr('{}.{}{}'.format(driven, attr, axis), value)
+
+    return mult_matrix
 
 
 def transform_to_offset_parent_matrix(node, world_space=False, *args):
@@ -518,7 +560,7 @@ def create_follow(base,
     driven_descriptor, driven_side, driven_usage = driven.split('_')
 
     driven_matrix = cmds.xform(driven, query=True, worldSpace=True, matrix=True)
-    #
+
     # base
     if '.' in base:
         base_descriptor = base.split('.')[-1].split('_')[0]
@@ -545,8 +587,8 @@ def create_follow(base,
                  math_lib.multiply_matrices_4_by_4(matrix_a=driven_matrix, matrix_b=base_inverse_matrix), type='matrix')
 
     # driver
-    if follow_name:
-        driver_descriptor = follow_name
+    if '.' in driver:
+        driver_descriptor = driver.split('.')[-1].split('_')[0]
         driver_capitalize_descriptor = '{}{}'.format(driver_descriptor[0].upper(), driver_descriptor[1:])
         driver_output = driver
         driver_inverse_matrix = math_lib.inverse_matrix(cmds.getAttr(driver))
@@ -609,18 +651,23 @@ def create_follow(base,
     driven_ah = attribute_lib.Helper(driven)
     driven_ah.add_separator_attribute(separator_name='Follows')
 
+    if follow_name:
+        follow_name = follow_name
+    else:
+        follow_name = 'follow{}'.format(driver_capitalize_descriptor)
+
     if pos:
-        attr_name = 'follow{}Pos'.format(driver_capitalize_descriptor)
+        attr_name = '{}Pos'.format(follow_name)
         driven_ah.add_float_attribute(attr_name, minValue=0, maxValue=1, defaultValue=default_value)
         cmds.connectAttr('{}.{}'.format(driven, attr_name), '{}.{}.translateWeight'.format(blend_matrix, target_index))
 
     if rot:
-        attr_name = 'follow{}Rot'.format(driver_capitalize_descriptor)
+        attr_name = '{}Rot'.format(follow_name)
         driven_ah.add_float_attribute(attr_name, minValue=0, maxValue=1, defaultValue=default_value)
         cmds.connectAttr('{}.{}'.format(driven, attr_name), '{}.{}.rotateWeight'.format(blend_matrix, target_index))
 
     if not pos and not rot:
-        attr_name = 'follow{}'.format(driver_capitalize_descriptor)
+        attr_name = follow_name
         driven_ah.add_float_attribute(attr_name, minValue=0, maxValue=1, defaultValue=default_value)
         cmds.connectAttr('{}.{}'.format(driven, attr_name), '{}.{}.translateWeight'.format(blend_matrix, target_index))
         cmds.connectAttr('{}.{}'.format(driven, attr_name), '{}.{}.rotateWeight'.format(blend_matrix, target_index))
