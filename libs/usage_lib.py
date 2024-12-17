@@ -1,3 +1,8 @@
+# Usages
+
+inputs = 'inputs'
+outputs = 'outputs'
+
 # Control usages
 control = 'ctr'
 control_valid_usages = [control]
@@ -79,7 +84,8 @@ component_match = 'cmatch'
 test = 'test'
 
 # Valid usages
-valid_usages = [control,
+valid_usages = [inputs, outputs,
+                control,
                 nurbs,
                 guide,
                 blend_shape, corrective, animation_curve,

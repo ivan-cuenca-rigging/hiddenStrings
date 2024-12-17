@@ -361,7 +361,7 @@ def connect_matrix_to_attribute(driver, driven_and_attr):
 
     Args:
         driver (str): name of the driver
-        driven_and_attr (str): E.G. 'rootOutputs_c_grp.root_c_ctr'
+        driven_and_attr (str): E.G. 'root_c_outputs.root_c_ctr'
     """
     node, attr = driven_and_attr.split('.')
     descriptor, side, usage = node.split('_')
@@ -384,7 +384,7 @@ def connect_matrix_from_attribute(driver_and_attr, driven):
     Connect an attribute to the offsetParentMatrix of the driven
 
     Args:
-        driver_and_attr (str): E.G. 'rootOutputs_c_grp.root_c_ctr'
+        driver_and_attr (str): E.G. 'root_c_outputs.root_c_ctr'
         driven (str): name of the driven
 
     Returns:

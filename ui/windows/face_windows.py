@@ -33,9 +33,9 @@ class EyesWindow(window_lib.Helper):
         self.name = cmds.textFieldGrp(label='Name: ', text='eye')
 
         # hook and base
-        self.base = cmds.textFieldGrp(label='Hook: ', text='rootOutputs_c_grp.center_c_ctr')
+        self.base = cmds.textFieldGrp(label='Hook: ', text='root_c_outputs.center_c_ctr')
 
-        self.hook = cmds.textFieldGrp(label='Base: ', text='neckOutputs_c_grp.head_c_ctr')
+        self.hook = cmds.textFieldGrp(label='Base: ', text='neck_c_outputs.head_c_ctr')
 
         # Vertices lists
         separator01 = cmds.separator(height=5)
@@ -283,13 +283,13 @@ class EyeWindow(window_lib.Helper):
 
         # hook and base
         self.base = cmds.textFieldGrp(
-            label='Hook: ', text='rootOutputs_c_grp.center_c_ctr')
+            label='Hook: ', text='root_c_outputs.center_c_ctr')
 
         self.hook = cmds.textFieldGrp(
-            label='Base: ', text='neckOutputs_c_grp.head_c_ctr')
+            label='Base: ', text='neck_c_outputs.head_c_ctr')
         
         self.follow = cmds.textFieldGrp(
-            label='Follow: ', text='eyesOutputs_c_grp.eyesLookAt_c_ctr')
+            label='Follow: ', text='eyes_c_outputs.eyesLookAt_c_ctr')
 
         # Vertices lists
         separator01 = cmds.separator(height=5)
@@ -456,10 +456,10 @@ class EarWindow(window_lib.Helper):
 
         # hook and base
         self.base = cmds.textFieldGrp(
-            label='Hook: ', text='rootOutputs_c_grp.center_c_ctr')
+            label='Hook: ', text='root_c_outputs.center_c_ctr')
 
         self.hook = cmds.textFieldGrp(
-            label='Base: ', text='neckOutputs_c_grp.head_c_ctr')
+            label='Base: ', text='neck_c_outputs.head_c_ctr')
 
         # --------------------------------------------------------------------------------------------------------------
         cmds.formLayout(self.main_layout, edit=True,
@@ -534,9 +534,9 @@ class CheekWindow(window_lib.Helper):
         self.connect_to_opposite = cmds.checkBoxGrp(label='Connect to opposite: ', value1=False)
 
         # hook and base
-        self.base = cmds.textFieldGrp(label='Hook: ', text='rootOutputs_c_grp.center_c_ctr')
+        self.base = cmds.textFieldGrp(label='Hook: ', text='root_c_outputs.center_c_ctr')
 
-        self.hook = cmds.textFieldGrp(label='Base: ', text='neckOutputs_c_grp.head_c_ctr')
+        self.hook = cmds.textFieldGrp(label='Base: ', text='neck_c_outputs.head_c_ctr')
 
         # --------------------------------------------------------------------------------------------------------------
         cmds.formLayout(self.main_layout, edit=True,
