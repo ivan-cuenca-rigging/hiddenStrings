@@ -35,7 +35,7 @@ constraint_valid_usages = [parent_constraint, orient_constraint, point_constrain
 geometry = 'geo'
 trigger = 'trg'
 driver = 'driver'
-
+macro = 'macro'
 # Deformers
 skin_cluster = 'skin'
 blend_shape = 'bs'
@@ -93,6 +93,7 @@ valid_usages = [inputs, outputs,
                 parent_constraint, orient_constraint, point_constraint,
                 geometry, driver,
                 trigger,
+                macro,
                 scale_constraint, aim_constraint, pole_vector_constraint,
                 multiply, divide, add, sub, maximum, minimum, distance, remap_value, reverse, clamp, plus_minus_Average,
                 angle_between,

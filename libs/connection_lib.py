@@ -535,9 +535,9 @@ def create_uvpin(nurbs, node_list):
         index += 1
 
 
-def create_follow(base,
-                  driver,
+def create_follow(driver,
                   driven,
+                  base=None,
                   follow_name=None,
                   rot=False,
                   pos=False,
@@ -546,9 +546,9 @@ def create_follow(base,
     Create a follow, if rot or pos is True, the follow will be split
 
     Args:
-        base (_type_): name of the base. It can be 'node' or 'node.attribute'
         driver (_type_): name of the driver. It can be 'node' or 'node.attribute'
         driven (_type_): name of the driven
+        base (_type_): name of the base. It can be 'node' or 'node.attribute'. Defaults to None
         follow_name (_type_, optional): name of the follow. Defaults to None.
         rot (bool, optional): follow only rotation. Defaults to False.
         pos (bool, optional): follow only position. Defaults to False.
@@ -562,16 +562,20 @@ def create_follow(base,
     driven_matrix = cmds.xform(driven, query=True, worldSpace=True, matrix=True)
 
     # base
-    if '.' in base:
-        base_descriptor = base.split('.')[-1].split('_')[0]
+    if base:
+        if '.' in base:
+            base_descriptor = base.split('.')[-1].split('_')[0]
+            base_output = base
+            base_inverse_matrix = math_lib.inverse_matrix(cmds.getAttr(base))
+        else:
+            base_descriptor = base.split('_')[0]
+            base_output = '{}.worldMatrix'.format(base)
+            base_inverse_matrix = cmds.getAttr('{}.worldInverseMatrix'.format(driver))
         base_capitalize_descriptor = '{}{}'.format(base_descriptor[0].upper(), base_descriptor[1:])
-        base_output = base
-        base_inverse_matrix = math_lib.inverse_matrix(cmds.getAttr(base))
+
     else:
-        base_descriptor = base.split('_')[0]
-        base_capitalize_descriptor = '{}{}'.format(base_descriptor[0].upper(), base_descriptor[1:])
-        base_output = '{}.worldMatrix'.format(base)
-        base_inverse_matrix = cmds.getAttr('{}.worldInverseMatrix'.format(driver))
+        base_inverse_matrix = cmds.getAttr('{}.worldInverseMatrix'.format(driven))
+        base_capitalize_descriptor = ''
 
     # base multmat
     base_mult_matrix = '{}{}_{}_{}'.format(driven_descriptor,
@@ -581,7 +585,11 @@ def create_follow(base,
 
     if not cmds.objExists(base_mult_matrix):
         base_mult_matrix = cmds.createNode('multMatrix', name=base_mult_matrix)
-        cmds.connectAttr(base_output, '{}.matrixIn[1]'.format(base_mult_matrix))
+        if base:
+            cmds.connectAttr(base_output, '{}.matrixIn[1]'.format(base_mult_matrix))
+        else:
+            cmds.setAttr('{}.matrixIn[1]'.format(base_mult_matrix),
+                         cmds.getAttr('{}.worldMatrix'.format(driven)), type='matrix')
 
     cmds.setAttr('{}.matrixIn[0]'.format(base_mult_matrix),
                  math_lib.multiply_matrices_4_by_4(matrix_a=driven_matrix, matrix_b=base_inverse_matrix), type='matrix')
