@@ -14,6 +14,7 @@ class ArmWindow(window_lib.Helper):
         title (str): title of the window
         size (list): width and height
     """
+
     def __init__(self, *args):
         """
         Initializes an instance of ArmWindow
@@ -76,7 +77,7 @@ class ArmWindow(window_lib.Helper):
                                                               value=6, maxValue=15, columnWidth=[1, 170])
 
         self.skin_mid_end_joints_number = cmds.intSliderGrp(label='Mid to End Skin Joints number: ', field=True,
-                                                            value=6, maxValue=15,  columnWidth=[1, 170])
+                                                            value=6, maxValue=15, columnWidth=[1, 170])
 
         # Layout
         cmds.formLayout(self.main_layout, edit=True,
@@ -110,7 +111,6 @@ class ArmWindow(window_lib.Helper):
                                        (self.skin_start_mid_joints_number, 'top', 5, joints_settings_text),
                                        (self.skin_mid_end_joints_number, 'top', 5, self.skin_start_mid_joints_number)]
                         )
-
 
     def apply_command(self, *args):
         """
@@ -166,7 +166,6 @@ class ArmWindow(window_lib.Helper):
                                  skin_start_mid_joints_number_default_value=skin_start_mid_joints_number,
                                  skin_mid_end_joints_number_default_value=skin_mid_end_joints_number)
 
-
     def set_finger_list_enable(self, *args):
         """
         Set the finger list textField enable
@@ -187,6 +186,7 @@ class LegWindow(window_lib.Helper):
         title (str): title of the window
         size (list): width and height
     """
+
     def __init__(self, *args):
         """
         Initializes an instance of LegWindow
@@ -249,7 +249,7 @@ class LegWindow(window_lib.Helper):
                                                               value=6, maxValue=15, columnWidth=[1, 170])
 
         self.skin_mid_end_joints_number = cmds.intSliderGrp(label='Mid to End Skin Joints number: ', field=True,
-                                                            value=6, maxValue=15,  columnWidth=[1, 170])
+                                                            value=6, maxValue=15, columnWidth=[1, 170])
 
         # Layout
         cmds.formLayout(self.main_layout, edit=True,
@@ -283,7 +283,6 @@ class LegWindow(window_lib.Helper):
                                        (self.skin_start_mid_joints_number, 'top', 5, joints_settings_text),
                                        (self.skin_mid_end_joints_number, 'top', 5, self.skin_start_mid_joints_number)]
                         )
-
 
     def apply_command(self, *args):
         """
@@ -339,7 +338,6 @@ class LegWindow(window_lib.Helper):
                                  skin_start_mid_joints_number_default_value=skin_start_mid_joints_number,
                                  skin_mid_end_joints_number_default_value=skin_mid_end_joints_number)
 
-
     def set_finger_list_enable(self, *args):
         """
         Set the finger list textField enable
@@ -360,6 +358,7 @@ class NeckWindow(window_lib.Helper):
         title (str): title of the window
         size (list): width and height
     """
+
     def __init__(self, *args):
         """
         Initializes an instance of NeckWindow
@@ -461,7 +460,6 @@ class NeckWindow(window_lib.Helper):
                                        (self.end_ik_world_rotation, 'top', 5, self.start_ik_world_rotation)]
                         )
 
-
     def apply_command(self, *args):
         """
         Apply button command
@@ -523,6 +521,7 @@ class RootWindow(window_lib.Helper):
         title (str): title of the window
         size (list): width and height
     """
+
     def __init__(self, *args):
         """
         Initializes an instance of RootWindow
@@ -542,7 +541,6 @@ class RootWindow(window_lib.Helper):
         cmds.formLayout(self.main_layout, edit=True,
                         attachForm=[(self.system_orientation, 'top', 20),
                                     (self.system_orientation, 'left', 25)])
-
 
     def apply_command(self, *args):
         """
@@ -566,6 +564,7 @@ class SpineWindow(window_lib.Helper):
         title (str): title of the window
         size (list): width and height
     """
+
     def __init__(self, *args):
         """
         Initializes an instance of SpineWindow
@@ -667,7 +666,6 @@ class SpineWindow(window_lib.Helper):
                                        (self.start_ik_world_rotation, 'top', 5, self.create_ik_middle_system),
                                        (self.end_ik_world_rotation, 'top', 5, self.start_ik_world_rotation)]
                         )
-
 
     def apply_command(self, *args):
         """
