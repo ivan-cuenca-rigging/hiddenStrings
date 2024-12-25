@@ -578,21 +578,18 @@ def create_follow(driver,
         base_capitalize_descriptor = ''
 
     # base multmat
-    base_mult_matrix = '{}{}_{}_{}'.format(driven_descriptor,
-                                           base_capitalize_descriptor,
-                                           driven_side,
-                                           usage_lib.mult_matrix)
+    if base:
+        base_mult_matrix = '{}{}_{}_{}'.format(driven_descriptor,
+                                            base_capitalize_descriptor,
+                                            driven_side,
+                                            usage_lib.mult_matrix)
 
-    if not cmds.objExists(base_mult_matrix):
-        base_mult_matrix = cmds.createNode('multMatrix', name=base_mult_matrix)
-        if base:
+        if not cmds.objExists(base_mult_matrix):
+            base_mult_matrix = cmds.createNode('multMatrix', name=base_mult_matrix)
             cmds.connectAttr(base_output, '{}.matrixIn[1]'.format(base_mult_matrix))
-        else:
-            cmds.setAttr('{}.matrixIn[1]'.format(base_mult_matrix),
-                         cmds.getAttr('{}.worldMatrix'.format(driven)), type='matrix')
 
-    cmds.setAttr('{}.matrixIn[0]'.format(base_mult_matrix),
-                 math_lib.multiply_matrices_4_by_4(matrix_a=driven_matrix, matrix_b=base_inverse_matrix), type='matrix')
+        cmds.setAttr('{}.matrixIn[0]'.format(base_mult_matrix),
+                    math_lib.multiply_matrices_4_by_4(matrix_a=driven_matrix, matrix_b=base_inverse_matrix), type='matrix')
 
     # driver
     if '.' in driver:
@@ -624,8 +621,12 @@ def create_follow(driver,
                                        usage_lib.blend_matrix)
     if not cmds.objExists(blend_matrix):
         blend_matrix = cmds.createNode('blendMatrix', name=blend_matrix)
-
-        cmds.connectAttr('{}.matrixSum'.format(base_mult_matrix), '{}.inputMatrix'.format(blend_matrix))
+        if base:
+            cmds.connectAttr('{}.matrixSum'.format(base_mult_matrix), '{}.inputMatrix'.format(blend_matrix))
+        else:
+            cmds.setAttr('{}.inputMatrix'.format(blend_matrix),
+                         cmds.xform(driven, query=True, worldSpace=True, matrix=True),
+                         type='matrix')
 
     target_index_list = cmds.ls('{}.target[*]'.format(blend_matrix))
     target_index = 0

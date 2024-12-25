@@ -5,7 +5,7 @@ from functools import partial
 from maya import cmds
 
 # Project imports
-from hiddenStrings.builder.modules.face import eyes, eye, cheek, ear
+from hiddenStrings.builder.modules.face import eyes, eye, cheek, cheekbone, ear
 from hiddenStrings.libs import window_lib
 
 
@@ -84,7 +84,6 @@ class EyesWindow(window_lib.Helper):
 
         right_text = cmds.text(label=' Right side',
                                backgroundColor=(0.4, 0.4, 0.4), height=20, align='left')
-
 
         self.mid_loop_vtx_right_list = cmds.textFieldGrp(label='Mid loop vertices: ', enable=True)
         self.mid_loop_vtx_right_button = cmds.iconTextButton(image='addClip.png',
@@ -282,14 +281,11 @@ class EyeWindow(window_lib.Helper):
         self.connect_to_opposite = cmds.checkBoxGrp(label='Connect to opposite: ', value1=False)
 
         # hook and base
-        self.base = cmds.textFieldGrp(
-            label='Hook: ', text='root_c_outputs.center_c_ctr')
+        self.base = cmds.textFieldGrp(label='Hook: ', text='root_c_outputs.center_c_ctr')
 
-        self.hook = cmds.textFieldGrp(
-            label='Base: ', text='neck_c_outputs.head_c_ctr')
-        
-        self.follow = cmds.textFieldGrp(
-            label='Follow: ', text='eyes_c_outputs.eyesLookAt_c_ctr')
+        self.hook = cmds.textFieldGrp(label='Base: ', text='neck_c_outputs.head_c_ctr')
+
+        self.follow = cmds.textFieldGrp(label='Follow: ', text='eyes_c_outputs.eyesLookAt_c_ctr')
 
         # Vertices lists
         separator01 = cmds.separator(height=5)
@@ -511,6 +507,7 @@ class CheekWindow(window_lib.Helper):
         title (str): title of the window
         size (list): width and height
     """
+
     def __init__(self, *args):
         """
         Initializes an instance of CheekWindow
@@ -550,7 +547,6 @@ class CheekWindow(window_lib.Helper):
                                        (self.hook, 'top', 5, self.base)]
                         )
 
-
     def apply_command(self, *args):
         """
         Apply button command
@@ -574,6 +570,86 @@ class CheekWindow(window_lib.Helper):
         cheek_module = cheek.Cheek(descriptor=descriptor, side=side)
 
         cheek_module.create_guides(connect_to_opposite_value=connect_to_opposite,
-                                 base_default_value=base,
-                                 hook_default_value=hook)
+                                   base_default_value=base,
+                                   hook_default_value=hook)
 
+
+class CheekboneWindow(window_lib.Helper):
+    """
+    Create the cheek window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
+
+    def __init__(self, *args):
+        """
+        Initializes an instance of CheekboneWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
+        """
+        super(CheekboneWindow, self).__init__(title='Cheek Guide Options', size=(450, 210))
+
+        # Name
+        self.name = cmds.textFieldGrp(label='Name: ', text='cheek')
+
+        # Side
+        self.side = cmds.optionMenu(label='Side')
+        cmds.menuItem(self.side, label='Left')
+        cmds.menuItem(self.side, label='Center')
+        cmds.menuItem(self.side, label='Right')
+        cmds.optionMenu(self.side, edit=True, value='Left')
+
+        self.connect_to_opposite = cmds.checkBoxGrp(label='Connect to opposite: ', value1=False)
+
+        # hook and base
+        self.base = cmds.textFieldGrp(label='Hook: ', text='root_c_outputs.center_c_ctr')
+
+        self.hook = cmds.textFieldGrp(label='Base: ', text='neck_c_outputs.head_c_ctr')
+
+        self.number_of_controls = cmds.intSliderGrp(label='Number of specific controls: ', field=True,
+                                                    value=3, maxValue=10, columnWidth=[1, 170])
+        # --------------------------------------------------------------------------------------------------------------
+        cmds.formLayout(self.main_layout, edit=True,
+
+                        attachForm=[(self.name, 'top', 20),
+                                    (self.side, 'left', 115)],
+
+                        attachControl=[(self.side, 'top', 5, self.name),
+                                       (self.connect_to_opposite, 'top', 5, self.side),
+                                       (self.base, 'top', 5, self.connect_to_opposite),
+                                       (self.hook, 'top', 5, self.base),
+                                       (self.number_of_controls, 'top', 5, self.hook)]
+                        )
+
+    def apply_command(self, *args):
+        """
+        Apply button command
+        """
+        descriptor = cmds.textFieldGrp(self.name, query=True, text=True)
+
+        side = cmds.optionMenu(self.side, query=True, value=True)
+        if side == 'Left':
+            side = 'l'
+        if side == 'Center':
+            side = 'c'
+        if side == 'Right':
+            side = 'r'
+
+        connect_to_opposite = cmds.checkBoxGrp(self.connect_to_opposite, query=True, value1=True)
+
+        base = cmds.textFieldGrp(self.base, query=True, text=True)
+
+        hook = cmds.textFieldGrp(self.hook, query=True, text=True)
+
+        number_of_controls = cmds.intSliderGrp(self.number_of_controls, query=True, value=True)
+
+        cheekbone_module = cheekbone.Cheekbone(descriptor=descriptor, side=side)
+
+        cheekbone_module.create_guides(connect_to_opposite_value=connect_to_opposite,
+                                       base_default_value=base,
+                                       hook_default_value=hook,
+                                       number_of_controls=number_of_controls)

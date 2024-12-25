@@ -9,14 +9,14 @@ from maya import cmds
 from hiddenStrings import module_utils
 from hiddenStrings import config as hiddenStrings_config
 from hiddenStrings.libs import (guide_lib, blend_shape_lib, skeleton_lib, connection_lib, skin_lib,
-                                import_export_lib, trigger_lib , reference_lib)
+                                import_export_lib, trigger_lib, reference_lib)
 
 from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, skin_windows, tools_windows
 
 builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings_path))
 if builder_exists:
     from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
-    from hiddenStrings.builder.modules.face import eyes, eye, ear, cheek
+    from hiddenStrings.builder.modules.face import eyes, eye, ear, cheek, cheekbone
 
     from hiddenStrings.ui.windows import body_windows
     from hiddenStrings.ui.windows import face_windows
@@ -29,6 +29,7 @@ class MarkingMenu(object):
     Args:
         click_input (int): click button input. 1 -> left click, 2 -> middle click, 3 -> right click
     """
+
     def __init__(self, click_input):
         """
         Initializes an instance of MarkinMenu
@@ -44,7 +45,6 @@ class MarkingMenu(object):
         self.delete()
         self.build()
 
-
     def build(self, *args):
         """
         Build the marking menu
@@ -59,14 +59,12 @@ class MarkingMenu(object):
 
         self.marking_menu_config()
 
-
     def delete(self):
         """
         Delete the marking menu
         """
         if cmds.popupMenu(self.menu_name, exists=True):
             cmds.deleteUI(self.menu_name)
-
 
     def marking_menu_config(self):
         """
@@ -108,7 +106,7 @@ class MarkingMenu(object):
                       command=self.hide_local_rotation_axis)
         cmds.menuItem(parent=local_rotation_axis_hierarchy, label='Hide with hierarchy',
                       command=self.hide_local_rotation_axis_with_hierarchy)
-        
+
         if hiddenStrings_config.dev_mode:
             cmds.menuItem(parent=self.menu_name, divider=True)
             cmds.menuItem(parent=self.menu_name, label='Reload modules', command=module_utils.reload)
@@ -116,7 +114,6 @@ class MarkingMenu(object):
         # ---------- East ----------
         if builder_exists:
             self.builder_menu()
-
 
     def deformation_menu(self, menu_parent, radial_position):
         """
@@ -136,7 +133,7 @@ class MarkingMenu(object):
 
         cmds.menuItem(parent=deformation_menu, label='Transfer shape', radialPosition='N',
                       command=self.transfer_shape_command)
-        
+
         cmds.menuItem(parent=deformation_menu, label='Paint Skin Weights', radialPosition='NW',
                       command=cmds.ArtPaintSkinWeightsToolOptions)
 
@@ -151,7 +148,6 @@ class MarkingMenu(object):
 
         cmds.menuItem(parent=deformation_menu, label='Pose Reader: Bary', command=self.create_default_bary)
         cmds.menuItem(parent=deformation_menu, optionBox=True, command=blend_shape_windows.CreateBaryWindow)
-
 
     def blend_shapes_menu(self, menu_parent, radial_position):
         """
@@ -209,7 +205,6 @@ class MarkingMenu(object):
         cmds.menuItem(parent=blend_shape_menu, optionBox=True,
                       command=blend_shape_windows.ExportBlendShapeWindow)
 
-
     def skins_menu(self, menu_parent, radial_position):
         """
         Create the skins menu items
@@ -254,7 +249,6 @@ class MarkingMenu(object):
                       command=self.export_skin_clusters)
         cmds.menuItem(parent=skin_menu, optionBox=True, command=skin_windows.ExportSkinWindow)
 
-
     def reference_menu(self, menu_parent, radial_position):
         """
         Create the reference menu items
@@ -266,18 +260,17 @@ class MarkingMenu(object):
         reference_menu = cmds.menuItem(parent=menu_parent, label='Reference', radialPosition=radial_position,
                                        subMenu=True)
 
-        cmds.menuItem(parent=reference_menu, label='Reference Editor', radialPosition='N',  
+        cmds.menuItem(parent=reference_menu, label='Reference Editor', radialPosition='N',
                       command=cmds.ReferenceEditor)
 
-        cmds.menuItem(parent=reference_menu, label='Reload reference', radialPosition='S',  
+        cmds.menuItem(parent=reference_menu, label='Reload reference', radialPosition='S',
                       command=reference_lib.reload_reference)
 
-        cmds.menuItem(parent=reference_menu, label='Replace reference', radialPosition='E',  
+        cmds.menuItem(parent=reference_menu, label='Replace reference', radialPosition='E',
                       command=reference_lib.replace_reference_window)
 
-        cmds.menuItem(parent=reference_menu, label='Remove reference', radialPosition='W',  
+        cmds.menuItem(parent=reference_menu, label='Remove reference', radialPosition='W',
                       command=reference_lib.remove_reference)
-
 
     def connections_menu(self, menu_parent, radial_position):
         """
@@ -341,7 +334,6 @@ class MarkingMenu(object):
         cmds.menuItem(parent=connections_menu, label='Export nodes and connections',
                       command=connections_windows.ExportNodesAndConnectionsWindow)
 
-
     def maya_editors_menu(self, menu_parent, radial_position):
         """
         Create the maya editors menu items
@@ -376,15 +368,14 @@ class MarkingMenu(object):
         cmds.menuItem(parent=maya_editors_menu, label='Node Editor', radialPosition='S',
                       command=cmds.NodeEditorWindow)
 
-
     # ---------- methods ----------
+
     @staticmethod
     def set_labels(*args):
         """
         Set joints labelling
         """
         skin_lib.set_labels()
-
 
     @staticmethod
     def rename_all_skin_clusters(*args):
@@ -393,14 +384,12 @@ class MarkingMenu(object):
         """
         skin_lib.rename_all_skin_clusters()
 
-
     @staticmethod
     def rename_all_blend_shapes(*args):
         """
         Rename all the blendshape of the scene
         """
         blend_shape_lib.rename_all_blend_shapes()
-
 
     @staticmethod
     def transfer_skin(*args):
@@ -416,7 +405,6 @@ class MarkingMenu(object):
                                target_skin_index=1,
                                surface_association='closestPoint')
 
-
     @staticmethod
     def export_skin_clusters(*args):
         """
@@ -428,7 +416,6 @@ class MarkingMenu(object):
                                                    sceneName=True))),
                                                skin_index=None)
 
-
     @staticmethod
     def export_blend_shapes(*args):
         """
@@ -437,7 +424,6 @@ class MarkingMenu(object):
         import_export_lib.export_blend_shapes(node_list=cmds.ls(selection=True),
                                               path='{}/blendShapes'.format(os.path.dirname(cmds.file(query=True,
                                                                                                      sceneName=True))))
-
 
     @staticmethod
     def connect_translate_rotate_scale(*args):
@@ -453,7 +439,6 @@ class MarkingMenu(object):
 
         cmds.select(sel)
 
-
     @staticmethod
     def connect_translate(*args):
         """
@@ -467,7 +452,6 @@ class MarkingMenu(object):
                                          driven=sel[1])
 
         cmds.select(sel)
-
 
     @staticmethod
     def connect_rotate(*args):
@@ -483,7 +467,6 @@ class MarkingMenu(object):
 
         cmds.select(sel)
 
-
     @staticmethod
     def connect_scale(*args):
         """
@@ -497,7 +480,6 @@ class MarkingMenu(object):
                                      driven=sel[1])
 
         cmds.select(sel)
-
 
     @staticmethod
     def connect_offset_parent_matrix(*args):
@@ -513,7 +495,6 @@ class MarkingMenu(object):
 
         cmds.select(sel)
 
-
     @staticmethod
     def transform_to_offset_parent_matrix(*args):
         """
@@ -521,7 +502,6 @@ class MarkingMenu(object):
         """
         for node in cmds.ls(sl=True):
             connection_lib.transform_to_offset_parent_matrix(node=node)
-
 
     @staticmethod
     def offset_parent_matrix_to_transform(*args):
@@ -531,14 +511,12 @@ class MarkingMenu(object):
         for node in cmds.ls(sl=True):
             connection_lib.offset_parent_matrix_to_transform(node=node)
 
-
     @staticmethod
     def transfer_shape_command(*args):
         """
         TransferShape command plugin command
         """
         cmds.transferShape()
-
 
     @staticmethod
     def mirror_targets(*args):
@@ -550,7 +528,6 @@ class MarkingMenu(object):
             blend_shape, target = target.split('.')
             blend_shape_lib.mirror_target(blend_shape=blend_shape, target=target)
 
-
     @staticmethod
     def create_default_angle_reader(*args):
         """
@@ -558,14 +535,12 @@ class MarkingMenu(object):
         """
         trigger_lib.create_angle_trigger(parent_node=cmds.ls(selection=True)[0], driver_node=cmds.ls(selection=True)[1])
 
-
     @staticmethod
     def create_default_bary(*args):
         """
         Create a default bary pose reader
         """
         trigger_lib.create_bary_trigger()
-
 
     @staticmethod
     def export_selection(*args):
@@ -575,14 +550,12 @@ class MarkingMenu(object):
         import_export_lib.export_selection(file_name='selection_data',
                                            path=r'{}/temp'.format(module_utils.hidden_strings_path))
 
-
     @staticmethod
     def import_selection(*args):
         """
         Import selection
         """
         import_export_lib.import_selection(path=r'{}/temp/selection_data.json'.format(module_utils.hidden_strings_path))
-
 
     @staticmethod
     def show_local_rotation_axis(hierarchy=False, *args):
@@ -600,7 +573,6 @@ class MarkingMenu(object):
             if cmds.attributeQuery('displayLocalAxis', node=node, exists=True):
                 cmds.setAttr('{}.displayLocalAxis'.format(node), True)
 
-
     def show_local_rotation_axis_with_hierarchy(self, *args):
         """
         Show the local rotation axis of the selection with hierarchy
@@ -608,7 +580,6 @@ class MarkingMenu(object):
         selection_list = cmds.ls(selection=True)
         self.show_local_rotation_axis(hierarchy=True)
         cmds.select(selection_list)
-
 
     @staticmethod
     def hide_local_rotation_axis(hierarchy=False, *args):
@@ -626,7 +597,6 @@ class MarkingMenu(object):
             if cmds.attributeQuery('displayLocalAxis', node=node, exists=True):
                 cmds.setAttr('{}.displayLocalAxis'.format(node), False)
 
-
     def hide_local_rotation_axis_with_hierarchy(self, *args):
         """
         Hide the local rotation axis of the selection with hierarchy
@@ -634,7 +604,6 @@ class MarkingMenu(object):
         selection_list = cmds.ls(selection=True)
         self.hide_local_rotation_axis(hierarchy=True)
         cmds.select(selection_list)
-
 
     # Builder
     def builder_menu(self):
@@ -704,7 +673,6 @@ class MarkingMenu(object):
         cmds.menuItem(parent=body_guides_menu, label='Legs', command=self.create_legs_guides)
         cmds.menuItem(optionBox=True, command=body_windows.LegWindow)
 
-
     def face_menu(self, menu_parent, radial_position):
         """
         Create the face menu items
@@ -735,9 +703,9 @@ class MarkingMenu(object):
         cmds.menuItem(parent=face_guides_menu, label='Eyelids', enable=False)
         cmds.menuItem(optionBox=True, enable=False)
 
-        # Cheeks Up guides
-        cmds.menuItem(parent=face_guides_menu, label='Cheeks Up', enable=False)
-        cmds.menuItem(optionBox=True, enable=False)
+        # Cheek Bone guides
+        cmds.menuItem(parent=face_guides_menu, label='Cheekbones', command=self.create_cheekbones_guides)
+        cmds.menuItem(optionBox=True, command=face_windows.CheekboneWindow)
 
         # Cheeks guides
         cmds.menuItem(parent=face_guides_menu, label='Cheeks', command=self.create_cheeks_guides)
@@ -750,7 +718,6 @@ class MarkingMenu(object):
         # Mouth guides
         cmds.menuItem(parent=face_guides_menu, label='Mouth', enable=False)
         cmds.menuItem(optionBox=True, enable=False)
-
 
     def templates_menu(self, menu_parent, radial_position):
         """
@@ -775,7 +742,6 @@ class MarkingMenu(object):
         cmds.menuItem(parent=template_guides_menu, divider=True)
 
         cmds.menuItem(parent=template_guides_menu, label='Face', command=self.create_face_guides)
-
 
     def build_rig(self, *args):
         """
@@ -815,7 +781,6 @@ class MarkingMenu(object):
                             rig_module.run()
         cmds.delete(guides_grp)
 
-
     def create_biped_guides(self, *args):
         """
         Create the biped guides template
@@ -826,7 +791,6 @@ class MarkingMenu(object):
         self.create_arms_guides()
         self.create_legs_guides()
 
-
     @staticmethod
     def create_root_guides(*args):
         """
@@ -834,7 +798,6 @@ class MarkingMenu(object):
         """
         root_module = root.Root()
         root_module.create_guides()
-
 
     @staticmethod
     def create_column_guides(*args):
@@ -844,7 +807,6 @@ class MarkingMenu(object):
         column_module = column.Column()
         column_module.create_guides()
 
-
     @staticmethod
     def create_neck_guides(*args):
         """
@@ -852,7 +814,6 @@ class MarkingMenu(object):
         """
         neck_module = neck.Neck()
         neck_module.create_guides()
-
 
     @staticmethod
     def create_arms_guides(*args):
@@ -865,7 +826,6 @@ class MarkingMenu(object):
         arm_l_module.create_guides()
         arm_r_module.create_guides(connect_to_opposite_value=True)
 
-
     @staticmethod
     def create_legs_guides(*args):
         """
@@ -877,7 +837,6 @@ class MarkingMenu(object):
         leg_l_module.create_guides()
         leg_r_module.create_guides(connect_to_opposite_value=True)
 
-
     def create_face_guides(self, *args):
         """
         Create the face guides template
@@ -885,6 +844,8 @@ class MarkingMenu(object):
         self.create_eyes_guides()
 
         self.create_ears_guides()
+
+        self.create_cheekbones_guides()
 
         self.create_cheeks_guides()
 
@@ -896,7 +857,6 @@ class MarkingMenu(object):
         eyes_module = eyes.Eyes()
         eyes_module.create_guides()
 
-
     @staticmethod
     def create_eye_guides(*args):
         """
@@ -904,7 +864,6 @@ class MarkingMenu(object):
         """
         eye_module = eye.Eye()
         eye_module.create_guides()
-
 
     @staticmethod
     def create_ears_guides(*args):
@@ -917,7 +876,6 @@ class MarkingMenu(object):
         ear_l_module.create_guides()
         ear_r_module.create_guides(connect_to_opposite_value=True)
 
-
     @staticmethod
     def create_cheeks_guides(*args):
         """
@@ -928,3 +886,14 @@ class MarkingMenu(object):
 
         cheek_l_module.create_guides()
         cheek_r_module.create_guides(connect_to_opposite_value=True)
+
+    @staticmethod
+    def create_cheekbones_guides(*args):
+        """
+        Create the cheekbones guides command
+        """
+        cheekbone_l_module = cheekbone.Cheekbone(side='l')
+        cheekbone_r_module = cheekbone.Cheekbone(side='r')
+
+        cheekbone_l_module.create_guides()
+        cheekbone_r_module.create_guides(connect_to_opposite_value=True)
