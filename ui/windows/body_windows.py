@@ -38,9 +38,9 @@ class ArmWindow(window_lib.Helper):
         self.connect_to_opposite = cmds.checkBoxGrp(label='Connect to opposite: ', value1=False)
 
         # hook and base
-        self.base = cmds.textFieldGrp(label='Hook: ', text='root_c_outputs.center_c_ctr')
+        self.base = cmds.textFieldGrp(label='Base: ', text='root_c_outputs.center_c_ctr')
 
-        self.hook = cmds.textFieldGrp(label='Base: ', text='spine_c_outputs.spineTop_c_ctr')
+        self.hook = cmds.textFieldGrp(label='Hook: ', text='spine_c_outputs.spineTop_c_ctr')
 
         # System orientation
         self.system_orientation = cmds.optionMenu(label='System Orientation')
@@ -210,9 +210,9 @@ class LegWindow(window_lib.Helper):
         self.connect_to_opposite = cmds.checkBoxGrp(label='Connect to opposite: ', value1=False)
 
         # hook and base
-        self.base = cmds.textFieldGrp(label='Hook: ', text='root_c_outputs.center_c_ctr')
+        self.base = cmds.textFieldGrp(label='Base: ', text='root_c_outputs.center_c_ctr')
 
-        self.hook = cmds.textFieldGrp(label='Base: ', text='spine_c_outputs.spineBottom_c_ctr')
+        self.hook = cmds.textFieldGrp(label='Hook: ', text='spine_c_outputs.spineBottom_c_ctr')
 
         # System orientation
         self.system_orientation = cmds.optionMenu(label='System Orientation')
@@ -379,9 +379,9 @@ class NeckWindow(window_lib.Helper):
         cmds.menuItem(self.side, label='Right')
         cmds.optionMenu(self.side, edit=True, value='Center')
 
-        self.base = cmds.textFieldGrp(label='Hook: ', text='root_c_outputs.center_c_ctr')
+        self.base = cmds.textFieldGrp(label='Base: ', text='root_c_outputs.center_c_ctr')
 
-        self.hook = cmds.textFieldGrp(label='Base: ', text='spine_c_outputs.spineTop_c_ctr')
+        self.hook = cmds.textFieldGrp(label='Hook: ', text='spine_c_outputs.spineTop_c_ctr')
 
         # Joints Settings
         separator01 = cmds.separator(height=5)
@@ -586,9 +586,9 @@ class SpineWindow(window_lib.Helper):
         cmds.optionMenu(self.side, edit=True, value='Center')
 
         # hook and base
-        self.base = cmds.textFieldGrp(label='Hook: ', text='root_c_outputs.center_c_ctr')
+        self.base = cmds.textFieldGrp(label='Base: ', text='root_c_outputs.center_c_ctr')
 
-        self.hook = cmds.textFieldGrp(label='Base: ', text='root_c_outputs.root_c_ctr')
+        self.hook = cmds.textFieldGrp(label='Hook: ', text='root_c_outputs.root_c_ctr')
 
         # Joints Settings
         separator01 = cmds.separator(height=5)
