@@ -5,7 +5,7 @@ from functools import partial
 from maya import cmds
 
 # Project imports
-from hiddenStrings.builder.modules.face import eyes, eye, cheek, cheekbone, ear, tongue, nose
+from hiddenStrings.builder.modules.face import eyes, eye, cheek, cheekbone, ear, tongue, nose, teeth
 from hiddenStrings.libs import window_lib
 
 
@@ -650,19 +650,10 @@ class TongueWindow(window_lib.Helper):
             title (str): title of the window
             size (list): width and height
         """
-        super(TongueWindow, self).__init__(title='Tongue Guides Options', size=(450, 210))
+        super(TongueWindow, self).__init__(title='Tongue Guides Options', size=(450, 150))
 
         # Name
         self.name = cmds.textFieldGrp(label='Name: ', text='tongue')
-
-        # Side
-        self.side = cmds.optionMenu(label='Side')
-        cmds.menuItem(self.side, label='Left')
-        cmds.menuItem(self.side, label='Center')
-        cmds.menuItem(self.side, label='Right')
-        cmds.optionMenu(self.side, edit=True, value='Left')
-
-        self.connect_to_opposite = cmds.checkBoxGrp(label='Connect to opposite: ', value1=False)
 
         # hook and base
         self.hook = cmds.textFieldGrp(label='Hook: ', text='neck_c_outputs.head_c_ctr')
@@ -672,12 +663,9 @@ class TongueWindow(window_lib.Helper):
         # --------------------------------------------------------------------------------------------------------------
         cmds.formLayout(self.main_layout, edit=True,
 
-                        attachForm=[(self.name, 'top', 20),
-                                    (self.side, 'left', 115)],
+                        attachForm=[(self.name, 'top', 20)],
 
-                        attachControl=[(self.side, 'top', 5, self.name),
-                                       (self.connect_to_opposite, 'top', 5, self.side),
-                                       (self.hook, 'top', 5, self.connect_to_opposite),
+                        attachControl=[(self.hook, 'top', 5, self.name),
                                        (self.number_of_controls, 'top', 5, self.hook)]
                         )
 
@@ -687,24 +675,13 @@ class TongueWindow(window_lib.Helper):
         """
         descriptor = cmds.textFieldGrp(self.name, query=True, text=True)
 
-        side = cmds.optionMenu(self.side, query=True, value=True)
-        if side == 'Left':
-            side = 'l'
-        if side == 'Center':
-            side = 'c'
-        if side == 'Right':
-            side = 'r'
-
-        connect_to_opposite = cmds.checkBoxGrp(self.connect_to_opposite, query=True, value1=True)
-
         hook = cmds.textFieldGrp(self.hook, query=True, text=True)
 
         number_of_controls = cmds.intSliderGrp(self.number_of_controls, query=True, value=True)
 
-        tongue_module = tongue.Tongue(descriptor=descriptor, side=side)
+        tongue_module = tongue.Tongue(descriptor=descriptor)
 
-        tongue_module.create_guides(connect_to_opposite_value=connect_to_opposite,
-                                    hook_default_value=hook,
+        tongue_module.create_guides(hook_default_value=hook,
                                     number_of_controls=number_of_controls)
 
 
@@ -732,8 +709,7 @@ class NoseWindow(window_lib.Helper):
         self.name = cmds.textFieldGrp(label='Name: ', text='nose')
 
         # hook and base
-        self.hook = cmds.textFieldGrp(
-            label='Hook: ', text='neck_c_outputs.head_c_ctr')
+        self.hook = cmds.textFieldGrp(label='Hook: ', text='neck_c_outputs.head_c_ctr')
 
         # --------------------------------------------------------------------------------------------------------------
         cmds.formLayout(self.main_layout, edit=True,
@@ -754,3 +730,55 @@ class NoseWindow(window_lib.Helper):
         nose_module = nose.Nose(descriptor=descriptor)
 
         nose_module.create_guides(hook_default_value=hook)
+
+
+class TeethWindow(window_lib.Helper):
+    """
+    Create the teeth window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
+
+    def __init__(self, *args):
+        """
+        Initializes an instance of TeethWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
+        """
+        super(TeethWindow, self).__init__(title='Teeth Guide Options', size=(450, 150))
+
+        # Name
+        self.name = cmds.textFieldGrp(label='Name: ', text='teeth')
+
+        # hook and base
+        self.base = cmds.textFieldGrp(label='Base: ', text='neck_c_outputs.head_c_ctr')
+
+        self.hook = cmds.textFieldGrp(label='Hook: ', text='mouth_c_outputs.jaw_c_ctr')
+
+        # --------------------------------------------------------------------------------------------------------------
+        cmds.formLayout(self.main_layout, edit=True,
+
+                        attachForm=[(self.name, 'top', 20)],
+
+                        attachControl=[(self.base, 'top', 5, self.name),
+                                       (self.hook, 'top', 5, self.base)]
+                        )
+
+    def apply_command(self, *args):
+        """
+        Apply button command
+        """
+        descriptor = cmds.textFieldGrp(self.name, query=True, text=True)
+
+        base = cmds.textFieldGrp(self.base, query=True, text=True)
+
+        hook = cmds.textFieldGrp(self.hook, query=True, text=True)
+
+        teeth_module = teeth.Teeth(descriptor=descriptor)
+
+        teeth_module.create_guides(base_default_value=base,
+                                   hook_default_value=hook)
