@@ -113,7 +113,14 @@ class Helper(node_lib.Helper):
 
 
     # ---------- Connect Methods ----------
-    def connect_to_opposite_side(self):
+    def connect_to_opposite_side(self,
+                                 world=True):
+        """
+        Connect to the opposite side
+
+        Args:
+            world (bool, optional): If true it will use worldMatrix. Defaults to True.
+        """
         if self.side == side_lib.center:
             cmds.error('the guide "{}" does not have opposite side'.format(self.name))
 
@@ -128,7 +135,11 @@ class Helper(node_lib.Helper):
                                                                                  self.side,
                                                                                  usage_lib.mult_matrix))
 
-            cmds.connectAttr('{}.worldMatrix'.format(opposite_name), '{}.matrixIn[0]'.format(mult_matrix))
+            if world:
+                cmds.connectAttr('{}.worldMatrix'.format(opposite_name), '{}.matrixIn[0]'.format(mult_matrix))
+            else:
+                cmds.connectAttr('{}.matrix'.format(opposite_name), '{}.matrixIn[0]'.format(mult_matrix))
+
             cmds.setAttr('{}.matrixIn[1]'.format(mult_matrix), math_lib.identity_matrix_x_negative, type='matrix')
 
             cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.offsetParentMatrix'.format(self.name))
