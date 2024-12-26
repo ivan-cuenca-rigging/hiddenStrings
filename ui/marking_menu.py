@@ -16,7 +16,7 @@ from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, s
 builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings_path))
 if builder_exists:
     from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
-    from hiddenStrings.builder.modules.face import eyes, eye, ear, cheek, cheekbone
+    from hiddenStrings.builder.modules.face import eyes, eye, ear, cheek, cheekbone, tongue, nose
 
     from hiddenStrings.ui.windows import body_windows
     from hiddenStrings.ui.windows import face_windows
@@ -703,7 +703,11 @@ class MarkingMenu(object):
         cmds.menuItem(parent=face_guides_menu, label='Eyelids', enable=False)
         cmds.menuItem(optionBox=True, enable=False)
 
-        # Cheek Bone guides
+        # Nose guides
+        cmds.menuItem(parent=face_guides_menu, label='Nose', command=self.create_nose_guides)
+        cmds.menuItem(optionBox=True, command=face_windows.NoseWindow)
+
+        # Cheekbone guides
         cmds.menuItem(parent=face_guides_menu, label='Cheekbones', command=self.create_cheekbones_guides)
         cmds.menuItem(optionBox=True, command=face_windows.CheekboneWindow)
 
@@ -718,6 +722,10 @@ class MarkingMenu(object):
         # Mouth guides
         cmds.menuItem(parent=face_guides_menu, label='Mouth', enable=False)
         cmds.menuItem(optionBox=True, enable=False)
+
+        # Tongue guides
+        cmds.menuItem(parent=face_guides_menu, label='Tongue', command=self.create_tongue_guides)
+        cmds.menuItem(optionBox=True, command=face_windows.TongueWindow)
 
     def templates_menu(self, menu_parent, radial_position):
         """
@@ -845,9 +853,13 @@ class MarkingMenu(object):
 
         self.create_ears_guides()
 
+        self.create_nose_guides()
+
         self.create_cheekbones_guides()
 
         self.create_cheeks_guides()
+
+        self.create_tongue_guides()
 
     @staticmethod
     def create_eyes_guides(*args):
@@ -888,6 +900,15 @@ class MarkingMenu(object):
         cheek_r_module.create_guides(connect_to_opposite_value=True)
 
     @staticmethod
+    def create_nose_guides(*args):
+        """
+        Create the nose guides command
+        """
+        nose_module = nose.Nose()
+
+        nose_module.create_guides()
+
+    @staticmethod
     def create_cheekbones_guides(*args):
         """
         Create the cheekbones guides command
@@ -897,3 +918,11 @@ class MarkingMenu(object):
 
         cheekbone_l_module.create_guides()
         cheekbone_r_module.create_guides(connect_to_opposite_value=True)
+
+    @staticmethod
+    def create_tongue_guides(*args):
+        """
+        Create the cheekbones guides command
+        """
+        tongue_module = tongue.Tongue()
+        tongue_module.create_guides()
