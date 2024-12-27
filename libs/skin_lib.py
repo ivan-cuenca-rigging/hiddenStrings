@@ -274,7 +274,7 @@ def add_joint_to_skin_cluster(joint_name, skin_cluster_name, prebind_name=None):
     Add a joint to an existing skinCluster
 
     Args:
-        prebind_name (str):name of the prebind node
+        prebind_name (str):name of the prebind node or node.attribute
         joint_name (str): name of the joint to include
         skin_cluster_name (str): name of the skinCluster
     """
@@ -286,6 +286,7 @@ def add_joint_to_skin_cluster(joint_name, skin_cluster_name, prebind_name=None):
     if prebind_name:
         if not cmds.objExists(prebind_name):
             logging.error('{} does not exists in the scene'.format(prebind_name))
+
     # Create a tmp skin to create some attributes in the joint
     cube_temp = cmds.polyCube()[0]
     cmds.skinCluster(joint_name,
@@ -310,8 +311,16 @@ def add_joint_to_skin_cluster(joint_name, skin_cluster_name, prebind_name=None):
 
     # If prebind exists then connect it, else set to its default value
     if prebind_name:
-        cmds.connectAttr('{}.worldInverseMatrix'.format(prebind_name),
-                         '{}.bindPreMatrix[{}]'.format(skin_cluster_name, joint_index))
+        if '.' in prebind_name:
+            descriptor, side = joint_name.split('_')[:2]
+            inverse_matrix = cmds.createNode('inverseMatrix', 
+                                             name='{}Prebind_{}_{}'.format(descriptor, side, usage_lib.inverse_matrix))
+            cmds.connectAttr(prebind_name, '{}.inputMatrix'.format(inverse_matrix))
+            cmds.connectAttr('{}.outputMatrix'.format(inverse_matrix), 
+                             '{}.bindPreMatrix[{}]'.format(skin_cluster_name, joint_index))
+        else:
+            cmds.connectAttr('{}.worldInverseMatrix'.format(prebind_name),
+                            '{}.bindPreMatrix[{}]'.format(skin_cluster_name, joint_index))
     else:
         cmds.setAttr('{}.bindPreMatrix[{}]'.format(skin_cluster_name, joint_index),
                      cmds.getAttr('{}.worldInverseMatrix'.format(joint_name)),

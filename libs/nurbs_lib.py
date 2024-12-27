@@ -37,4 +37,18 @@ def create_nurbs_from_points(descriptor,
 
     cmds.delete(crv_0, crv_1)
 
+    cmds.rebuildSurface(nurbs_transform,
+                        replaceOriginal=True,
+                        rebuildType=0,
+                        endKnots=1,
+                        keepRange=False,
+                        keepControlPoints=False,
+                        keepCorners=False,
+                        spansU=0,
+                        degreeU=1,
+                        spansV=0,
+                        degreeV=3,
+                        fitRebuild=False,
+                        direction=2)
+
     return nurbs_transform

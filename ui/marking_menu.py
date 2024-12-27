@@ -16,7 +16,7 @@ from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, s
 builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings_path))
 if builder_exists:
     from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
-    from hiddenStrings.builder.modules.face import eyes, eye, ear, cheek, cheekbone, tongue, nose, teeth
+    from hiddenStrings.builder.modules.face import brows, eyes, eye, ear, cheek, cheekbone, tongue, nose, teeth
 
     from hiddenStrings.ui.windows import body_windows
     from hiddenStrings.ui.windows import face_windows
@@ -687,6 +687,7 @@ class MarkingMenu(object):
         cmds.menuItem(parent=face_guides_menu, label='             Face             ', enable=False)
         cmds.menuItem(parent=face_guides_menu, divider=True)
 
+
         # Eyes guides
         cmds.menuItem(parent=face_guides_menu, label='Eyes', command=self.create_eyes_guides)
         cmds.menuItem(optionBox=True, command=face_windows.EyesWindow)
@@ -696,11 +697,15 @@ class MarkingMenu(object):
         cmds.menuItem(optionBox=True, command=face_windows.EyeWindow)
 
         # Brows guides
-        cmds.menuItem(parent=face_guides_menu, label='Brows', enable=False)
-        cmds.menuItem(optionBox=True, enable=False)
+        cmds.menuItem(parent=face_guides_menu, label='Brows', command=self.create_brows_guides)
+        cmds.menuItem(optionBox=True, command=face_windows.BrowsWindow)
 
         # Eyelids guides
         cmds.menuItem(parent=face_guides_menu, label='Eyelids', enable=False)
+        cmds.menuItem(optionBox=True, enable=False)
+
+        # Eyelines guides
+        cmds.menuItem(parent=face_guides_menu, label='Eyelines', enable=False)
         cmds.menuItem(optionBox=True, enable=False)
 
         # Nose guides
@@ -730,6 +735,10 @@ class MarkingMenu(object):
         # Teeth guides
         cmds.menuItem(parent=face_guides_menu, label='Teeth', command=self.create_teeth_guides)
         cmds.menuItem(optionBox=True, command=face_windows.TeethWindow)
+
+        # Squash guides
+        cmds.menuItem(parent=face_guides_menu, label='Squash', enable=False)
+        cmds.menuItem(optionBox=True, enable=False)
 
     def templates_menu(self, menu_parent, radial_position):
         """
@@ -807,6 +816,8 @@ class MarkingMenu(object):
         """
         Create the face guides template
         """
+        self.create_brows_guides()
+
         self.create_eyes_guides()
 
         self.create_ears_guides()
@@ -866,6 +877,14 @@ class MarkingMenu(object):
 
         leg_l_module.create_guides()
         leg_r_module.create_guides(connect_to_opposite_value=True)
+
+    @staticmethod
+    def create_brows_guides(*args):
+        """
+        Create the brows guides command
+        """
+        brows_module = brows.Brows()
+        brows_module.create_guides()
 
     @staticmethod
     def create_eyes_guides(*args):

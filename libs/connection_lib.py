@@ -307,34 +307,34 @@ def connect_offset_parent_matrix(driver, driven,
         str: multMatrix node name
     """
     if len(driven.split('_')) != 3:
-        desc = driven
+        descriptor = driven
         side = side_lib.center
         usage = ''
         logging.info('Names should have 3 fields {descriptor}_{side}_{usage}.')
     else:
-        desc, side, usage = driven.split('_')
+        descriptor, side, usage = driven.split('_')
 
     # Logic
-    multmat = cmds.createNode('multMatrix',
-                              name='{}{}_{}_{}'.format(desc, usage.capitalize(), side, usage_lib.mult_matrix))
+    mult_matrix = cmds.createNode('multMatrix',
+                              name='{}{}_{}_{}'.format(descriptor, usage.capitalize(), side, usage_lib.mult_matrix))
 
     if world:
         driven_matrix = cmds.getAttr('{}.worldMatrix'.format(driven))
         driver_inverse_matrix = cmds.getAttr('{}.worldInverseMatrix'.format(driver))
         matrix_difference = math_lib.multiply_matrices_4_by_4(driven_matrix, driver_inverse_matrix)
-        cmds.setAttr('{}.matrixIn[0]'.format(multmat), matrix_difference, type='matrix')
-        cmds.connectAttr('{}.worldMatrix'.format(driver), '{}.matrixIn[1]'.format(multmat))
+        cmds.setAttr('{}.matrixIn[0]'.format(mult_matrix), matrix_difference, type='matrix')
+        cmds.connectAttr('{}.worldMatrix'.format(driver), '{}.matrixIn[1]'.format(mult_matrix))
 
     else:
         matrix_difference = cmds.getAttr('{}.worldMatrix'.format(driven))
-        cmds.connectAttr('{}.matrix'.format(driver), '{}.matrixIn[0]'.format(multmat))
-        cmds.setAttr('{}.matrixIn[1]'.format(multmat), matrix_difference, type='matrix')
+        cmds.connectAttr('{}.matrix'.format(driver), '{}.matrixIn[0]'.format(mult_matrix))
+        cmds.setAttr('{}.matrixIn[1]'.format(mult_matrix), matrix_difference, type='matrix')
 
     if translate and rotate and scale and shear:
-        cmds.connectAttr('{}.matrixSum'.format(multmat), '{}.offsetParentMatrix'.format(driven))
+        cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.offsetParentMatrix'.format(driven))
     else:
-        pick_mat = cmds.createNode('pickMatrix', name='{}_{}_{}'.format(desc, side, usage_lib.pick_matrix))
-        cmds.connectAttr('{}.matrixSum'.format(multmat), '{}.inputMatrix'.format(pick_mat))
+        pick_mat = cmds.createNode('pickMatrix', name='{}_{}_{}'.format(descriptor, side, usage_lib.pick_matrix))
+        cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.inputMatrix'.format(pick_mat))
 
         if not translate:
             cmds.setAttr('{}.useTranslate'.format(pick_mat), 0)
@@ -352,16 +352,24 @@ def connect_offset_parent_matrix(driver, driven,
         for axis in 'xyz':
             if cmds.getAttr('{}.{}{}'.format(driven, attr, axis), settable=True):
                 cmds.setAttr('{}.{}{}'.format(driven, attr, axis), value)
-    return multmat
+    return mult_matrix
 
 
-def connect_matrix_to_attribute(driver, driven_and_attr):
+def connect_matrix_to_attribute(driver, driven_and_attr,
+                                translate=True,
+                                rotate=True,
+                                scale=True,
+                                shear=True):
     """    
     Connect driver worldMatrix to an attribute, the result matrix will be the identity matrix
 
     Args:
         driver (str): name of the driver
         driven_and_attr (str): E.G. 'root_c_outputs.root_c_ctr'
+        translate (bool, optional): connect translate. Defaults to True.
+        rotate (bool, optional): connect rotate. Defaults to True.
+        scale (bool, optional): connect scale. Defaults to True.
+        shear (bool, optional): connect shear. Defaults to True.
     """
     node, attr = driven_and_attr.split('.')
     descriptor, side, usage = node.split('_')
@@ -376,16 +384,39 @@ def connect_matrix_to_attribute(driver, driven_and_attr):
                  type='matrix')
     cmds.connectAttr('{}.worldMatrix'.format(driver), '{}.matrixIn[1]'.format(mult_matrix))
 
-    cmds.connectAttr('{}.matrixSum'.format(mult_matrix), driven_and_attr)
+    if translate and rotate and scale and shear:
+        cmds.connectAttr('{}.matrixSum'.format(mult_matrix), driven_and_attr)
+    else:
+        pick_mat = cmds.createNode('pickMatrix', name='{}_{}_{}'.format(descriptor, side, usage_lib.pick_matrix))
+        cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.inputMatrix'.format(pick_mat))
+
+        if not translate:
+            cmds.setAttr('{}.useTranslate'.format(pick_mat), 0)
+        if not rotate:
+            cmds.setAttr('{}.useRotate'.format(pick_mat), 0)
+        if not scale:
+            cmds.setAttr('{}.useScale'.format(pick_mat), 0)
+        if not shear:
+            cmds.setAttr('{}.useShear'.format(pick_mat), 0)
+
+        cmds.connectAttr('{}.outputMatrix'.format(pick_mat), driven_and_attr)
 
 
-def connect_matrix_from_attribute(driver_and_attr, driven):
+def connect_matrix_from_attribute(driver_and_attr, driven,
+                                  translate=True,
+                                  rotate=True,
+                                  scale=True,
+                                  shear=True):
     """
     Connect an attribute to the offsetParentMatrix of the driven
 
     Args:
         driver_and_attr (str): E.G. 'root_c_outputs.root_c_ctr'
         driven (str): name of the driven
+        translate (bool, optional): connect translate. Defaults to True.
+        rotate (bool, optional): connect rotate. Defaults to True.
+        scale (bool, optional): connect scale. Defaults to True.
+        shear (bool, optional): connect shear. Defaults to True.
 
     Returns:
         str: mult_matrix
@@ -396,14 +427,38 @@ def connect_matrix_from_attribute(driver_and_attr, driven):
     if not cmds.objExists(mult_matrix):
         mult_matrix = cmds.createNode('multMatrix', name=mult_matrix)
 
-    matrix_difference = math_lib.multiply_matrices_4_by_4(matrix_a=cmds.getAttr('{}.worldMatrix'.format(driven)),
-                                                         matrix_b=math_lib.inverse_matrix(cmds.getAttr(driver_and_attr)))
+    driver_inverse_matrix = cmds.createNode('inverseMatrix')
+    cmds.connectAttr(driver_and_attr, '{}.inputMatrix'.format(driver_inverse_matrix))
+    
+    matrix_difference = math_lib.multiply_matrices_4_by_4(
+        matrix_a=cmds.getAttr('{}.worldMatrix'.format(driven)),
+        matrix_b=cmds.getAttr('{}.outputMatrix'.format(driver_inverse_matrix)))
 
     cmds.setAttr('{}.matrixIn[0]'.format(mult_matrix), matrix_difference, type='matrix')
     cmds.connectAttr(driver_and_attr, '{}.matrixIn[1]'.format(mult_matrix), force=True)
 
-    if not cmds.isConnected('{}.matrixSum'.format(mult_matrix), '{}.offsetParentMatrix'.format(driven)):
+    cmds.delete(driver_inverse_matrix)
+    
+    if translate and rotate and scale and shear:
         cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.offsetParentMatrix'.format(driven))
+    else:
+        pick_mat = cmds.createNode('pickMatrix', 
+                                   name='{}{}_{}_{}'.format(descriptor, 
+                                                            usage_lib.get_usage_capitalize(usage=usage),
+                                                            side, 
+                                                            usage_lib.pick_matrix))
+        cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.inputMatrix'.format(pick_mat))
+
+        if not translate:
+            cmds.setAttr('{}.useTranslate'.format(pick_mat), 0)
+        if not rotate:
+            cmds.setAttr('{}.useRotate'.format(pick_mat), 0)
+        if not scale:
+            cmds.setAttr('{}.useScale'.format(pick_mat), 0)
+        if not shear:
+            cmds.setAttr('{}.useShear'.format(pick_mat), 0)
+
+        cmds.connectAttr('{}.outputMatrix'.format(pick_mat), '{}.offsetParentMatrix'.format(driven))
 
     for attr in 'trs':
         value = 0 if attr != 's' else 1
@@ -498,15 +553,27 @@ def connect_point_matrix_mult_to_a_cv(driver, crv_and_cv):
     cmds.connectAttr('{}.output'.format(point_matrix_mult), '{}.controlPoints[{}]'.format(crv, cv))
 
 
-def create_uvpin(nurbs, node_list):
+def create_uvpin(nurbs, 
+                 node_list,
+                 maintain_offset=True,
+                 translate=True,
+                 rotate=True,
+                 scale=True,
+                 shear=True):
     """
     Create an uvPin
 
     Args:
         nurbs (str): name of the nurbs
         node_list (list): list of nodes we want to attach to the uvPin
+        maintain_offset (bool, optional): maintain offset. Defaults to True.
+        translate (bool, optional): connect translate. Defaults to True.
+        rotate (bool, optional): connect rotate. Defaults to True.
+        scale (bool, optional): connect scale. Defaults to True.
+        shear (bool, optional): connect shear. Defaults to True.
     """
     descriptor, side = nurbs.split('_')[:2]
+    nurbs_shape = cmds.listRelatives(nurbs, shapes=True)[0]
 
     uvpin_node = cmds.createNode('uvPin', name='{}_{}_{}'.format(descriptor, side, usage_lib.uvpin))
 
@@ -514,22 +581,54 @@ def create_uvpin(nurbs, node_list):
     cmds.setAttr('{}.tangentAxis'.format(uvpin_node), 0)
     cmds.setAttr('{}.normalAxis'.format(uvpin_node), 2)
 
-    cmds.connectAttr('{}.worldSpace[0]'.format(nurbs), '{}.deformedGeometry'.format(uvpin_node))
+    cmds.connectAttr('{}.worldSpace[0]'.format(nurbs_shape), '{}.deformedGeometry'.format(uvpin_node))
+
     index = 0
     for node in node_list:
+        node_descriptor, node_side, node_usage = node.split('_')
         transform_temp = cmds.createNode('transform')
         cmds.xform(transform_temp, worldSpace=True, matrix=cmds.xform(node, query=True, worldSpace=True, matrix=True))
         cpos_temp = cmds.createNode('closestPointOnSurface')
 
-        cmds.connectAttr('{}.worldSpace[0]'.format(nurbs), '{}.inputSurface'.format(cpos_temp))
+        cmds.connectAttr('{}.worldSpace[0]'.format(nurbs_shape), '{}.inputSurface'.format(cpos_temp))
         cmds.connectAttr('{}.translate'.format(transform_temp), '{}.inPosition'.format(cpos_temp))
 
         u_value = cmds.getAttr('{}.parameterU'.format(cpos_temp))
         v_value = cmds.getAttr('{}.parameterV'.format(cpos_temp))
 
-        cmds.connectAttr('{}.outputMatrix[{}]'.format(uvpin_node, index), '{}.offsetParentMatrix'.format(node))
         cmds.setAttr('{}.coordinate[{}].coordinateU'.format(uvpin_node, index), u_value)
         cmds.setAttr('{}.coordinate[{}].coordinateV'.format(uvpin_node, index), v_value)
+        
+        if maintain_offset:
+            connect_matrix_from_attribute(driver_and_attr='{}.outputMatrix[{}]'.format(uvpin_node, index),
+                                        driven=node,
+                                        translate=translate,
+                                        rotate=rotate,
+                                        scale=scale,
+                                        shear=shear)
+        else:
+            if translate and rotate and scale and shear:
+                cmds.connectAttr('{}.outputMatrix[{}]'.format(uvpin_node, index),
+                                 '{}.offsetParentMatrix'.format(node))
+            else:
+                pick_mat = cmds.createNode('pickMatrix',
+                                           name='{}{}_{}_{}'.format(node_descriptor,
+                                                                    usage_lib.get_usage_capitalize(usage=node_usage),
+                                                                    node_side,
+                                                                    usage_lib.pick_matrix))
+                cmds.connectAttr('{}.outputMatrix[{}]'.format(uvpin_node, index), '{}.inputMatrix'.format(pick_mat))
+
+                if not translate:
+                    cmds.setAttr('{}.useTranslate'.format(pick_mat), 0)
+                if not rotate:
+                    cmds.setAttr('{}.useRotate'.format(pick_mat), 0)
+                if not scale:
+                    cmds.setAttr('{}.useScale'.format(pick_mat), 0)
+                if not shear:
+                    cmds.setAttr('{}.useShear'.format(pick_mat), 0)
+
+                cmds.connectAttr('{}.outputMatrix'.format(pick_mat), '{}.offsetParentMatrix'.format(node))
+
 
         cmds.delete(transform_temp, cpos_temp)
         index += 1

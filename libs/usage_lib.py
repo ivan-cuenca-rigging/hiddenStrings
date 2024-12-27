@@ -82,6 +82,7 @@ nearest_point_on_curve = 'npoc'
 component_match = 'cmatch'
 
 test = 'test'
+temp = 'temp'
 
 # Valid usages
 valid_usages = [inputs, outputs,

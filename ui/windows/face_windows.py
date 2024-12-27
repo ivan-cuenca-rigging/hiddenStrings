@@ -5,7 +5,7 @@ from functools import partial
 from maya import cmds
 
 # Project imports
-from hiddenStrings.builder.modules.face import eyes, eye, cheek, cheekbone, ear, tongue, nose, teeth
+from hiddenStrings.builder.modules.face import eyes, eye, brows, cheek, cheekbone, ear, tongue, nose, teeth
 from hiddenStrings.libs import window_lib
 
 
@@ -417,6 +417,75 @@ class EyeWindow(window_lib.Helper):
             cmds.iconTextButton(self.pupil_vertices_button, edit=True, enable=False)
 
 
+class BrowsWindow(window_lib.Helper):
+    """
+    Create the brows window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
+
+    def __init__(self, *args):
+        """
+        Initializes an instance of BrowsWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
+        """
+        super(BrowsWindow, self).__init__(title='Brows Guide Options', size=(450, 175))
+
+        # Name
+        self.name = cmds.textFieldGrp(label='Name: ', text='brows')
+
+        # hook and base
+        self.hook = cmds.textFieldGrp(label='Hook: ', text='neck_c_outputs.head_c_ctr')
+        
+        # Vertices list
+        separator01 = cmds.separator(height=5)
+
+        vertices_list_inputs_text = cmds.text(label=' Vertices list inputs',
+                                              backgroundColor=(0.4, 0.4, 0.4), height=20, align='left')
+
+        self.vertices_list = cmds.textFieldGrp(label='Mid loop vertices: ', enable=True)
+        self.vertices_list_button = cmds.iconTextButton(image='addClip.png',
+                                                       command=partial(self.get_selection_and_set_text_field,
+                                                                       text_field=self.vertices_list))
+
+        # --------------------------------------------------------------------------------------------------------------
+        cmds.formLayout(self.main_layout, edit=True,
+
+                        attachForm=[(self.name, 'top', 20),
+                                    (separator01, 'left', 5), (separator01, 'right', 5),
+                                    (vertices_list_inputs_text, 'left', 5), (vertices_list_inputs_text, 'right', 5)
+                                    ],
+
+                        attachControl=[(self.hook, 'top', 5, self.name),
+                                       (separator01, 'top', 5, self.hook),
+                                       (vertices_list_inputs_text, 'top', 5, separator01),
+                                       (self.vertices_list, 'top', 5, vertices_list_inputs_text),
+                                       (self.vertices_list_button, 'left', 5, self.vertices_list),
+                                       (self.vertices_list_button, 'top', 5, vertices_list_inputs_text),
+                                       ]
+                        )
+
+    def apply_command(self, *args):
+        """
+        Apply button command
+        """
+        descriptor = cmds.textFieldGrp(self.name, query=True, text=True)
+
+        hook = cmds.textFieldGrp(self.hook, query=True, text=True)
+
+        vertice_list = cmds.textFieldGrp(self.vertices_list, query=True, text=True)
+
+        brow_module = brows.Brows(descriptor=descriptor)
+
+        brow_module.create_guides(hook_default_value=hook,
+                                  vertices_list_value=vertice_list)
+
+
 class EarWindow(window_lib.Helper):
     """
     Create the ear window
@@ -460,7 +529,7 @@ class EarWindow(window_lib.Helper):
                                     (self.side, 'left', 115)],
 
                         attachControl=[(self.side, 'top', 5, self.name),
-                                       (self.connect_to_opposite,'top', 5, self.side),
+                                       (self.connect_to_opposite, 'top', 5, self.side),
                                        (self.hook, 'top', 5, self.connect_to_opposite)]
                         )
 
