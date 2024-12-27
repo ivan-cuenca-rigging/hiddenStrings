@@ -351,7 +351,7 @@ class ShapeManagerWindow(window_lib.Helper):
             title (str): title of the window
             size (list): width and height
         """
-        super(ShapeManagerWindow, self).__init__(title='Shape Manager', size=(450, 510))
+        super(ShapeManagerWindow, self).__init__(title='Shape Manager', size=(500, 530))
 
         self.shapes_path = r'{}/libs/spline_shapes'.format(module_utils.hidden_strings_path)
 
@@ -362,7 +362,7 @@ class ShapeManagerWindow(window_lib.Helper):
 
         self.export_button = cmds.button(label='Export', width=100, command=self.export_shape_command)
 
-        self.shapes_layout = cmds.scrollLayout(width=375, height=250, backgroundColor=(0.2, 0.2, 0.2))
+        self.shapes_layout = cmds.scrollLayout(width=425, height=250, backgroundColor=(0.2, 0.2, 0.2))
         self.shapes_items_layout()
 
         self.merge_button = cmds.button(label='Merge', width=100, command=self.merge_shape_command)
@@ -371,7 +371,7 @@ class ShapeManagerWindow(window_lib.Helper):
 
         # Color override layout
         self.color_override_layout = self.color_override_items_layout()
-        self.default_color = cmds.button(label='Default', width=375,
+        self.default_color = cmds.button(label='Default', width=425,
                                          command=partial(spline_lib.set_override_color, color_key='default'))
 
         # --------------------------------------------------------------------------------------------------------------
@@ -431,7 +431,7 @@ class ShapeManagerWindow(window_lib.Helper):
         Color override layout
         """
         color_override_layout = cmds.gridLayout(self.main_layout,
-                                                numberOfRowsColumns=(3, 10), cellWidthHeight=(37.5, 37.5))
+                                                numberOfRowsColumns=(3, 10), cellWidthHeight=(42.5, 42.5))
 
         for index in range(2, 32):  # Color index
             color_component = cmds.colorIndex(index, query=True)
