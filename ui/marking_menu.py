@@ -16,7 +16,8 @@ from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, s
 builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings_path))
 if builder_exists:
     from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
-    from hiddenStrings.builder.modules.face import brows, eyes, eye, ear, cheek, cheekbone, tongue, nose, teeth
+    from hiddenStrings.builder.modules.face import (brows, eyelids, eyes, eye, ear, cheek, cheekbone, tongue, nose,
+                                                    teeth)
 
     from hiddenStrings.ui.windows import body_windows
     from hiddenStrings.ui.windows import face_windows
@@ -701,8 +702,8 @@ class MarkingMenu(object):
         cmds.menuItem(optionBox=True, command=face_windows.BrowsWindow)
 
         # Eyelids guides
-        cmds.menuItem(parent=face_guides_menu, label='Eyelids', enable=False)
-        cmds.menuItem(optionBox=True, enable=False)
+        cmds.menuItem(parent=face_guides_menu, label='Eyelids', command=self.create_eyelids_guides)
+        cmds.menuItem(optionBox=True, command=face_windows.EyelidsWindow)
 
         # Eyelines guides
         cmds.menuItem(parent=face_guides_menu, label='Eyelines', enable=False)
@@ -818,6 +819,8 @@ class MarkingMenu(object):
         """
         self.create_brows_guides()
 
+        self.create_eyelids_guides()
+
         self.create_eyes_guides()
 
         self.create_ears_guides()
@@ -885,6 +888,14 @@ class MarkingMenu(object):
         """
         brows_module = brows.Brows()
         brows_module.create_guides()
+
+    @staticmethod
+    def create_eyelids_guides(*args):
+        """
+        Create the eyelids guides command
+        """
+        eyelids_module = eyelids.Eyelids()
+        eyelids_module.create_guides()
 
     @staticmethod
     def create_eyes_guides(*args):
