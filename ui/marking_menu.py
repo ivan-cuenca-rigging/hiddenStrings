@@ -3,20 +3,21 @@ import importlib
 import os
 
 # Maya imports
+from hiddenStrings.builder.modules.face import eyelid
 from maya import cmds
 
 # Project imports
 from hiddenStrings import module_utils
 from hiddenStrings import config as hiddenStrings_config
 from hiddenStrings.libs import (guide_lib, blend_shape_lib, skeleton_lib, connection_lib, skin_lib,
-                                import_export_lib, trigger_lib, reference_lib)
+                                import_export_lib, trigger_lib, reference_lib, side_lib)
 
 from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, skin_windows, tools_windows
 
 builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings_path))
 if builder_exists:
     from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
-    from hiddenStrings.builder.modules.face import (brows, eyelids, eyes, eye, ear, cheek, cheekbone, tongue, nose,
+    from hiddenStrings.builder.modules.face import (brows, eyes, eye, ear, cheek, cheekbone, tongue, nose,
                                                     teeth)
 
     from hiddenStrings.ui.windows import body_windows
@@ -701,9 +702,9 @@ class MarkingMenu(object):
         cmds.menuItem(parent=face_guides_menu, label='Brows', command=self.create_brows_guides)
         cmds.menuItem(optionBox=True, command=face_windows.BrowsWindow)
 
-        # Eyelids guides
-        cmds.menuItem(parent=face_guides_menu, label='Eyelids', command=self.create_eyelids_guides)
-        cmds.menuItem(optionBox=True, command=face_windows.EyelidsWindow)
+        # Eyelid guides
+        cmds.menuItem(parent=face_guides_menu, label='Eyelid', command=self.create_eyelids_guides)
+        cmds.menuItem(optionBox=True, command=face_windows.EyelidWindow)
 
         # Eyelines guides
         cmds.menuItem(parent=face_guides_menu, label='Eyelines', enable=False)
@@ -864,8 +865,8 @@ class MarkingMenu(object):
         """
         Create the arm guides command
         """
-        arm_l_module = arm.Arm(side='l')
-        arm_r_module = arm.Arm(side='r')
+        arm_l_module = arm.Arm(side=side_lib.left)
+        arm_r_module = arm.Arm(side=side_lib.right)
 
         arm_l_module.create_guides()
         arm_r_module.create_guides(connect_to_opposite_value=True)
@@ -875,8 +876,8 @@ class MarkingMenu(object):
         """
         Create the leg guides command
         """
-        leg_l_module = leg.Leg(side='l')
-        leg_r_module = leg.Leg(side='r')
+        leg_l_module = leg.Leg(side=side_lib.left)
+        leg_r_module = leg.Leg(side=side_lib.right)
 
         leg_l_module.create_guides()
         leg_r_module.create_guides(connect_to_opposite_value=True)
@@ -892,10 +893,13 @@ class MarkingMenu(object):
     @staticmethod
     def create_eyelids_guides(*args):
         """
-        Create the eyelids guides command
+        Create the eyelid guides command
         """
-        eyelids_module = eyelids.Eyelids()
-        eyelids_module.create_guides()
+        eyelid_l_module = eyelid.Eyelid(side=side_lib.left)
+        eyelid_l_module.create_guides()
+
+        eyelid_r_module = eyelid.Eyelid(side=side_lib.right)
+        eyelid_r_module.create_guides(connect_to_opposite_value=True)
 
     @staticmethod
     def create_eyes_guides(*args):
@@ -918,8 +922,8 @@ class MarkingMenu(object):
         """
         Create the ears guides command
         """
-        ear_l_module = ear.Ear(side='l')
-        ear_r_module = ear.Ear(side='r')
+        ear_l_module = ear.Ear(side=side_lib.left)
+        ear_r_module = ear.Ear(side=side_lib.right)
 
         ear_l_module.create_guides()
         ear_r_module.create_guides(connect_to_opposite_value=True)
@@ -929,8 +933,8 @@ class MarkingMenu(object):
         """
         Create the cheeks guides command
         """
-        cheek_l_module = cheek.Cheek(side='l')
-        cheek_r_module = cheek.Cheek(side='r')
+        cheek_l_module = cheek.Cheek(side=side_lib.left)
+        cheek_r_module = cheek.Cheek(side=side_lib.right)
 
         cheek_l_module.create_guides()
         cheek_r_module.create_guides(connect_to_opposite_value=True)
@@ -949,8 +953,8 @@ class MarkingMenu(object):
         """
         Create the cheekbones guides command
         """
-        cheekbone_l_module = cheekbone.Cheekbone(side='l')
-        cheekbone_r_module = cheekbone.Cheekbone(side='r')
+        cheekbone_l_module = cheekbone.Cheekbone(side=side_lib.left)
+        cheekbone_r_module = cheekbone.Cheekbone(side=side_lib.right)
 
         cheekbone_l_module.create_guides()
         cheekbone_r_module.create_guides(connect_to_opposite_value=True)

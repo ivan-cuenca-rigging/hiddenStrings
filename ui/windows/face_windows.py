@@ -5,7 +5,7 @@ from functools import partial
 from maya import cmds
 
 # Project imports
-from hiddenStrings.builder.modules.face import eyes, eye, brows, eyelids, cheek, cheekbone, ear, tongue, nose, teeth
+from hiddenStrings.builder.modules.face import eyelid, eyes, eye, brows, cheek, cheekbone, ear, tongue, nose, teeth
 from hiddenStrings.libs import window_lib
 
 
@@ -486,9 +486,9 @@ class BrowsWindow(window_lib.Helper):
                                   vertices_list_value=vertice_list)
 
 
-class EyelidsWindow(window_lib.Helper):
+class EyelidWindow(window_lib.Helper):
     """
-    Create the eyelids window
+    Create the Eyelid window
 
     Args:
         title (str): title of the window
@@ -497,16 +497,16 @@ class EyelidsWindow(window_lib.Helper):
 
     def __init__(self, *args):
         """
-        Initializes an instance of EyelidsWindow
+        Initializes an instance of EyelidWindow
 
         Args:
             title (str): title of the window
             size (list): width and height
         """
-        super(EyelidsWindow, self).__init__(title='Eyelids Guide Options', size=(450, 265))
+        super(EyelidWindow, self).__init__(title='Eyelid Guide Options', size=(450, 210))
 
         # Name
-        self.name = cmds.textFieldGrp(label='Name: ', text='eyelids')
+        self.name = cmds.textFieldGrp(label='Name: ', text='Eyelid')
 
         # hook and base
         self.hook = cmds.textFieldGrp(label='Hook: ', text='neck_c_outputs.head_c_ctr')
@@ -517,25 +517,15 @@ class EyelidsWindow(window_lib.Helper):
         vertices_list_inputs_text = cmds.text(label=' Vertices list inputs',
                                               backgroundColor=(0.4, 0.4, 0.4), height=20, align='left')
 
-        self.upper_vertices_l_list = cmds.textFieldGrp(label='Left upper eyelid: ', enable=True)
-        self.upper_vertices_l_list_button = cmds.iconTextButton(image='addClip.png',
+        self.upper_vertices_list = cmds.textFieldGrp(label='Upper eyelid: ', enable=True)
+        self.upper_vertices_list_button = cmds.iconTextButton(image='addClip.png',
                                                                 command=partial(self.get_selection_and_set_text_field,
-                                                                                text_field=self.upper_vertices_l_list))
+                                                                                text_field=self.upper_vertices_list))
 
-        self.lower_vertices_l_list = cmds.textFieldGrp(label='Left lower eyelid: ', enable=True)
-        self.lower_vertices_l_list_button = cmds.iconTextButton(image='addClip.png',
+        self.lower_vertices_list = cmds.textFieldGrp(label='Lower eyelid: ', enable=True)
+        self.lower_vertices_list_button = cmds.iconTextButton(image='addClip.png',
                                                                 command=partial(self.get_selection_and_set_text_field,
-                                                                                text_field=self.lower_vertices_l_list))
-
-        self.upper_vertices_r_list = cmds.textFieldGrp(label='Right upper eyelid: ', enable=True)
-        self.upper_vertices_r_list_button = cmds.iconTextButton(image='addClip.png',
-                                                                command=partial(self.get_selection_and_set_text_field,
-                                                                                text_field=self.upper_vertices_r_list))
-
-        self.lower_vertices_r_list = cmds.textFieldGrp(label='Right lower eyelid: ', enable=True)
-        self.lower_vertices_r_list_button = cmds.iconTextButton(image='addClip.png',
-                                                                command=partial(self.get_selection_and_set_text_field,
-                                                                                text_field=self.lower_vertices_r_list))
+                                                                                text_field=self.lower_vertices_list))
 
         # --------------------------------------------------------------------------------------------------------------
         cmds.formLayout(self.main_layout, edit=True,
@@ -549,21 +539,13 @@ class EyelidsWindow(window_lib.Helper):
                                        (separator01, 'top', 5, self.hook),
                                        (vertices_list_inputs_text, 'top', 5, separator01),
 
-                                       (self.upper_vertices_l_list, 'top', 5, vertices_list_inputs_text),
-                                       (self.upper_vertices_l_list_button, 'left', 5, self.upper_vertices_l_list),
-                                       (self.upper_vertices_l_list_button, 'top', 5, vertices_list_inputs_text),
+                                       (self.upper_vertices_list, 'top', 5, vertices_list_inputs_text),
+                                       (self.upper_vertices_list_button, 'left', 5, self.upper_vertices_list),
+                                       (self.upper_vertices_list_button, 'top', 5, vertices_list_inputs_text),
 
-                                       (self.lower_vertices_l_list, 'top', 5, self.upper_vertices_l_list),
-                                       (self.lower_vertices_l_list_button, 'left', 5, self.lower_vertices_l_list),
-                                       (self.lower_vertices_l_list_button, 'top', 5, self.upper_vertices_l_list),
-
-                                       (self.upper_vertices_r_list, 'top', 5, self.lower_vertices_l_list),
-                                       (self.upper_vertices_r_list_button, 'left', 5, self.upper_vertices_r_list),
-                                       (self.upper_vertices_r_list_button, 'top', 5, self.lower_vertices_l_list),
-
-                                       (self.lower_vertices_r_list, 'top', 5, self.upper_vertices_r_list),
-                                       (self.lower_vertices_r_list_button, 'left', 5, self.lower_vertices_r_list),
-                                       (self.lower_vertices_r_list_button, 'top', 5, self.upper_vertices_r_list),
+                                       (self.lower_vertices_list, 'top', 5, self.upper_vertices_list),
+                                       (self.lower_vertices_list_button, 'left', 5, self.lower_vertices_list),
+                                       (self.lower_vertices_list_button, 'top', 5, self.upper_vertices_list)
                                        ]
                         )
 
@@ -575,18 +557,14 @@ class EyelidsWindow(window_lib.Helper):
 
         hook = cmds.textFieldGrp(self.hook, query=True, text=True)
 
-        upper_vertices_l_list = cmds.textFieldGrp(self.upper_vertices_l_list, query=True, text=True)
-        lower_vertices_l_list = cmds.textFieldGrp(self.lower_vertices_l_list, query=True, text=True)
-        upper_vertices_r_list = cmds.textFieldGrp(self.upper_vertices_r_list, query=True, text=True)
-        lower_vertices_r_list = cmds.textFieldGrp(self.lower_vertices_r_list, query=True, text=True)
+        upper_vertices_list = cmds.textFieldGrp(self.upper_vertices_list, query=True, text=True)
+        lower_vertices_list = cmds.textFieldGrp(self.lower_vertices_list, query=True, text=True)
 
-        eyelids_module = eyelids.Eyelids(descriptor=descriptor)
+        eyelid_module = eyelid.Eyelids(descriptor=descriptor)
 
-        eyelids_module.create_guides(hook_default_value=hook,
-                                     upper_vertices_l_list=upper_vertices_l_list,
-                                     lower_vertices_l_list=lower_vertices_l_list,
-                                     upper_vertices_r_list=upper_vertices_r_list,
-                                     lower_vertices_r_list=lower_vertices_r_list)
+        eyelid_module.create_guides(hook_default_value=hook,
+                                    upper_vertices_list=upper_vertices_list,
+                                    lower_vertices_list=lower_vertices_list)
 
 
 class EarWindow(window_lib.Helper):
