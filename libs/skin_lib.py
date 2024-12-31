@@ -127,19 +127,26 @@ def rename_all_skin_clusters():
 
 def create_skin_cluster(node,
                         joints,
+                        prebinds=None,
                         skin_index=1):
     """
     Create skinCluster by default
 
     Args:
-        joints (list): list of joints to bind
         node (str):, geometry, nurbs, curve, etc
+        joints (list): list of joints to bind
+        prebinds (list): list of prebinds. Defaults to None.
         skin_index (int): index of the skin. Defaults to 1.
     
     Returns:
         str: skinCluster
     """
     deformer_list = cmds.listHistory(node, pruneDagObjects=True)
+
+    if prebinds:
+        for prebind in prebinds:
+            if not cmds.objExists(prebind):
+                logging.error('{} does not exists in the scene'.format(prebind))
 
     if deformer_list:
         node_shape = cmds.listRelatives(node, shapes=True, noIntermediate=True)[0]
@@ -187,6 +194,23 @@ def create_skin_cluster(node,
         
     # Rename skinCluster
     skin_cluster = cmds.rename(skin_cluster, format_skin_cluster_name(node, skin_index))
+    
+    if prebinds:
+        for index, prebind in enumerate(prebinds):
+            if prebind:
+                if '.' in prebind:
+                        descriptor, side = joints[index].split('_')[:2]
+                        inverse_matrix = cmds.createNode(
+                            'inverseMatrix',
+                            name='{}{}_{}_{}'.format(descriptor,
+                                                     usage_lib.get_usage_capitalize(usage_lib.prebind),
+                                                     side, usage_lib.inverse_matrix))
+                        cmds.connectAttr(prebind, '{}.inputMatrix'.format(inverse_matrix))
+                        cmds.connectAttr('{}.outputMatrix'.format(inverse_matrix),
+                                        '{}.bindPreMatrix[{}]'.format(skin_cluster, index))
+                else:
+                    cmds.connectAttr('{}.worldInverseMatrix'.format(prebind),
+                                    '{}.bindPreMatrix[{}]'.format(skin_cluster, index))
 
     return skin_cluster
 
@@ -313,8 +337,10 @@ def add_joint_to_skin_cluster(joint_name, skin_cluster_name, prebind_name=None):
     if prebind_name:
         if '.' in prebind_name:
             descriptor, side = joint_name.split('_')[:2]
-            inverse_matrix = cmds.createNode('inverseMatrix', 
-                                             name='{}Prebind_{}_{}'.format(descriptor, side, usage_lib.inverse_matrix))
+            inverse_matrix = cmds.createNode(
+                'inverseMatrix', 
+                name='{}{}_{}_{}'.format(descriptor, usage_lib.get_usage_capitalize(usage_lib.prebind),
+                                         side, usage_lib.inverse_matrix))
             cmds.connectAttr(prebind_name, '{}.inputMatrix'.format(inverse_matrix))
             cmds.connectAttr('{}.outputMatrix'.format(inverse_matrix), 
                              '{}.bindPreMatrix[{}]'.format(skin_cluster_name, joint_index))
