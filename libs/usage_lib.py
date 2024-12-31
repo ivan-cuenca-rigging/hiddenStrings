@@ -21,6 +21,7 @@ joint = 'jnt'
 nurbs_skin_joint = 'nskn'
 curve_skin_joint = 'cskn'
 skeleton_valid_usages = [skin_joint, joint, nurbs_skin_joint, curve_skin_joint]
+prebind = 'prebind'
 
 # Constraint usages
 parent_constraint = 'pacns'
