@@ -81,6 +81,8 @@ quat_to_euler = 'qte'
 point_on_curve_info = 'pocinfo'
 nearest_point_on_curve = 'npoc'
 component_match = 'cmatch'
+closest_point_on_mesh = 'cpom'
+closest_point_on_surface = 'cpos'
 
 test = 'test'
 temp = 'temp'
@@ -104,6 +106,7 @@ valid_usages = [inputs, outputs,
                 skin_cluster,
                 locator,
                 norm, blend_color, power,
+                closest_point_on_mesh, closest_point_on_surface,
                 ik_spline, ik_handle,
                 curve_info,
                 mult_matrix, inverse_matrix, decompose_matrix, compose_matrix, blend_matrix, pick_matrix, aim_matrix,

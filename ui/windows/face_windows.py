@@ -503,10 +503,19 @@ class EyelidWindow(window_lib.Helper):
             title (str): title of the window
             size (list): width and height
         """
-        super(EyelidWindow, self).__init__(title='Eyelid Guide Options', size=(450, 210))
+        super(EyelidWindow, self).__init__(title='Eyelid Guide Options', size=(450, 230))
 
         # Name
         self.name = cmds.textFieldGrp(label='Name: ', text='Eyelid')
+
+        # Side
+        self.side = cmds.optionMenu(label='Side')
+        cmds.menuItem(self.side, label='Left')
+        cmds.menuItem(self.side, label='Center')
+        cmds.menuItem(self.side, label='Right')
+        cmds.optionMenu(self.side, edit=True, value='Left')
+
+        self.connect_to_opposite = cmds.checkBoxGrp(label='Connect to opposite: ', value1=False)
 
         # hook and base
         self.hook = cmds.textFieldGrp(label='Hook: ', text='neck_c_outputs.head_c_ctr')
@@ -531,11 +540,15 @@ class EyelidWindow(window_lib.Helper):
         cmds.formLayout(self.main_layout, edit=True,
 
                         attachForm=[(self.name, 'top', 20),
+                                    (self.side, 'left', 115),
                                     (separator01, 'left', 5), (separator01, 'right', 5),
                                     (vertices_list_inputs_text, 'left', 5), (vertices_list_inputs_text, 'right', 5)
                                     ],
 
-                        attachControl=[(self.hook, 'top', 5, self.name),
+                        attachControl=[(self.side, 'top', 5, self.name),
+                                       (self.connect_to_opposite, 'top', 7, self.name),
+                                       (self.connect_to_opposite, 'left', 4, self.side),
+                                       (self.hook, 'top', 5, self.connect_to_opposite),
                                        (separator01, 'top', 5, self.hook),
                                        (vertices_list_inputs_text, 'top', 5, separator01),
 
@@ -554,15 +567,26 @@ class EyelidWindow(window_lib.Helper):
         Apply button command
         """
         descriptor = cmds.textFieldGrp(self.name, query=True, text=True)
+        
+        side = cmds.optionMenu(self.side, query=True, value=True)
+        if side == 'Left':
+            side = 'l'
+        if side == 'Center':
+            side = 'c'
+        if side == 'Right':
+            side = 'r'
 
+        connect_to_opposite = cmds.checkBoxGrp(self.connect_to_opposite, query=True, value1=True)
+        
         hook = cmds.textFieldGrp(self.hook, query=True, text=True)
 
         upper_vertices_list = cmds.textFieldGrp(self.upper_vertices_list, query=True, text=True)
         lower_vertices_list = cmds.textFieldGrp(self.lower_vertices_list, query=True, text=True)
 
-        eyelid_module = eyelid.Eyelids(descriptor=descriptor)
+        eyelid_module = eyelid.Eyelid(descriptor=descriptor, side=side)
 
-        eyelid_module.create_guides(hook_default_value=hook,
+        eyelid_module.create_guides(connect_to_opposite=connect_to_opposite,
+                                    hook_default_value=hook,
                                     upper_vertices_list=upper_vertices_list,
                                     lower_vertices_list=lower_vertices_list)
 
