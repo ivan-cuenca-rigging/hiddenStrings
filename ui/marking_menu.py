@@ -465,7 +465,7 @@ class MarkingMenu(object):
         cmds.menuItem(optionBox=True, command=face_windows.BrowsWindow)
 
         # Eyelid guides
-        cmds.menuItem(parent=face_guides_menu, label='Eyelid', command=self.create_eyelids_guides)
+        cmds.menuItem(parent=face_guides_menu, label='Eyelids', command=self.create_eyelids_guides)
         cmds.menuItem(optionBox=True, command=face_windows.EyelidWindow)
 
         # Eyelines guides
