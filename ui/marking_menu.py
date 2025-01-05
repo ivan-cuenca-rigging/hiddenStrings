@@ -3,14 +3,13 @@ import importlib
 import os
 
 # Maya imports
-from hiddenStrings.builder.modules.face import eyelid
 from maya import cmds
 
 # Project imports
 from hiddenStrings import module_utils
 from hiddenStrings import config as hiddenStrings_config
 from hiddenStrings.libs import (guide_lib, blend_shape_lib, skeleton_lib, connection_lib, skin_lib,
-                                import_export_lib, trigger_lib, reference_lib, side_lib)
+                                import_export_lib, trigger_lib, reference_lib, side_lib, scene_lib)
 
 from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, skin_windows, tools_windows
 
@@ -18,7 +17,7 @@ builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings
 if builder_exists:
     from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
     from hiddenStrings.builder.modules.face import (brows, eyes, eye, ear, cheek, cheekbone, tongue, nose,
-                                                    teeth)
+                                                    teeth, eyelid, eyeline)
 
     from hiddenStrings.ui.windows import body_windows
     from hiddenStrings.ui.windows import face_windows
@@ -404,6 +403,11 @@ class MarkingMenu(object):
         cmds.menuItem(parent=builder_menu, label='Show skeleton', command=skeleton_lib.show_skeleton)
         cmds.menuItem(parent=builder_menu, label='Hide skeleton', command=skeleton_lib.hide_skeleton)
 
+        cmds.menuItem(parent=builder_menu, divider=True)
+
+        cmds.menuItem(parent=builder_menu, label='toggle Hidden in outliner', 
+                      command=scene_lib.togle_hidden_in_outliner)
+
     def body_menu(self, menu_parent, radial_position):
         """
         Create the body menu items
@@ -469,8 +473,8 @@ class MarkingMenu(object):
         cmds.menuItem(optionBox=True, command=face_windows.EyelidWindow)
 
         # Eyelines guides
-        cmds.menuItem(parent=face_guides_menu, label='Eyelines', enable=False)
-        cmds.menuItem(optionBox=True, enable=False)
+        cmds.menuItem(parent=face_guides_menu, label='Eyelines', command=self.create_eyelines_guides)
+        cmds.menuItem(optionBox=True, command=face_windows.EyelineWindow)
 
         # Nose guides
         cmds.menuItem(parent=face_guides_menu, label='Nose', command=self.create_nose_guides)
@@ -582,6 +586,7 @@ class MarkingMenu(object):
         """
         self.create_brows_guides()
         self.create_eyelids_guides()
+        self.create_eyelines_guides()
         self.create_eyes_guides()
         self.create_ears_guides()
         self.create_nose_guides()
@@ -654,6 +659,17 @@ class MarkingMenu(object):
 
         eyelid_r_module = eyelid.Eyelid(side=side_lib.right)
         eyelid_r_module.create_guides(connect_to_opposite_value=True)
+
+    @staticmethod
+    def create_eyelines_guides(*args):
+        """
+        Create the eyeline guides command
+        """
+        eyeline_l_module = eyeline.Eyeline(side=side_lib.left)
+        eyeline_l_module.create_guides()
+
+        eyeline_r_module = eyeline.Eyeline(side=side_lib.right)
+        eyeline_r_module.create_guides(connect_to_opposite_value=True)
 
     @staticmethod
     def create_eyes_guides(*args):
