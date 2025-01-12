@@ -383,7 +383,7 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index', search_
     cmds.skinCluster(skin_cluster, edit=True, normalizeWeights=0)
 
     # Empty skin cluster, if not it does not work as expected
-    node_type = cmds.nodeType(node)
+    node_type = cmds.nodeType(cmds.listRelatives(node, shapes=True)[0])
     if 'nurbs' in node_type:
         component_type = 'cv'
     elif 'lattice' in node_type:
