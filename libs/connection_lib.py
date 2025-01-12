@@ -373,13 +373,16 @@ def connect_matrix_to_attribute(driver, driven_and_attr,
     """
     node, attr = driven_and_attr.split('.')
     descriptor, side, usage = node.split('_')
+    if '_' in attr:
+        side = attr.split('_')[1]
+        attr = attr.split('_')[0] + attr.split('_')[1].capitalize() + attr.split('_')[2].capitalize()
     attr_capitalize = '{}{}'.format(attr[0].upper(), attr[1:])
 
     mult_matrix = cmds.createNode('multMatrix', name='{}{}_{}_{}'.format(descriptor,
                                                                          attr_capitalize,
                                                                          side,
                                                                          usage_lib.mult_matrix))
-
+    
     cmds.setAttr('{}.matrixIn[0]'.format(mult_matrix), cmds.getAttr('{}.worldInverseMatrix'.format(driver)),
                  type='matrix')
     cmds.connectAttr('{}.worldMatrix'.format(driver), '{}.matrixIn[1]'.format(mult_matrix))
@@ -646,7 +649,7 @@ def create_follow(driver,
 
     Args:
         driver (_type_): name of the driver. It can be 'node' or 'node.attribute'
-        driven (_type_): name of the driven
+        driven (_type_): name of the driven. It can be 'node' or 'node.attribute'
         base (_type_): name of the base. It can be 'node' or 'node.attribute'. Defaults to None
         follow_name (_type_, optional): name of the follow. Defaults to None.
         rot (bool, optional): follow only rotation. Defaults to False.
@@ -656,11 +659,12 @@ def create_follow(driver,
     Returns:
         str: blendMatrix output
     """
+    # Driven
     driven_descriptor, driven_side, driven_usage = driven.split('_')
 
     driven_matrix = cmds.xform(driven, query=True, worldSpace=True, matrix=True)
 
-    # base
+    # Base
     if base:
         if '.' in base:
             base_descriptor = base.split('.')[-1].split('_')[0]
@@ -669,7 +673,8 @@ def create_follow(driver,
         else:
             base_descriptor = base.split('_')[0]
             base_output = '{}.worldMatrix'.format(base)
-            base_inverse_matrix = cmds.getAttr('{}.worldInverseMatrix'.format(driver))
+            base_inverse_matrix = cmds.getAttr('{}.worldInverseMatrix'.format(base))
+
         base_capitalize_descriptor = '{}{}'.format(base_descriptor[0].upper(), base_descriptor[1:])
 
     else:
@@ -688,7 +693,7 @@ def create_follow(driver,
             cmds.connectAttr(base_output, '{}.matrixIn[1]'.format(base_mult_matrix))
 
         cmds.setAttr('{}.matrixIn[0]'.format(base_mult_matrix),
-                    math_lib.multiply_matrices_4_by_4(matrix_a=driven_matrix, matrix_b=base_inverse_matrix), type='matrix')
+                     math_lib.multiply_matrices_4_by_4(matrix_a=driven_matrix, matrix_b=base_inverse_matrix), type='matrix')
 
     # driver
     if '.' in driver:
@@ -709,7 +714,7 @@ def create_follow(driver,
                                                                                 usage_lib.mult_matrix))
     cmds.setAttr('{}.matrixIn[0]'.format(driver_mult_matrix),
                  math_lib.multiply_matrices_4_by_4(matrix_a=driven_matrix,
-                                                  matrix_b=driver_inverse_matrix), type='matrix')
+                                                   matrix_b=driver_inverse_matrix), type='matrix')
 
     cmds.connectAttr(driver_output, '{}.matrixIn[1]'.format(driver_mult_matrix))
 
@@ -736,13 +741,11 @@ def create_follow(driver,
 
     cmds.connectAttr('{}.matrixSum'.format(driver_mult_matrix), '{}.{}.targetMatrix'.format(blend_matrix, target_index))
 
-    # Delete old multMatrix
+    # Store old multMatrix
     mult_mat_connection = cmds.listConnections('{}.offsetParentMatrix'.format(driven))
     if mult_mat_connection:
         mult_mat_connection = [x for x in cmds.listConnections('{}.offsetParentMatrix'.format(driven))
                                if x.endswith(usage_lib.mult_matrix)]
-        if mult_mat_connection:
-            cmds.delete(mult_mat_connection[0])
 
     # new offsetParentMatrix connection
     if not cmds.isConnected('{}.outputMatrix'.format(blend_matrix),
@@ -779,5 +782,10 @@ def create_follow(driver,
         driven_ah.add_float_attribute(attr_name, minValue=0, maxValue=1, defaultValue=default_value)
         cmds.connectAttr('{}.{}'.format(driven, attr_name), '{}.{}.translateWeight'.format(blend_matrix, target_index))
         cmds.connectAttr('{}.{}'.format(driven, attr_name), '{}.{}.rotateWeight'.format(blend_matrix, target_index))
+
+    # Delete stored mult matrix if they do not have connections
+    if mult_mat_connection:
+         if not cmds.listConnections(mult_mat_connection[0], destination=True, source=False):
+             cmds.delete(mult_mat_connection[0])
 
     return blend_matrix
