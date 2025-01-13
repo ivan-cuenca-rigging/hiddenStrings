@@ -9,7 +9,7 @@ from maya import cmds
 from hiddenStrings import module_utils
 from hiddenStrings import config as hiddenStrings_config
 from hiddenStrings.libs import (guide_lib, blend_shape_lib, skeleton_lib, connection_lib, skin_lib,
-                                import_export_lib, trigger_lib, reference_lib, side_lib, scene_lib)
+                                import_export_lib, trigger_lib, reference_lib, side_lib, usage_lib, scene_lib)
 
 from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, skin_windows, tools_windows
 
@@ -17,7 +17,7 @@ builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings
 if builder_exists:
     from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
     from hiddenStrings.builder.modules.face import (brows, eyes, eye, ear, cheek, cheekbone, tongue, nose,
-                                                    teeth, eyelid, eyeline)
+                                                    teeth, eyelid, eyeline, mouth)
 
     from hiddenStrings.ui.windows import body_windows
     from hiddenStrings.ui.windows import face_windows
@@ -388,7 +388,7 @@ class MarkingMenu(object):
         # ----- Face guides Menu -----
         self.face_menu(builder_menu, radial_position='SE')
 
-        # ----- Delete guides -----
+        # ----- Builder utils -----
         cmds.menuItem(parent=builder_menu, label='             Builder utils             ', enable=False)
         cmds.menuItem(parent=builder_menu, divider=True)
 
@@ -397,6 +397,9 @@ class MarkingMenu(object):
         cmds.menuItem(parent=builder_menu, divider=True)
 
         cmds.menuItem(parent=builder_menu, label='Delete guides', command=guide_lib.delete_guides)
+
+        cmds.menuItem(parent=builder_menu, label='Show guides drawlabel', command=self.show_guides_draw_label)
+        cmds.menuItem(parent=builder_menu, label='Hide guides drawlabel', command=self.hide_guides_draw_label)
 
         cmds.menuItem(parent=builder_menu, divider=True)
 
@@ -493,8 +496,8 @@ class MarkingMenu(object):
         cmds.menuItem(optionBox=True, command=face_windows.EarWindow)
 
         # Mouth guides
-        cmds.menuItem(parent=face_guides_menu, label='Mouth', enable=False)
-        cmds.menuItem(optionBox=True, enable=False)
+        cmds.menuItem(parent=face_guides_menu, label='Mouth', command=self.create_mouth_guides)
+        cmds.menuItem(optionBox=True, command=face_windows.MouthWindow)
 
         # Tongue guides
         cmds.menuItem(parent=face_guides_menu, label='Tongue', command=self.create_tongue_guides)
@@ -592,6 +595,7 @@ class MarkingMenu(object):
         self.create_nose_guides()
         self.create_cheekbones_guides()
         self.create_cheeks_guides()
+        self.create_mouth_guides()
         self.create_tongue_guides()
         self.create_teeth_guides()
 
@@ -728,6 +732,14 @@ class MarkingMenu(object):
 
         cheekbone_l_module.create_guides()
         cheekbone_r_module.create_guides(connect_to_opposite_value=True)
+
+    @staticmethod
+    def create_mouth_guides(*args):
+        """
+        Create the mouth guides command
+        """
+        mouth_module = mouth.Mouth()
+        mouth_module.create_guides()
 
     @staticmethod
     def create_tongue_guides(*args):
@@ -981,3 +993,19 @@ class MarkingMenu(object):
         selection_list = cmds.ls(selection=True)
         self.hide_local_rotation_axis(hierarchy=True)
         cmds.select(selection_list)
+
+    @staticmethod
+    def show_guides_draw_label(*args):
+        """
+        Show the drawlabel of the guides
+        """
+        for guide in cmds.ls('*{}'.format(usage_lib.guide)):
+            cmds.setAttr('{}.drawLabel'.format(guide), True)
+
+    @staticmethod
+    def hide_guides_draw_label(*args):
+        """
+        Hide the drawlabel of the guides
+        """
+        for guide in cmds.ls('*{}'.format(usage_lib.guide)):
+            cmds.setAttr('{}.drawLabel'.format(guide), False)
