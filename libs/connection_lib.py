@@ -667,15 +667,18 @@ def create_follow(driver,
     # Base
     if base:
         if '.' in base:
-            base_descriptor = base.split('.')[-1].split('_')[0]
+            base_descriptor = base.split('.')[0].split('_')[0]
+            base_usage = base.split('.')[0].split('_')[-1]
             base_output = base
             base_inverse_matrix = math_lib.inverse_matrix(cmds.getAttr(base))
         else:
             base_descriptor = base.split('_')[0]
+            base_usage = base.split('_')[-1]
             base_output = '{}.worldMatrix'.format(base)
             base_inverse_matrix = cmds.getAttr('{}.worldInverseMatrix'.format(base))
 
-        base_capitalize_descriptor = '{}{}'.format(base_descriptor[0].upper(), base_descriptor[1:])
+        base_capitalize_descriptor = '{}{}{}'.format(base_descriptor[0].upper(), base_descriptor[1:], 
+                                                     base_usage.capitalize())
 
     else:
         base_inverse_matrix = cmds.getAttr('{}.worldInverseMatrix'.format(driven))
@@ -684,9 +687,9 @@ def create_follow(driver,
     # base multmat
     if base:
         base_mult_matrix = '{}{}_{}_{}'.format(driven_descriptor,
-                                            base_capitalize_descriptor,
-                                            driven_side,
-                                            usage_lib.mult_matrix)
+                                               base_capitalize_descriptor,
+                                               driven_side,
+                                               usage_lib.mult_matrix)
 
         if not cmds.objExists(base_mult_matrix):
             base_mult_matrix = cmds.createNode('multMatrix', name=base_mult_matrix)
