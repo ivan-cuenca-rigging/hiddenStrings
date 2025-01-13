@@ -399,7 +399,10 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index', search_
             cmds.skinCluster(skin_cluster, edit=True, influence=jnt, lockWeights=True)
 
     # Import skinCluster
-    cmds.deformerWeights(file_name, path=path, deformer=skin_cluster, im=True, method=import_method)
+    try:
+        cmds.deformerWeights(file_name, path=path, deformer=skin_cluster, im=True, method=import_method)
+    except:
+        logging.warning('{} has not been imported, check the topology'.format(skin_cluster))
 
     # Restore normalize weights
     cmds.skinCluster(skin_cluster, edit=True, normalizeWeights=skin_normalize)
