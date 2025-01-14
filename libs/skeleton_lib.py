@@ -147,8 +147,6 @@ def create_skeleton_chain_from_a_to_b(descriptor,
         skin_joint_parent = skin_joint_sh.get_name()
         joint_list.append(skin_joint_sh.get_name())
 
-        cmds.ToggleLocalRotationAxes(skin_joint_sh.get_name())
-
     # To avoid the automatic transform when the scale is != 1
     for index in range(joints_number):
         skin_joint_sh = Helper(joint_list[index])
