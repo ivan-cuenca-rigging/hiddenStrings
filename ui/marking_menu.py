@@ -1,6 +1,8 @@
 # Imports
-import importlib
 import os
+import logging
+import importlib
+
 
 # Maya imports
 from maya import cmds
@@ -21,6 +23,8 @@ if builder_exists:
 
     from hiddenStrings.ui.windows import body_windows
     from hiddenStrings.ui.windows import face_windows
+
+logging = logging.getLogger(__name__)
 
 
 class MarkingMenu(object):
@@ -545,6 +549,10 @@ class MarkingMenu(object):
         if not cmds.objExists(guides_grp):
             self.create_biped_guides()
             self.create_face_guides()
+        
+        logging.info('--------------------------------------------------')
+        logging.info('---------------- BUILDING THE RIG ----------------')
+        logging.info('--------------------------------------------------')
 
         # For each module create the rig with the guides
         guides_groups = cmds.listRelatives(guides_grp, children=True)
@@ -572,6 +580,10 @@ class MarkingMenu(object):
 
                             rig_module.run()
         cmds.delete(guides_grp)
+
+        logging.info('--------------------------------------------------')
+        logging.info('------------------- RIG FINISH -------------------')
+
 
     def create_biped_guides(self, *args):
         """

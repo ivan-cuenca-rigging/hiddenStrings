@@ -19,6 +19,8 @@ def reload(*args):
     Reload the given module and all children
     """
     previous_logging = logging
+    previous_logging.info('--------------------------------------------------')
+    previous_logging.info('--------------------------------------------------')
     # Get a reference to each loaded module
     loaded_modules = dict([(key, value) for key, value in sys.modules.items()
                            if key.startswith(hidden_strings_name) and
@@ -37,7 +39,9 @@ def reload(*args):
         old_module.__dict__.update(new_module.__dict__)
 
     # Print in the command line
-    previous_logging.info('Module reloaded.')
+    previous_logging.info('--------------------------------------------------')
+    previous_logging.info('---------------- Module Reloaded -----------------')
+    
 
 
 def set_user_setup():
