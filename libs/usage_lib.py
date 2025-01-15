@@ -2,6 +2,9 @@
 
 inputs = 'inputs'
 outputs = 'outputs'
+controls = 'controls'
+skeleton = 'skeleton'
+logic = 'logic'
 
 # Control usages
 control = 'ctr'
