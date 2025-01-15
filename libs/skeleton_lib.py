@@ -361,7 +361,7 @@ def create_local_skeleton(skeleton_grp,
 
 
 def show_skeleton(*args):
-    skeleton_grp_list = cmds.ls('*Skeleton_*_{}'.format(usage_lib.group))
+    skeleton_grp_list = cmds.ls('*_*_{}'.format(usage_lib.skeleton))
     if skeleton_grp_list:
         for grp in skeleton_grp_list:
             try:
@@ -371,7 +371,7 @@ def show_skeleton(*args):
 
 
 def hide_skeleton(*args):
-    skeleton_grp_list = cmds.ls('*Skeleton_*_{}'.format(usage_lib.group))
+    skeleton_grp_list = cmds.ls('*_*_{}'.format(usage_lib.skeleton))
     if skeleton_grp_list:
         for grp in skeleton_grp_list:
             try:
