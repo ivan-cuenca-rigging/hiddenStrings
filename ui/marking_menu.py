@@ -551,44 +551,43 @@ class MarkingMenu(object):
         """
         guides_grp = 'guides_c_grp'
 
-        # If not guides found create the default ones (for testing)
         if not cmds.objExists(guides_grp):
-            self.create_biped_guides()
-            self.create_face_guides()
-        
-        logging.info('--------------------------------------------------')
-        logging.info('---------------- BUILDING THE RIG ----------------')
-        logging.info('--------------------------------------------------')
+            logging.warning('"{}" not found to build the rig'.format(guides_grp))
 
-        # For each module create the rig with the guides
-        guides_groups = cmds.listRelatives(guides_grp, children=True)
-        for guide_group in guides_groups:
-            descriptor = guide_group.split('Guides')[0]
-            side = guide_group.split('_')[1]
+        else:
+            logging.info('--------------------------------------------------')
+            logging.info('---------------- BUILDING THE RIG ----------------')
+            logging.info('--------------------------------------------------')
 
-            module_name = cmds.getAttr('{}.moduleName'.format(guide_group))
-            root_path = r'{}/builder/modules'.format(module_utils.hidden_strings_path)
+            # For each module create the rig with the guides
+            guides_groups = cmds.listRelatives(guides_grp, children=True)
+            for guide_group in guides_groups:
+                descriptor = guide_group.split('Guides')[0]
+                side = guide_group.split('_')[1]
 
-            for i in os.scandir(root_path):
-                if i.is_dir():
-                    for file in os.listdir(i):
-                        if file == '{}.py'.format(module_name.lower()):
-                            file = file.split('.py')[0]
-                            file_capitalize = file.capitalize()
-                            file_path = i.path.split(module_utils.hidden_strings_name)[-1]  # Get relative path
-                            file_path = os.path.normpath(file_path).split(os.sep)  # split path
+                module_name = cmds.getAttr('{}.moduleName'.format(guide_group))
+                root_path = r'{}/builder/modules'.format(module_utils.hidden_strings_path)
 
-                            rig_module = importlib.import_module('{}{}.{}'.format(module_utils.hidden_strings_name,
-                                                                                  '.'.join(file_path),
-                                                                                  file))
-                            rig_module = getattr(rig_module, file_capitalize)
-                            rig_module = rig_module(descriptor=descriptor, side=side)
+                for i in os.scandir(root_path):
+                    if i.is_dir():
+                        for file in os.listdir(i):
+                            if file == '{}.py'.format(module_name.lower()):
+                                file = file.split('.py')[0]
+                                file_capitalize = file.capitalize()
+                                file_path = i.path.split(module_utils.hidden_strings_name)[-1]  # Get relative path
+                                file_path = os.path.normpath(file_path).split(os.sep)  # split path
 
-                            rig_module.run()
-        cmds.delete(guides_grp)
+                                rig_module = importlib.import_module('{}{}.{}'.format(module_utils.hidden_strings_name,
+                                                                                    '.'.join(file_path),
+                                                                                    file))
+                                rig_module = getattr(rig_module, file_capitalize)
+                                rig_module = rig_module(descriptor=descriptor, side=side)
 
-        logging.info('--------------------------------------------------')
-        logging.info('------------------- RIG FINISH -------------------')
+                                rig_module.run()
+            cmds.delete(guides_grp)
+
+            logging.info('--------------------------------------------------')
+            logging.info('------------------- RIG FINISH -------------------')
 
 
     def create_biped_guides(self, *args):
