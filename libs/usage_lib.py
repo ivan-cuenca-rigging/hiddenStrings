@@ -43,12 +43,15 @@ geometry = 'geo'
 trigger = 'trg'
 driver = 'driver'
 macro = 'macro'
+
 # Deformers
 skin_cluster = 'skin'
 blend_shape = 'bs'
 lattice_ffd = 'ffd'
 squash = 'sq'
 bend = 'bend'
+twist = 'twist'
+
 corrective = 'crr'
 animation_curve = 'acrv'
 
