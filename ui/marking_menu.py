@@ -610,7 +610,8 @@ class MarkingMenu(object):
         self.create_mouth_guides()
         self.create_tongue_guides()
         self.create_teeth_guides()
-        self.create_squash_guides()
+        self.create_squash_guides(descriptor='squashSup')
+        self.create_squash_guides(descriptor='squashInf')
 
     @staticmethod
     def create_root_guides(*args):
@@ -771,11 +772,11 @@ class MarkingMenu(object):
         teeth_module.create_guides()
 
     @staticmethod
-    def create_squash_guides(*args):
+    def create_squash_guides(descriptor='squash', side=side_lib.center, *args):
         """
         Create the squash guides command
         """
-        squash_module = squash.Squash()
+        squash_module = squash.Squash(descriptor=descriptor, side=side)
         squash_module.create_guides()
 
     # ---------- methods ----------
