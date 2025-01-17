@@ -778,11 +778,11 @@ class MarkingMenu(object):
         teeth_module.create_guides()
 
     @staticmethod
-    def create_squash_guides(descriptor='squash', side=side_lib.center, *args):
+    def create_squash_guides(*args, descriptor='squash', side=side_lib.center, ):
         """
         Create the squash guides command
         """
-        squash_module = squash.Squash(descriptor=descriptor, side=side)
+        squash_module = squash.Squash(descriptor, side)
         squash_module.create_guides()
 
     # ---------- methods ----------
