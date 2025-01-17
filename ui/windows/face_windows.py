@@ -6,7 +6,7 @@ from maya import cmds
 
 # Project imports
 from hiddenStrings.builder.modules.face import (eyelid, eyes, eye, brows, cheek, cheekbone, ear, tongue, nose, teeth,
-                                                eyeline, mouth)
+                                                eyeline, mouth, squash)
 from hiddenStrings.libs import window_lib
 
 
@@ -1143,3 +1143,78 @@ class TeethWindow(window_lib.Helper):
 
         teeth_module.create_guides(base_default_value=base,
                                    hook_default_value=hook)
+
+
+class SquashWindow(window_lib.Helper):
+    """
+    Create the squash window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
+
+    def __init__(self, *args):
+        """
+        Initializes an instance of SquashWindow
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
+        """
+        super(SquashWindow, self).__init__(
+            title='Squash Guide Options', size=(450, 170))
+
+        # Name
+        self.name = cmds.textFieldGrp(label='Name: ', text='squash')
+
+        # Side
+        self.side = cmds.optionMenu(label='Side')
+        cmds.menuItem(self.side, label='Left')
+        cmds.menuItem(self.side, label='Center')
+        cmds.menuItem(self.side, label='Right')
+        cmds.optionMenu(self.side, edit=True, value='Center')
+
+        # Geometries list
+        self.geometries_list = cmds.textFieldGrp(label='Geometries list: ', enable=True)
+        self.geometries_list_button = cmds.iconTextButton(image='addClip.png',
+                                                          command=partial(self.get_selection_and_set_text_field,
+                                                                          text_field=self.geometries_list))
+        # hook
+        self.hook = cmds.textFieldGrp(label='Hook: ', text='neck_c_outputs.head_c_ctr')
+
+        # --------------------------------------------------------------------------------------------------------------
+        cmds.formLayout(self.main_layout, edit=True,
+
+                        attachForm=[(self.name, 'top', 20),
+                                    (self.side, 'left', 115)],
+
+                        attachControl=[(self.side, 'top', 5, self.name),
+                                       (self.geometries_list, 'top', 5, self.side),
+                                       (self.geometries_list_button, 'top', 5, self.side),
+                                       (self.geometries_list_button, 'left', 5, self.geometries_list),
+                                       (self.hook, 'top', 5, self.geometries_list)]
+                        )
+
+    def apply_command(self, *args):
+        """
+        Apply button command
+        """
+        descriptor = cmds.textFieldGrp(self.name, query=True, text=True)
+
+        side = cmds.optionMenu(self.side, query=True, value=True)
+        if side == 'Left':
+            side = 'l'
+        if side == 'Center':
+            side = 'c'
+        if side == 'Right':
+            side = 'r'
+
+        geometries_list = cmds.textFieldGrp(self.geometries_list, query=True, text=True)
+        
+        hook = cmds.textFieldGrp(self.hook, query=True, text=True)
+
+        squash_module = squash.Squash(descriptor=descriptor, side=side)
+
+        squash_module.create_guides(geometries_list_value=geometries_list,
+                                    hook_default_value=hook)

@@ -1,5 +1,8 @@
-# Usages
+# Imports
+import inspect
 
+
+# Usages
 inputs = 'inputs'
 outputs = 'outputs'
 controls = 'controls'
@@ -43,6 +46,9 @@ macro = 'macro'
 # Deformers
 skin_cluster = 'skin'
 blend_shape = 'bs'
+lattice_ffd = 'ffd'
+squash = 'sq'
+bend = 'bend'
 corrective = 'crr'
 animation_curve = 'acrv'
 
@@ -50,6 +56,7 @@ multiply = 'mult'
 divide = 'div'
 add = 'add'
 sub = 'sub'
+condition = 'cond'
 plus_minus_Average = 'pma'
 angle_between = 'ab'
 maximum = 'max'
@@ -62,6 +69,7 @@ group = 'grp'
 zero = 'zero'
 set_driven_key = 'sdk'
 reference = 'ref'
+poly_cube = 'pc'
 uvpin = 'uvp'
 curve_info = 'cinfo'
 norm = 'norm'
@@ -69,6 +77,7 @@ blend_color = 'bc'
 ik_handle = 'ikh'
 ik_spline = 'iks'
 power = 'pow'
+square_root = 'sqrt'
 remap_value = 'rv'
 reverse = 'rev'
 clamp = 'clamp'
@@ -91,33 +100,10 @@ test = 'test'
 temp = 'temp'
 
 # Valid usages
-valid_usages = [inputs, outputs,
-                control,
-                nurbs,
-                guide,
-                blend_shape, corrective, animation_curve,
-                skin_joint, joint, nurbs_skin_joint, curve_skin_joint,
-                parent_constraint, orient_constraint, point_constraint,
-                geometry, driver,
-                trigger,
-                macro,
-                scale_constraint, aim_constraint, pole_vector_constraint,
-                multiply, divide, add, sub, maximum, minimum, distance, remap_value, reverse, clamp, plus_minus_Average,
-                angle_between,
-                curve, spline,
-                uvpin,
-                skin_cluster,
-                locator,
-                norm, blend_color, power,
-                closest_point_on_mesh, closest_point_on_surface,
-                ik_spline, ik_handle,
-                curve_info,
-                mult_matrix, inverse_matrix, decompose_matrix, compose_matrix, blend_matrix, pick_matrix, aim_matrix,
-                point_matrix_mult,
-                quat_to_euler,
-                point_on_curve_info, nearest_point_on_curve,
-                group, zero, set_driven_key, reference, component_match]
+def get_all_usages():
+    return [v for k, v in globals().items() if isinstance(v, str) and not k.startswith('_')]
 
+valid_usages = get_all_usages()
 
 def get_usage_capitalize(usage):
     """

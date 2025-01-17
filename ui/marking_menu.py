@@ -19,7 +19,7 @@ builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings
 if builder_exists:
     from hiddenStrings.builder.modules.body import column, leg, root, arm, neck
     from hiddenStrings.builder.modules.face import (brows, eyes, eye, ear, cheek, cheekbone, tongue, nose,
-                                                    teeth, eyelid, eyeline, mouth)
+                                                    teeth, eyelid, eyeline, mouth, squash)
 
     from hiddenStrings.ui.windows import body_windows
     from hiddenStrings.ui.windows import face_windows
@@ -512,8 +512,8 @@ class MarkingMenu(object):
         cmds.menuItem(optionBox=True, command=face_windows.TeethWindow)
 
         # Squash guides
-        cmds.menuItem(parent=face_guides_menu, label='Squash', enable=False)
-        cmds.menuItem(optionBox=True, enable=False)
+        cmds.menuItem(parent=face_guides_menu, label='Squash', command=self.create_squash_guides)
+        cmds.menuItem(optionBox=True, command=face_windows.SquashWindow)
 
     def templates_menu(self, menu_parent, radial_position):
         """
@@ -610,6 +610,7 @@ class MarkingMenu(object):
         self.create_mouth_guides()
         self.create_tongue_guides()
         self.create_teeth_guides()
+        self.create_squash_guides()
 
     @staticmethod
     def create_root_guides(*args):
@@ -768,6 +769,14 @@ class MarkingMenu(object):
         """
         teeth_module = teeth.Teeth()
         teeth_module.create_guides()
+
+    @staticmethod
+    def create_squash_guides(*args):
+        """
+        Create the squash guides command
+        """
+        squash_module = squash.Squash()
+        squash_module.create_guides()
 
     # ---------- methods ----------
 
