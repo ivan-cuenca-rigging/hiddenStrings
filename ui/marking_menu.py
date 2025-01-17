@@ -88,6 +88,12 @@ class MarkingMenu(object):
         cmds.menuItem(parent=self.menu_name, label='           Tools', enable=False)
         cmds.menuItem(parent=self.menu_name, divider=True)
 
+        cmds.menuItem(parent=self.menu_name, label='Copy matrix', command=self.export_matrix)
+
+        cmds.menuItem(parent=self.menu_name, label='Paste matrix', command=self.import_matrix)
+
+        cmds.menuItem(parent=self.menu_name, divider=True)
+
         cmds.menuItem(parent=self.menu_name, label='Save selection', command=self.export_selection)
 
         cmds.menuItem(parent=self.menu_name, label='Load selection', command=self.import_selection)
@@ -396,6 +402,10 @@ class MarkingMenu(object):
         cmds.menuItem(parent=builder_menu, label='             Builder utils             ', enable=False)
         cmds.menuItem(parent=builder_menu, divider=True)
 
+        cmds.menuItem(parent=builder_menu, label='Snap Fk Ik', command=self.snap_fk_ik)
+
+        cmds.menuItem(parent=builder_menu, divider=True)
+
         cmds.menuItem(parent=builder_menu, label='Skin Pose', command=skin_lib.set_skin_pose)
 
         cmds.menuItem(parent=builder_menu, divider=True)
@@ -530,10 +540,6 @@ class MarkingMenu(object):
         cmds.menuItem(parent=template_guides_menu, divider=True)
 
         cmds.menuItem(parent=template_guides_menu, label='Biped', command=self.create_biped_guides)
-
-        cmds.menuItem(parent=template_guides_menu, label='Quadruped', enable=False)
-
-        cmds.menuItem(parent=template_guides_menu, label='Bird', enable=False)
 
         cmds.menuItem(parent=template_guides_menu, divider=True)
 
@@ -969,6 +975,21 @@ class MarkingMenu(object):
         import_export_lib.import_selection(path=r'{}/temp/selection_data.json'.format(module_utils.hidden_strings_path))
 
     @staticmethod
+    def export_matrix(*args):
+        """
+        Export matrix
+        """
+        import_export_lib.export_matrix(file_name='matrix_data',
+                                        path=r'{}/temp'.format(module_utils.hidden_strings_path))
+
+    @staticmethod
+    def import_matrix(*args):
+        """
+        Import matrix
+        """
+        import_export_lib.import_matrix(path=r'{}/temp/matrix_data.json'.format(module_utils.hidden_strings_path))
+
+    @staticmethod
     def show_local_rotation_axis(hierarchy=False, *args):
         """
         Show the local rotation axis of the selection
@@ -1031,3 +1052,73 @@ class MarkingMenu(object):
         """
         for guide in cmds.ls('*{}'.format(usage_lib.guide)):
             cmds.setAttr('{}.drawLabel'.format(guide), False)
+
+    def snap_fk_ik(self, *args):
+        node_list = cmds.ls(selection=True)
+        if node_list:
+            for node in node_list:
+                module_grp = [x for x in cmds.listRelatives(node, fullPath=True)[0].split('|') if 'Module' in x][-1]
+                
+                if 'Arm' in cmds.getAttr('{}.moduleName'.format(module_grp)) \
+                        or 'Leg' in cmds.getAttr('{}.moduleName'.format(module_grp)):
+                    namespace = self.get_namespace()
+                    limb = cmds.getAttr('{}.moduleName'.format(module_grp)).lower()
+                    side = node.split('_')[-2]
+
+                    self.snap_fk_ik_script(namespace=namespace, limb=limb, side=side)
+    
+    @staticmethod
+    def snap_fk_ik_script(namespace=None, limb='arm', side='l', * args):
+        end_name = 'hand' if limb == 'arm' else 'foot'
+
+        snap_info = {'start': {'fk_control': '{}up{}Fk_{}_ctr'.format(namespace, limb.capitalize(), side),
+                               'ik_control': None,
+                               'fk_snap': '{}up{}_{}_jnt'.format(namespace, limb.capitalize(), side),
+                               'ik_snap': None,
+                               'snap_xform': None
+                               },
+                     'mid': {'fk_control': '{}low{}Fk_{}_ctr'.format(namespace, limb.capitalize(), side),
+                             'ik_control': '{}{}PoleVector_{}_ctr'.format(namespace, limb, side),
+                             'fk_snap': '{}low{}_{}_jnt'.format(namespace, limb.capitalize(), side),
+                              'ik_snap': '{}{}PoleVector_{}_snap'.format(namespace, limb, side),
+                             'snap_xform': None
+                             },
+                     'end': {'fk_control': '{}{}{}Fk_{}_ctr'.format(namespace, end_name, limb.capitalize(), side),
+                             'ik_control': '{}{}{}Ik_{}_ctr'.format(namespace, end_name, limb.capitalize(), side),
+                               'fk_snap': '{}{}{}_{}_skn'.format(namespace, end_name, limb.capitalize(), side),
+                             'ik_snap': '{}{}{}_{}_skn'.format(namespace, end_name, limb.capitalize(), side),
+                                 'snap_xform': None
+                             }
+                     }
+
+        settings_control = '{}{}Settings_{}_ctr'.format(namespace, limb, side)
+        state = cmds.getAttr('{}.fkIk'.format(settings_control))  # 0 == Fk; 1 == Ik
+
+        snap_value = 'ik_snap' if state == 0 else 'fk_snap'
+        control_value = 'ik_control' if state == 0 else 'fk_control'
+
+        for key in snap_info.keys():
+            if snap_info[key][control_value]:
+                snap_info[key]['snap_xform'] = cmds.xform(snap_info[key][snap_value],
+                                                          query=True, worldSpace=True, matrix=True)
+
+        new_state = 1 if state == 0 else 0
+        cmds.setAttr('{}.fkIk'.format(settings_control), new_state)
+
+        for key in snap_info.keys():
+            if snap_info[key][control_value]:
+                cmds.xform(snap_info[key][control_value], worldSpace=True, matrix=snap_info[key]['snap_xform'])
+    
+    def get_namespace(*args):
+        selection = cmds.ls(selection=True)
+        namespace = None
+        if len(selection) >= 1:
+            selection = selection[0]
+            if ':' in selection:
+                namespace = '{}:'.format(':'.join(selection.split(':')[:-1]))
+            else:
+                namespace = ''
+        else:
+            namespace = ''
+
+        return namespace

@@ -43,6 +43,7 @@ geometry = 'geo'
 trigger = 'trg'
 driver = 'driver'
 macro = 'macro'
+snap = 'snap'
 
 # Deformers
 skin_cluster = 'skin'

@@ -59,6 +59,53 @@ def import_selection(path):
     return selection_data
 
 
+def export_matrix(file_name, path):
+    """
+    Expport matrix to json
+
+    Args:
+        file_name (str): name of the file
+        path (str): export file folder
+
+    Returns:
+        matrix: matrix exported to the file
+    """
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    matrix_data = cmds.xform(cmds.ls(selection=True)[0], query=True, worldSpace=True, matrix=True)
+
+    export_data_to_json(data=matrix_data,
+                        file_name=file_name,
+                        file_path=path,
+                        relative_path=False)
+
+    logging.info(matrix_data)
+    return matrix_data
+
+
+def import_matrix(path):
+    """
+    Import matrix from json
+
+    Args:
+        path (str): full path of the file to import
+
+    Returns:
+        matrix: matrix imported from the file
+    """
+    file_name = os.path.basename(path).split('.json')[0]
+    path = os.path.dirname(path)
+
+    matrix_data = import_data_from_json(file_name=file_name,
+                                        file_path=path,
+                                        relative_path=False)
+    cmds.xform(cmds.ls(selection=True)[0], worldSpace=True, matrix=matrix_data)
+    logging.info(matrix_data)
+
+    return matrix_data
+
+
 def export_nodes_and_connections(file_name, path, export_nodes=True, export_edges=False, export_connections=True):
     """
     Export nodes and connections to an .ma file
