@@ -1,6 +1,8 @@
 # Maya imports
 import os
+from functools import partial
 
+# Maya imports
 from maya import cmds
 
 # Project imports
@@ -378,6 +380,81 @@ class ConnectTranslateRotateScaleWindow(window_lib.Helper):
             cmds.checkBoxGrp(self.scale_axis, edit=True, enable=False)
         else:
             cmds.checkBoxGrp(self.scale_axis, edit=True, enable=True)
+
+
+class CreateNurbsUvPin(window_lib.Helper):
+    """
+    Create the nurbsUvPin window
+
+    Args:
+        title (str): title of the window
+        size (list): width and height
+    """
+
+    def __init__(self, *args):
+        """
+        Initializes an instance of CreateUvPin
+
+        Args:
+            title (str): title of the window
+            size (list): width and height
+        """
+        super(CreateNurbsUvPin, self).__init__(title='Create nurbs UvPin Options', size=(450, 210))
+
+        self.nurbs = cmds.textFieldGrp(label='Nurbs: ', enable=True)
+        self.nurbs_button = cmds.iconTextButton(image='addClip.png',
+                                                command=partial(self.get_last_selection_and_set_text_field,
+                                                                text_field=self.nurbs))
+
+        self.driven_list = cmds.textFieldGrp(label='driven list: ', enable=True)
+        self.driven_list_button = cmds.iconTextButton(image='addClip.png',
+                                                      command=partial(self.get_selection_and_set_text_field,
+                                                                      text_field=self.driven_list))
+        
+        self.maintain_offset = cmds.checkBoxGrp(label='Maintain offset: ', value1=True)
+
+        self.translate = cmds.checkBoxGrp(label='Translate: ', value1=True)
+        self.rotate = cmds.checkBoxGrp(label='Rotate: ', value1=True)
+        self.scale = cmds.checkBoxGrp(label='Scale: ', value1=True)
+        self.shear = cmds.checkBoxGrp(label='Shear: ', value1=True)
+
+        # --------------------------------------------------------------------------------------------------------------
+        cmds.formLayout(self.main_layout, edit=True,
+                        attachForm=[(self.nurbs, 'top', 10),
+                                    (self.nurbs, 'left', 0),
+                                    (self.nurbs_button, 'top', 10),],
+
+                        attachControl=[(self.nurbs_button, 'left', 5, self.nurbs),
+                                       (self.driven_list, 'top', 5, self.nurbs),
+                                       (self.driven_list_button, 'top', 5, self.nurbs),
+                                       (self.driven_list_button, 'left', 5, self.driven_list),
+                                       (self.maintain_offset, 'top', 5, self.driven_list),
+                                       (self.translate, 'top', 5, self.maintain_offset),
+                                       (self.rotate, 'top', 5, self.translate),
+                                       (self.scale, 'top', 5, self.rotate),
+                                       (self.shear, 'top', 5, self.scale)])
+
+    def apply_command(self, *args):
+        """
+        Apply button command
+        """
+        nurbs = cmds.textFieldGrp(self.nurbs, query=True, text=True)
+        driven_list = eval(cmds.textFieldGrp(self.driven_list, query=True, text=True))
+        
+        maintain_offset = cmds.checkBoxGrp(self.maintain_offset, query=True, value1=True)
+
+        translate = cmds.checkBoxGrp(self.translate, query=True, value1=True)
+        rotate = cmds.checkBoxGrp(self.rotate, query=True, value1=True)
+        scale = cmds.checkBoxGrp(self.scale, query=True, value1=True)
+        shear = cmds.checkBoxGrp(self.shear, query=True, value1=True)
+
+        connection_lib.create_nurbs_uvpin(nurbs=nurbs,
+                                          node_list=driven_list,
+                                          maintain_offset=maintain_offset,
+                                          translate=translate,
+                                          rotate=rotate,
+                                          scale=scale,
+                                          shear=shear)
 
 
 class ExportNodesAndConnectionsWindow(window_lib.Helper):

@@ -337,6 +337,12 @@ class MarkingMenu(object):
                       command=self.offset_parent_matrix_to_transform)
 
         cmds.menuItem(parent=connections_menu, divider=True)
+        cmds.menuItem(parent=connections_menu, label='                       UvPin', enable=False)
+        cmds.menuItem(parent=connections_menu, divider=True)
+
+        cmds.menuItem(parent=connections_menu, label='Create nurbs UvPin', command=connections_windows.CreateNurbsUvPin)
+        
+        cmds.menuItem(parent=connections_menu, divider=True)
         cmds.menuItem(parent=connections_menu, label='                Import/Export', enable=False)
         cmds.menuItem(parent=connections_menu, divider=True)
 
