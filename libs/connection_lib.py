@@ -556,7 +556,7 @@ def connect_point_matrix_mult_to_a_cv(driver, crv_and_cv):
     cmds.connectAttr('{}.output'.format(point_matrix_mult), '{}.controlPoints[{}]'.format(crv, cv))
 
 
-def create_uvpin(nurbs, 
+def create_nurbs_uvpin(nurbs, 
                  node_list,
                  maintain_offset=True,
                  translate=True,
@@ -575,6 +575,17 @@ def create_uvpin(nurbs,
         scale (bool, optional): connect scale. Defaults to True.
         shear (bool, optional): connect shear. Defaults to True.
     """
+    # Checks
+    if len(nurbs.split('_')) != 3:
+        logging.error('check nurbs name, it should be: {descriptor}_{side}_{usage}')
+        raise RuntimeError('Check scriptEditor for further details')
+    for node in node_list:
+        if len(node.split('_')) != 3:
+            print(node.split('_'))
+            logging.error('check nodes names, they should be: {descriptor}_{side}_{usage}')
+            raise RuntimeError('Check scriptEditor for further details')
+    
+    #Create uvPin node and connect nurbs
     descriptor, side = nurbs.split('_')[:2]
     nurbs_shape = cmds.listRelatives(nurbs, shapes=True)[0]
 
@@ -586,6 +597,7 @@ def create_uvpin(nurbs,
 
     cmds.connectAttr('{}.worldSpace[0]'.format(nurbs_shape), '{}.deformedGeometry'.format(uvpin_node))
 
+    # Connections for each driven
     index = 0
     for node in node_list:
         node_descriptor, node_side, node_usage = node.split('_')
