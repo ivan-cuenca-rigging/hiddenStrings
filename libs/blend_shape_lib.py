@@ -6,7 +6,7 @@ from collections import OrderedDict
 from maya import cmds, mel
 
 # Project imports
-from hiddenStrings.libs import side_lib, usage_lib, skin_lib
+from hiddenStrings.libs import side_lib, usage_lib, skin_lib, nurbs_lib
 
 logging = logging.getLogger(__name__)
 
@@ -705,11 +705,6 @@ def mirror_target(blend_shape, target):
                                                  noIntermediate=True)[0])
 
     if 'mesh' not in node_type:
-        if 'lattice' in node_type:
-            component_type = 'pt'
-        else:
-            component_type = 'cv'
-
         for target_value in get_target_values(blend_shape=blend_shape, target=target):
             if target_value == 1:
                 target_rebuild = cmds.sculptTarget(blend_shape,
@@ -736,19 +731,96 @@ def mirror_target(blend_shape, target):
                                                                            target=target_mirror_name),
                                                    inbetweenWeight=target_value)[0]
 
-            target_cv_list = cmds.ls('{}.{}[*]'.format(target_rebuild, component_type), flatten=True)
+            # If it is a curve
+            if 'nurbsCurve' in node_type:
+                component_type = 'cv'
 
-            source_cv_max = int(max(target_cv_list).split('.{}['.format(component_type))[-1].split(']')[0])
-            for cv in target_cv_list:
-                cv_index = int(cv.split('.{}['.format(component_type))[-1].split(']')[0])
-                opposite_cv = list(range(0, source_cv_max + 1))[::-1][cv_index]
+                target_cv_list = cmds.ls('{}.{}[*]'.format(target_rebuild, component_type), flatten=True)
 
-                cv_position = cmds.xform(cv, query=True, objectSpace=True, translation=True)
+                target_cv_indices = [int(cv.split('[')[1].split(']')[0]) for cv in target_cv_list]
 
-                cmds.xform(
-                    cv.replace(target_rebuild, mirror_rebuild).replace('.{}[{}]'.format(component_type, cv_index),
-                                                                       '.{}[{}]'.format(component_type, opposite_cv)),
-                    objectSpace=True, translation=[cv_position[0] * -1, cv_position[1], cv_position[2]])
+                source_cv_max = int(max(target_cv_indices))
+
+                for cv in target_cv_list:
+                    cv_position = cmds.xform(cv, query=True, objectSpace=True, translation=True)
+
+                    cv_index = int(cv.split('[')[1].split(']')[0])
+
+                    opposite_cv = list(range(0, source_cv_max + 1))[::-1][cv_index]
+
+                    cmds.xform(cv.replace(
+                            target_rebuild, mirror_rebuild).replace('.{}[{}]'.format(component_type, cv_index),
+                                                                    '.{}[{}]'.format(component_type, opposite_cv)),
+                        objectSpace=True, translation=[cv_position[0] * -1, cv_position[1], cv_position[2]])
+
+            # If it is a nurbs
+            if 'nurbsSurface' in node_type:
+                component_type = 'cv'
+
+                target_cv_list = cmds.ls('{}.{}[*]'.format(target_rebuild, component_type), flatten=True)
+                print(max(target_cv_list), target_cv_list)
+                param_x = nurbs_lib.get_param_along_x(nurbs=target_rebuild)
+
+                target_cv_u_indices = [int(cv.split('[')[1].split(']')[0]) for cv in target_cv_list]
+                target_cv_v_indices = [int(cv.split('[')[2].split(']')[0]) for cv in target_cv_list]
+
+                source_u_max = int(max(target_cv_u_indices))
+                source_v_max = int(max(target_cv_v_indices))
+
+                for cv in target_cv_list:
+                    cv_position = cmds.xform(cv, query=True, objectSpace=True, translation=True)
+
+                    u_index = int(cv.split('[')[1].split(']')[0])
+                    v_index = int(cv.split('[')[2].split(']')[0])
+                    
+                    opposite_u = list(range(0, source_u_max + 1))[::-1][u_index]
+                    opposite_v = list(range(0, source_v_max + 1))[::-1][v_index]
+
+                    if param_x == 'U':
+                        cmds.xform(
+                            cv.replace(
+                                target_rebuild, mirror_rebuild).replace('.{}[{}][{}]'.format(component_type,
+                                                                                             u_index, v_index),
+                                                                        '.{}[{}][{}]'.format(component_type,
+                                                                                             opposite_u, v_index)),
+                            objectSpace=True, translation=[cv_position[0] * -1, cv_position[1], cv_position[2]])
+                    else:
+                        cmds.xform(
+                            cv.replace(
+                                target_rebuild, mirror_rebuild).replace('.{}[{}][{}]'.format(component_type,
+                                                                                             u_index, v_index),
+                                                                        '.{}[{}][{}]'.format(component_type,
+                                                                                             u_index, opposite_v)),
+                            objectSpace=True, translation=[cv_position[0] * -1, cv_position[1], cv_position[2]])
+
+            # If it is a lattice
+            if 'lattice' in node_type:
+                component_type = 'pt'
+
+                target_pt_list = cmds.ls('{}.{}[*]'.format(target_rebuild, component_type), flatten=True)
+
+                target_pt_x_indices = [int(pt.split('[')[1].split(']')[0]) for pt in target_pt_list]
+
+                source_x_max = int(max(target_pt_x_indices))
+
+                for cv in target_pt_list:
+                    cv_position = cmds.xform(cv, query=True, objectSpace=True, translation=True)
+
+                    x_index = int(cv.split('['.format(component_type))[1].split(']')[0])
+                    y_index = int(cv.split('['.format(component_type))[2].split(']')[0])
+                    z_index = int(cv.split('['.format(component_type))[3].split(']')[0])
+
+                    opposite_x = list(range(0, source_x_max + 1))[::-1][x_index]
+                    cmds.xform(cv.replace(
+                            target_rebuild, mirror_rebuild).replace('.{}[{}][{}][{}]'.format(component_type,
+                                                                                             x_index, 
+                                                                                             y_index, 
+                                                                                             z_index),
+                                                                    '.{}[{}][{}][{}]'.format(component_type,
+                                                                                             opposite_x, 
+                                                                                             y_index, 
+                                                                                             z_index)),
+                        objectSpace=True, translation=[cv_position[0] * -1, cv_position[1], cv_position[2]])
 
             cmds.delete(target_rebuild)
             cmds.delete(mirror_rebuild)

@@ -52,3 +52,29 @@ def create_nurbs_from_points(descriptor,
                         direction=2)
 
     return nurbs_transform
+
+
+def get_param_along_x(nurbs):
+    """
+    Detects if the change on the X axis is related to U or V of a NURBS surface.
+
+    Args:
+        nurbs (str): Name of the NURBS surface (e.g., 'test_c_nurbs').
+
+    Returns:
+        str: 'U' or 'V', depending on which axis affects X.
+    """
+    # Key CV points in U and V:
+    cv_u0_v0 = cmds.xform('{}.cv[0][0]'.format(nurbs), q=True, ws=True, t=True)  # U=0, V=0
+    cv_u1_v0 = cmds.xform('{}.cv[1][0]'.format(nurbs), q=True, ws=True, t=True)  # U=1, V=0
+    cv_u0_v1 = cmds.xform('{}.cv[0][1]'.format(nurbs), q=True, ws=True, t=True)  # U=0, V=1
+
+    # Changes on the X axis:
+    delta_u_x = abs(cv_u1_v0[0] - cv_u0_v0[0])  # Change in X along U
+    delta_v_x = abs(cv_u0_v1[0] - cv_u0_v0[0])  # Change in X along V
+
+    # Determines which axis causes the change:
+    if delta_u_x > delta_v_x:
+        return 'U'
+    else:
+        return 'V'
