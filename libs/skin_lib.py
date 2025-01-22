@@ -266,11 +266,13 @@ def transfer_skin(source, target, source_skin_index=1, target_skin_index=1, surf
         target_skin_index (int):. -1 (last), 1, 2, 3. Defaults to 1.
         surface_association (str): closestPoint or closestComponent. Defaults to 'closestComponent'.
     """
+    # Get source skin cluster and source skin joints
     source_skin_cluster = get_skin_cluster_index(node=source, index=source_skin_index)
     if not source_skin_cluster:
         cmds.error('{} skinCluster index {} does not exists'.format(source, source_skin_index))
     source_skin_joints = cmds.skinCluster(source_skin_cluster, query=True, influence=True)
 
+    # Get target skin cluster if it exists
     target_skin_cluster = get_skin_cluster_index(node=target, index=target_skin_index)
 
     # If skinCluster exists get its joints and add the joints that are not in the skinCluster
