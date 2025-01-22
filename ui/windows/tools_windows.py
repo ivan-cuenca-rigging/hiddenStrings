@@ -1,5 +1,6 @@
 # Imports
 import os
+import logging
 from functools import partial
 
 # Maya imports
@@ -8,6 +9,9 @@ from maya import cmds
 # Project imports
 from hiddenStrings import module_utils
 from hiddenStrings.libs import window_lib, spline_lib, side_lib, usage_lib, import_export_lib, blend_shape_lib
+
+
+logging = logging.getLogger(__name__)
 
 
 class RenamerWindow(window_lib.Helper):
@@ -122,6 +126,16 @@ class RenamerWindow(window_lib.Helper):
         """
         Search and replace names of the nodes selected
         """
+        # Check if a component is selected
+        selection_list = cmds.ls(selection=True)
+
+        component_types = cmds.filterExpand(selection_list, selectionMask=(31, 32, 34, 35, 36, 37, 38))
+
+        if component_types:
+            logging.error('The selection contains components, select nodes or blendshapes/targets')
+            raise RuntimeError('Check Script Editor for further details.')
+        
+        # Get selection
         selection_list = cmds.ls(selection=True, uuid=True)
 
         # Search adn replace
@@ -174,6 +188,16 @@ class RenamerWindow(window_lib.Helper):
         """
         Rename nodes selected
         """
+        # Check if a component is selected
+        selection_list = cmds.ls(selection=True)
+
+        component_types = cmds.filterExpand(selection_list, selectionMask=(31, 32, 34, 35, 36, 37, 38))
+
+        if component_types:
+            logging.error('The selection contains components, select nodes or blendshapes/targets')
+            raise RuntimeError('Check Script Editor for further details.')
+
+        # Get selections and fields
         selection_list = cmds.ls(selection=True, uuid=True)
 
         rename = cmds.textFieldGrp(self.rename, query=True, text=True)
@@ -181,6 +205,7 @@ class RenamerWindow(window_lib.Helper):
         suffix = cmds.textFieldGrp(self.suffix, query=True, text=True)
         increment = cmds.textFieldGrp(self.increment, query=True, text=True)
 
+        # Rename nodes
         for node in selection_list:
             node = cmds.ls(node, allPaths=True)[0]
             if rename:
