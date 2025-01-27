@@ -50,7 +50,7 @@ class Helper(attribute_lib.Helper):
         Check if the name is in the side_lib
         """
         if self.side not in side_lib.valid_sides:
-            cmds.error('the name must have a valid side, {}'.format(side_lib.valid_sides))
+            cmds.error(f'the name must have a valid side, {side_lib.valid_sides}')
 
 
     def check_usage(self):
@@ -58,7 +58,7 @@ class Helper(attribute_lib.Helper):
         Check if the usage is a valid usage
         """
         if self.usage not in usage_lib.valid_usages:
-            cmds.error('the name must have a valid usage, {}'.format(usage_lib.valid_usages))
+            cmds.error(f'the name must have a valid usage, {usage_lib.valid_usages}')
 
 
     def check_node_type(self):
@@ -112,7 +112,7 @@ class Helper(attribute_lib.Helper):
         Returns:
             str: descriptor capitalize
         """
-        return '{}{}'.format(self.get_descriptor()[0].upper(), self.get_descriptor()[1:])
+        return f'{self.get_descriptor()[0].upper()}{self.get_descriptor()[1:]}'
 
 
     def set_descriptor(self, new_descriptor):
@@ -122,7 +122,7 @@ class Helper(attribute_lib.Helper):
         Args:
             new_descriptor (str): new descriptor
         """
-        self.name = cmds.rename(self.name, '{}_{}_{}'.format(new_descriptor, self.name_tokens[1], self.name_tokens[2]))
+        self.name = cmds.rename(self.name, f'{new_descriptor}_{self.name_tokens[1]}_{self.name_tokens[2]}')
 
 
     def get_side(self):
@@ -142,7 +142,7 @@ class Helper(attribute_lib.Helper):
         Args:
             new_side (str): new side
         """
-        self.name = cmds.rename(self.name, '{}_{}_{}'.format(self.name_tokens[0], new_side, self.name_tokens[2]))
+        self.name = cmds.rename(self.name, f'{self.name_tokens[0]}_{new_side}_{self.name_tokens[2]}')
 
 
     def get_usage(self):
@@ -162,7 +162,7 @@ class Helper(attribute_lib.Helper):
         Returns:
             str: usage capitalize
         """
-        return '{}{}'.format(self.get_usage()[0].upper(), self.get_usage()[1:])
+        return f'{self.get_usage()[0].upper()}{self.get_usage()[1:]}'
 
 
     def set_usage(self, new_usage):
@@ -172,7 +172,7 @@ class Helper(attribute_lib.Helper):
         Args:
             new_usage (str): new usage
         """
-        self.name = cmds.rename(self.name, '{}_{}_{}'.format(self.name_tokens[0], self.name_tokens[1], new_usage))
+        self.name = cmds.rename(self.name, f'{self.name_tokens[0]}_{self.name_tokens[1]}_{new_usage}')
 
 
     def get_node_type(self):
@@ -193,19 +193,19 @@ class Helper(attribute_lib.Helper):
         ud_attrs_l = cmds.listAttr(self.name, ud=True, settable=True)
         for attr in ['translate', 'rotate', 'scale']:
             for axis in ['X', 'Y', 'Z']:
-                if cmds.getAttr('{}.{}{}'.format(self.name, attr, axis), settable=True):
-                    cmds.setAttr('{}.{}{}'.format(self.name, attr, axis), 0)
+                if cmds.getAttr(f'{self.name}.{attr}{axis}', settable=True):
+                    cmds.setAttr(f'{self.name}.{attr}{axis}', 0)
                     if attr == 'scale':
-                        cmds.setAttr('{}.{}{}'.format(self.name, attr, axis), 1)
+                        cmds.setAttr(f'{self.name}.{attr}{axis}', 1)
         if ud_attrs_l:
             for attr in ud_attrs_l:
-                if cmds.getAttr('{}.{}'.format(self.name, attr), settable=True):
-                    if cmds.getAttr('{}.{}'.format(self.name, attr), type=True) != 'string':
-                        def_value = cmds.addAttr('{}.{}'.format(self.name, attr), query=True, defaultValue=True)
-                        cmds.setAttr('{}.{}'.format(self.name, attr), def_value)
+                if cmds.getAttr(f'{self.name}.{attr}', settable=True):
+                    if cmds.getAttr(f'{self.name}.{attr}', type=True) != 'string':
+                        def_value = cmds.addAttr(f'{self.name}.{attr}', query=True, defaultValue=True)
+                        cmds.setAttr(f'{self.name}.{attr}', def_value)
         if self.node_type == 'joint':
             for axis in ['X', 'Y', 'Z']:
-                cmds.setAttr('{}.jointOrient{}'.format(self.name, axis), 0)
+                cmds.setAttr(f'{self.name}.jointOrient{axis}', 0)
 
 
     def get_matrix(self):
@@ -264,7 +264,7 @@ class Helper(attribute_lib.Helper):
             point_matrix = cmds.xform(ref_node, query=True, worldSpace=True, matrix=True)
             cmds.delete(ref_node)
 
-        cmds.setAttr('{}.offsetParentMatrix'.format(self.name), point_matrix, type='matrix')
+        cmds.setAttr(f'{self.name}.offsetParentMatrix', point_matrix, type='matrix')
 
 
     def get_position(self):
@@ -287,11 +287,11 @@ class Helper(attribute_lib.Helper):
             z (float): new z value
         """
         if x:
-            cmds.setAttr('{}.translateX'.format(self.name), x)
+            cmds.setAttr(f'{self.name}.translateX', x)
         if y:
-            cmds.setAttr('{}.translateY'.format(self.name), y)
+            cmds.setAttr(f'{self.name}.translateY', y)
         if z:
-            cmds.setAttr('{}.translateZ'.format(self.name), z)
+            cmds.setAttr(f'{self.name}.translateZ', z)
 
 
     def set_position_from_point(self, point):
@@ -330,13 +330,13 @@ class Helper(attribute_lib.Helper):
         """
         if xyz:
             for index, axis in enumerate('XYZ'):
-                cmds.setAttr('{}.rotate{}'.format(self.name, axis), xyz[index])
+                cmds.setAttr(f'{self.name}.rotate{axis}', xyz[index])
         if x:
-            cmds.setAttr('{}.rotateX'.format(self.name), x)
+            cmds.setAttr(f'{self.name}.rotateX', x)
         if y:
-            cmds.setAttr('{}.rotateY'.format(self.name), y)
+            cmds.setAttr(f'{self.name}.rotateY', y)
         if z:
-            cmds.setAttr('{}.rotateZ'.format(self.name), z)
+            cmds.setAttr(f'{self.name}.rotateZ', z)
 
 
     def set_rotation_from_point(self, point):
@@ -370,11 +370,11 @@ class Helper(attribute_lib.Helper):
             z (float): new z value
         """
         if x:
-            cmds.setAttr('{}.scaleX'.format(self.name), x)
+            cmds.setAttr(f'{self.name}.scaleX', x)
         if y:
-            cmds.setAttr('{}.scaleY'.format(self.name), y)
+            cmds.setAttr(f'{self.name}.scaleY', y)
         if z:
-            cmds.setAttr('{}.scaleZ'.format(self.name), z)
+            cmds.setAttr(f'{self.name}.scaleZ', z)
 
 
     def set_scale_from_point(self, point):
@@ -458,7 +458,7 @@ class Helper(attribute_lib.Helper):
             str: zero's name
         """
         zero = None
-        zero_name = '{}{}_{}_zero'.format(self.get_descriptor(), self.get_usage().capitalize(), self.get_side())
+        zero_name = f'{self.get_descriptor()}{self.get_usage().capitalize()}_{self.get_side()}_zero'
         if cmds.objExists(zero_name):
             zero = zero_name
         return zero
@@ -485,7 +485,7 @@ class Helper(attribute_lib.Helper):
             str: structural parent
         """
         point_matrix = self.get_matrix()
-        parent_name = '{}{}_{}_{}'.format(self.get_descriptor(), self.get_usage().capitalize(), self.get_side(), usage)
+        parent_name = f'{self.get_descriptor()}{self.get_usage().capitalize()}_{self.get_side()}_{usage}'
         if cmds.objExists(parent_name):
             new_structural_parent = parent_name
             logging.info('This parent already exists.')
@@ -512,7 +512,7 @@ class Helper(attribute_lib.Helper):
             if self.get_node_type() == 'joint':
                 node_rotation = cmds.xform(self.name, query=True, worldSpace=True, rotation=True)
                 for axis in 'XYZ':
-                    cmds.setAttr('{}.jointOrient{}'.format(self.name, axis), 0)
+                    cmds.setAttr(f'{self.name}.jointOrient{axis}', 0)
                 cmds.xform(self.name, worldSpace=True, rotation=node_rotation)
 
 

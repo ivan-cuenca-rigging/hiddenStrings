@@ -26,7 +26,7 @@ class ExportBlendShapeWindow(window_lib.Helper):
             size (list): width and height
         """
         super(ExportBlendShapeWindow, self).__init__(title='Export blendShape Options', size=(450, 130))
-        export_path = '{}/blendShapes'.format(os.path.dirname(cmds.file(query=True, sceneName=True)))
+        export_path = f'{os.path.dirname(cmds.file(query=True, sceneName=True))}/blendShapes'
         self.export_path = cmds.textFieldGrp(label='Path: ', text=export_path)
 
         self.file_search = cmds.iconTextButton(style='iconOnly', image1='folder-closed.png',
@@ -88,7 +88,7 @@ class ImportBlendShapeWindow(window_lib.Helper):
         super(ImportBlendShapeWindow, self).__init__(title='Import blendShape Options', size=(450, 150))
         self.import_folder = cmds.checkBoxGrp(label='Import folder: ', value1=False)
 
-        import_path = '{}/blendShapes'.format(os.path.dirname(cmds.file(query=True, sceneName=True)))
+        import_path = f'{os.path.dirname(cmds.file(query=True, sceneName=True))}/blendShapes'
         self.import_path = cmds.textFieldGrp(label='Path: ', text=import_path)
         self.file_search = cmds.iconTextButton(style='iconOnly', image1='folder-closed.png',
                                                command=self.file_dialog_command)
@@ -445,11 +445,11 @@ class MultiplyVertexValues(window_lib.Helper):
             axes = 'xyz'
         else:
             if cmds.checkBoxGrp(self.axis_check_box, query=True, value1=True):
-                axes = "{}x".format(axes)
+                axes = f"{axes}x"
             if cmds.checkBoxGrp(self.axis_check_box, query=True, value2=True):
-                axes = "{}y".format(axes)
+                axes = f"{axes}y"
             if cmds.checkBoxGrp(self.axis_check_box, query=True, value3=True):
-                axes = "{}z".format(axes)
+                axes = f"{axes}z"
 
         geo_vtx_list = cmds.ls(cmds.polyListComponentConversion(cmds.ls(selection=True), toVertex=True), flatten=True)
         
@@ -457,8 +457,8 @@ class MultiplyVertexValues(window_lib.Helper):
             geo = vtx.split('.')[-2]
             vtx_num = vtx.split('[')[-1].split(']')[0]
             for axis in axes.lower():
-                vtx_value = cmds.getAttr('{}.pnts[{}].pnt{}'.format(geo, vtx_num, axis))
-                cmds.setAttr('{}.pnts[{}].pnt{}'.format(geo, vtx_num, axis), vtx_value*value)
+                vtx_value = cmds.getAttr(f'{geo}.pnts[{vtx_num}].pnt{axis}')
+                cmds.setAttr(f'{geo}.pnts[{vtx_num}].pnt{axis}', vtx_value*value)
 
 
     def apply_command(self, *args):

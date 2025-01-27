@@ -29,7 +29,7 @@ def create_bary_trigger(descriptor='bary', side=side_lib.center,
     # Create Bary geometry
     bary_geo = import_export_lib.import_obj(
         path=r'{}/libs/geo_shapes/bary.obj'.format(module_utils.hidden_strings_path))[0]
-    bary_geo = cmds.rename(bary_geo, '{}_{}_{}'.format(descriptor, side, usage_lib.geometry))
+    bary_geo = cmds.rename(bary_geo, f'{descriptor}_{side}_{usage_lib.geometry}')
     bary_geo_shape = cmds.listRelatives(bary_geo, allDescendents=True, shapes=True, noIntermediate=True)[0]
 
     # Create bary node (bifrost graph)
@@ -42,7 +42,7 @@ def create_bary_trigger(descriptor='bary', side=side_lib.center,
 
     bary_shape = bifrost_lib.import_compound(compound_namespace=compound_namespace, compound_name=compound_name)
     bary_trigger = cmds.rename(cmds.listRelatives(bary_shape, parent=True)[0],
-                               '{}_{}_{}'.format(descriptor, side, usage_lib.trigger))
+                               f'{descriptor}_{side}_{usage_lib.trigger}')
     bary_shape = cmds.listRelatives(bary_trigger, allDescendents=True, shapes=True, noIntermediate=True)[0]
 
     cmds.parent(bary_geo, bary_trigger)
@@ -52,19 +52,19 @@ def create_bary_trigger(descriptor='bary', side=side_lib.center,
     cmds.parent(bary_trigger, bary_grp)
 
     # Create driver
-    driver_shape = cmds.createNode('locator', name='{}_{}_{}Shape'.format(descriptor, side, usage_lib.driver))
+    driver_shape = cmds.createNode('locator', name=f'{descriptor}_{side}_{usage_lib.driver}Shape')
     driver = cmds.rename(cmds.listRelatives(driver_shape, parent=True)[0],
-                         '{}_{}_{}'.format(descriptor, side, usage_lib.driver))
+                         f'{descriptor}_{side}_{usage_lib.driver}')
     cmds.parent(driver, bary_grp)
 
     for axis in 'XYZ':
-        cmds.setAttr('{}.localScale{}'.format(driver_shape, axis), 0.25)
+        cmds.setAttr(f'{driver_shape}.localScale{axis}', 0.25)
     # Connect driver and shape to the bary node
-    cmds.connectAttr('{}.worldMesh'.format(bary_geo_shape), '{}.mesh'.format(bary_shape))
-    cmds.connectAttr('{}.worldMatrix'.format(driver), '{}.driverMatrix'.format(bary_shape))
+    cmds.connectAttr(f'{bary_geo_shape}.worldMesh', f'{bary_shape}.mesh')
+    cmds.connectAttr(f'{driver}.worldMatrix', f'{bary_shape}.driverMatrix')
 
     # Create outputs
-    vertex_length = len(cmds.ls('{}.vtx[*]'.format(bary_geo_shape), flatten=True))
+    vertex_length = len(cmds.ls(f'{bary_geo_shape}.vtx[*]', flatten=True))
 
     driver_ah = attribute_lib.Helper(driver)
 
@@ -73,13 +73,13 @@ def create_bary_trigger(descriptor='bary', side=side_lib.center,
     driver_ah.add_separator_attribute(separator_name='Attributes')
 
     driver_ah.add_enum_attribute(attribute_name='driverAxis', states='X:-X:Y:-Y:Z:-Z', keyable=False)
-    cmds.connectAttr('{}.driverAxis'.format(driver), '{}.driverAxis'.format(bary_shape))
+    cmds.connectAttr(f'{driver}.driverAxis', f'{bary_shape}.driverAxis')
     driver_ah.add_separator_attribute(separator_name='Weights')
     weight_attribute = 'weight'
     for index in range(vertex_length):
-        driver_ah.add_float_attribute(attribute_name='{}{}'.format(weight_attribute, str(index)))
-        cmds.connectAttr('{}.baryWeight[{}]'.format(bary_shape, str(index)),
-                         '{}.{}{}'.format(driver, weight_attribute, str(index)))
+        driver_ah.add_float_attribute(attribute_name=f'{weight_attribute}{str(index)}')
+        cmds.connectAttr(f'{bary_shape}.baryWeight[{str(index)}]',
+                         f'{driver}.{weight_attribute}{str(index)}')
 
     if parent_node and driver_node:
         cmds.xform(bary_trigger, worldSpace=True,
@@ -128,7 +128,7 @@ def create_angle_trigger(parent_node, driver_node,
         cmds.createNode('transform', name=structural_parent)
 
     # Create Angle reader group
-    angle_reader_group = cmds.createNode('transform', name='{}AngleReader_{}_grp'.format(descriptor, side),
+    angle_reader_group = cmds.createNode('transform', name=f'{descriptor}AngleReader_{side}_grp',
                                          parent=structural_parent)
 
     cmds.xform(angle_reader_group, worldSpace=True,
@@ -137,29 +137,29 @@ def create_angle_trigger(parent_node, driver_node,
     connection_lib.connect_offset_parent_matrix(driver=parent_node, driven=angle_reader_group)
 
     # Create the reader
-    ref_reader = cmds.createNode('transform', name='{}Reader_{}_{}'.format(descriptor, side, usage_lib.reference),
+    ref_reader = cmds.createNode('transform', name=f'{descriptor}Reader_{side}_{usage_lib.reference}',
                                  parent=angle_reader_group)
     ref_reader_static = cmds.createNode('transform',
-                                        name='{}ReaderStatic_{}_{}'.format(descriptor, side, usage_lib.reference),
+                                        name=f'{descriptor}ReaderStatic_{side}_{usage_lib.reference}',
                                         parent=angle_reader_group)
 
     # Give the position to the reader
     reader_mult_mat = cmds.createNode('multMatrix',
-                                      name='{}ReaderRef_{}_{}'.format(driver_node, side, usage_lib.mult_matrix))
+                                      name=f'{driver_node}ReaderRef_{side}_{usage_lib.mult_matrix}')
 
-    cmds.connectAttr('{}.worldMatrix'.format(driver_node), '{}.matrixIn[0]'.format(reader_mult_mat))
-    cmds.connectAttr('{}.worldInverseMatrix'.format(parent_node), '{}.matrixIn[1]'.format(reader_mult_mat))
-    cmds.setAttr('{}.matrixIn[2]'.format(reader_mult_mat),
-                 cmds.getAttr('{}.worldMatrix'.format(parent_node)), type='matrix')
-    cmds.setAttr('{}.matrixIn[3]'.format(reader_mult_mat),
-                 cmds.getAttr('{}.worldInverseMatrix'.format(driver_node)), type='matrix')
+    cmds.connectAttr(f'{driver_node}.worldMatrix', f'{reader_mult_mat}.matrixIn[0]')
+    cmds.connectAttr(f'{parent_node}.worldInverseMatrix', f'{reader_mult_mat}.matrixIn[1]')
+    cmds.setAttr(f'{reader_mult_mat}.matrixIn[2]',
+                 cmds.getAttr(f'{parent_node}.worldMatrix'), type='matrix')
+    cmds.setAttr(f'{reader_mult_mat}.matrixIn[3]',
+                 cmds.getAttr(f'{driver_node}.worldInverseMatrix'), type='matrix')
 
-    cmds.connectAttr('{}.matrixSum'.format(reader_mult_mat), '{}.offsetParentMatrix'.format(ref_reader))
-    cmds.setAttr('{}.translateX'.format(ref_reader), 1)
-    cmds.setAttr('{}.translateX'.format(ref_reader_static), 1)
+    cmds.connectAttr(f'{reader_mult_mat}.matrixSum', f'{ref_reader}.offsetParentMatrix')
+    cmds.setAttr(f'{ref_reader}.translateX', 1)
+    cmds.setAttr(f'{ref_reader_static}.translateX', 1)
 
-    cmds.setAttr('{}.displayHandle'.format(ref_reader), 1)
-    cmds.setAttr('{}.displayHandle'.format(ref_reader_static), 1)
+    cmds.setAttr(f'{ref_reader}.displayHandle', 1)
+    cmds.setAttr(f'{ref_reader_static}.displayHandle', 1)
 
     # Create a vector for the reader
     vector_reader_pma = vector_lib.create_pma_vector_from_a_to_b(a=angle_reader_group, b=ref_reader)
@@ -172,15 +172,15 @@ def create_angle_trigger(parent_node, driver_node,
     for num in ['01', '02', '03', '04']:
         # Create a reader in each direction
         ref_transform = cmds.createNode('transform',
-                                        name='{}Reader{}_{}_{}'.format(descriptor, num, side, usage_lib.reference),
+                                        name=f'{descriptor}Reader{num}_{side}_{usage_lib.reference}',
                                         parent=angle_reader_group)
 
         # Give the position to each transform
         axis = 'Y' if num == '01' or num == '03' else 'Z'
         value = 1 if num == '01' or num == '02' else -1
 
-        cmds.setAttr('{}.translate{}'.format(ref_transform, axis), value)
-        cmds.setAttr('{}.displayHandle'.format(ref_transform), 1)
+        cmds.setAttr(f'{ref_transform}.translate{axis}', value)
+        cmds.setAttr(f'{ref_transform}.displayHandle', 1)
 
         # Create a vector for each direction
         vector_pma = vector_lib.create_pma_vector_from_a_to_b(a=angle_reader_group, b=ref_transform)
@@ -191,17 +191,17 @@ def create_angle_trigger(parent_node, driver_node,
 
         # Remap values to normalize the outputs
         remap_value = cmds.createNode('remapValue',
-                                      name='{}Reader{}_{}_{}'.format(descriptor, num, side, usage_lib.remap_value))
+                                      name=f'{descriptor}Reader{num}_{side}_{usage_lib.remap_value}')
 
-        cmds.connectAttr(angle_between, '{}.inputValue'.format(remap_value))
-        cmds.connectAttr(angle_between_static, '{}.inputMax'.format(remap_value))
+        cmds.connectAttr(angle_between, f'{remap_value}.inputValue')
+        cmds.connectAttr(angle_between_static, f'{remap_value}.inputMax')
 
-        cmds.setAttr('{}.outputMin'.format(remap_value), 1)
-        cmds.setAttr('{}.outputMax'.format(remap_value), 0)
+        cmds.setAttr(f'{remap_value}.outputMin', 1)
+        cmds.setAttr(f'{remap_value}.outputMax', 0)
 
         # Create attribute
-        reader_ah.add_float_attribute(attribute_name='output{}'.format(num))
-        cmds.connectAttr('{}.outValue'.format(remap_value), '{}.output{}'.format(ref_reader, num))
+        reader_ah.add_float_attribute(attribute_name=f'output{num}')
+        cmds.connectAttr(f'{remap_value}.outValue', f'{ref_reader}.output{num}')
 
 
 def build_biped_angle_trigger_template():
@@ -218,26 +218,26 @@ def build_biped_angle_trigger_template():
     for side in ('l', 'r'):
         # Clavicle
         create_angle_trigger(parent_node='spineTop_c_skn',
-                             driver_node='clavicleArm_{}_skn'.format(side))
+                             driver_node=f'clavicleArm_{side}_skn')
         # UpArm
-        create_angle_trigger(parent_node='clavicleArm_{}_skn'.format(side),
-                             driver_node='upArm01_{}_skn'.format(side))
+        create_angle_trigger(parent_node=f'clavicleArm_{side}_skn',
+                             driver_node=f'upArm01_{side}_skn')
         # LowArm
-        create_angle_trigger(parent_node=cmds.ls('upArm??_{}_jnt'.format(side))[0],
-                             driver_node='lowArm01_{}_skn'.format(side))
+        create_angle_trigger(parent_node=cmds.ls(f'upArm??_{side}_jnt')[0],
+                             driver_node=f'lowArm01_{side}_skn')
         # hand
-        create_angle_trigger(parent_node=cmds.ls('lowArm??_{}_jnt'.format(side))[0],
-                             driver_node='handArm_{}_skn'.format(side))
+        create_angle_trigger(parent_node=cmds.ls(f'lowArm??_{side}_jnt')[0],
+                             driver_node=f'handArm_{side}_skn')
 
         # UpLeg
         create_angle_trigger(parent_node='spineBottom_c_skn',
-                             driver_node='upLeg01_{}_skn'.format(side))
+                             driver_node=f'upLeg01_{side}_skn')
         # LowLeg
-        create_angle_trigger(parent_node=cmds.ls('upLeg??_{}_jnt'.format(side))[0],
-                             driver_node='lowLeg01_{}_skn'.format(side))
+        create_angle_trigger(parent_node=cmds.ls(f'upLeg??_{side}_jnt')[0],
+                             driver_node=f'lowLeg01_{side}_skn')
         # Foot
-        create_angle_trigger(parent_node=cmds.ls('lowLeg??_{}_jnt'.format(side))[0],
-                             driver_node='footLeg_{}_skn'.format(side))
+        create_angle_trigger(parent_node=cmds.ls(f'lowLeg??_{side}_jnt')[0],
+                             driver_node=f'footLeg_{side}_skn')
         # FootMiddle
-        create_angle_trigger(parent_node='footLeg_{}_skn'.format(side),
-                             driver_node='footLegMiddle_{}_skn'.format(side))
+        create_angle_trigger(parent_node=f'footLeg_{side}_skn',
+                             driver_node=f'footLegMiddle_{side}_skn')

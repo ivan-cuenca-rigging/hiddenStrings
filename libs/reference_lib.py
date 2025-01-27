@@ -73,7 +73,7 @@ def replace_reference_window(node=None, *args):
     if not node:
         node = cmds.ls(selection=True)[0]
 
-    mel.eval('replaceReference "{}" "{}"'.format(get_reference_file(node=node), get_reference_node(node=node)))
+    mel.eval(f'replaceReference "{get_reference_file(node=node)}" "{get_reference_node(node=node)}"')
 
 
 def load_reference_window(*args):
@@ -110,4 +110,4 @@ def remove_reference(node=None, *args):
     reference_file = get_reference_file(node=node)
 
     cmds.file(removeReference=True, referenceNode=reference_node)
-    logging.info('{} reference has been removed'.format(reference_file))
+    logging.info(f'{reference_file} reference has been removed')

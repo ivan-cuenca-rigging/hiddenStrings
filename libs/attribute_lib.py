@@ -50,8 +50,8 @@ class Helper(object):
             attribute_name (str): name of the attribute
             lock (bool, optional): True == lock. Defaults to True.
         """
-        if cmds.getAttr('{}.{}'.format(self.name, attribute_name), settable=True):
-            cmds.setAttr('{}.{}'.format(self.name, attribute_name), lock=lock)
+        if cmds.getAttr(f'{self.name}.{attribute_name}', settable=True):
+            cmds.setAttr(f'{self.name}.{attribute_name}', lock=lock)
 
 
     def lock_attributes(self, attributes_list, lock=True):
@@ -74,7 +74,7 @@ class Helper(object):
             attribute_name (str): name of the attribute
             hide (bool, optional): True == hide. Defaults to True.
         """
-        cmds.setAttr('{}.{}'.format(self.name, attribute_name), keyable=not hide, channelBox=not hide)
+        cmds.setAttr(f'{self.name}.{attribute_name}', keyable=not hide, channelBox=not hide)
 
 
     def hide_attributes(self, attributes_list, hide=True):
@@ -123,12 +123,12 @@ class Helper(object):
             attribute_name (str): name of the attribute
             keyable (bool, optional): True == keyable. Defaults to True.
         """
-        cmds.setAttr('{}.{}'.format(self.name, attribute_name), keyable=keyable, channelBox=not keyable)
+        cmds.setAttr(f'{self.name}.{attribute_name}', keyable=keyable, channelBox=not keyable)
 
 
     def set_default_value(self, attr, value):
-        cmds.addAttr('{}.{}'.format(self.name, attr), edit=True, defaultValue=value)
-        cmds.setAttr('{}.{}'.format(self.name, attr), value)
+        cmds.addAttr(f'{self.name}.{attr}', edit=True, defaultValue=value)
+        cmds.setAttr(f'{self.name}.{attr}', value)
 
 
     # ---------- Add attributes Methods ----------
@@ -144,10 +144,10 @@ class Helper(object):
             str: name of the attribute
         """
         if self.check_attribute_exists(attribute_name):
-            logging.info('{}.{} already exists.'.format(self.name, attribute_name))
+            logging.info(f'{self.name}.{attribute_name} already exists.')
         else:
             cmds.addAttr(self.name, longName=attribute_name, **kwargs)
-            cmds.setAttr('{}.{}'.format(self.name, attribute_name), keyable=keyable, channelBox=not keyable)
+            cmds.setAttr(f'{self.name}.{attribute_name}', keyable=keyable, channelBox=not keyable)
 
         return attribute_name
 
@@ -272,7 +272,7 @@ class Helper(object):
             str: name of the attribute
         """
         self.add_attribute(attribute_name, dataType='string')
-        cmds.setAttr('{}.{}'.format(self.name, attribute_name), text, type='string')
+        cmds.setAttr(f'{self.name}.{attribute_name}', text, type='string')
         return attribute_name
 
 

@@ -37,7 +37,7 @@ class Helper(node_lib.Helper, attribute_lib.Helper):
         Check if the usage is valid
         """
         if self.get_usage() not in usage_lib.control_valid_usages:
-            logging.info('this control has not a valid usage, use "{}".'.format(usage_lib.control_valid_usages))
+            logging.info(f'this control has not a valid usage, use "{usage_lib.control_valid_usages}".')
 
 
     # ---------- Get and Set Methods ----------
@@ -105,7 +105,7 @@ class Helper(node_lib.Helper, attribute_lib.Helper):
         """
         # Check if the control already exists
         if cmds.objExists(self.name):
-            cmds.error('the {} already exists in the scene'.format(self.name))
+            cmds.error(f'the {self.name} already exists in the scene')
 
         # Create control as joint or transform
         ctr_type = 'joint' if as_joint else 'transform'
@@ -116,7 +116,7 @@ class Helper(node_lib.Helper, attribute_lib.Helper):
         ctr_ah.lock_and_hide_attribute('visibility')
 
         if ctr_type == 'joint':
-            cmds.setAttr('{}.drawStyle'.format(self.name), 2)
+            cmds.setAttr(f'{self.name}.drawStyle', 2)
             ctr_ah.lock_and_hide_attribute('radius')
 
         # Checks

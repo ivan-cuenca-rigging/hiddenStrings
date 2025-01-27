@@ -3,6 +3,7 @@ import inspect
 
 
 # Usages
+module = 'module'
 inputs = 'inputs'
 outputs = 'outputs'
 controls = 'controls'
@@ -119,4 +120,4 @@ def get_usage_capitalize(usage):
     Returns:
         str: usage capitalized
     """
-    return '{}{}'.format(usage[0].upper(), usage[1:])
+    return f'{usage[0].upper()}{usage[1:]}'

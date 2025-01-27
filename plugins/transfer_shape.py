@@ -233,8 +233,8 @@ class PluginCommand(OpenMaya.MPxCommand):
             object_space = True
 
         # Get lattice points positions
-        source_point_list = cmds.ls('{}.cv[*][*]'.format(self.source), flatten=True)
-        target_point_list = cmds.ls('{}.cv[*][*]'.format(self.target), flatten=True)
+        source_point_list = cmds.ls(f'{self.source}.cv[*][*]', flatten=True)
+        target_point_list = cmds.ls(f'{self.target}.cv[*][*]', flatten=True)
 
         if not source_points:
             source_points = dict()
@@ -253,7 +253,7 @@ class PluginCommand(OpenMaya.MPxCommand):
                                                             translation=True)
         # Set nurbs points positions
         for key, value in source_points.items():
-            cmds.xform('{}.{}'.format(self.target, key),
+            cmds.xform(f'{self.target}.{key}',
                     worldSpace=world_space, objectSpace=object_space, translation=value)
 
     def transfer_curve_shape(self, source_points=None):
@@ -272,8 +272,8 @@ class PluginCommand(OpenMaya.MPxCommand):
             object_space = True
 
         # Get lattice points positions
-        source_point_list = cmds.ls('{}.cv[*]'.format(self.source), flatten=True)
-        target_point_list = cmds.ls('{}.cv[*]'.format(self.target), flatten=True)
+        source_point_list = cmds.ls(f'{self.source}.cv[*]', flatten=True)
+        target_point_list = cmds.ls(f'{self.target}.cv[*]', flatten=True)
 
         if not source_points:
             source_points = dict()
@@ -292,7 +292,7 @@ class PluginCommand(OpenMaya.MPxCommand):
                                                             translation=True)
         # Set curve points positions
         for key, value in source_points.items():
-            cmds.xform('{}.{}'.format(self.target, key),
+            cmds.xform(f'{self.target}.{key}',
                     worldSpace=world_space, objectSpace=object_space, translation=value)
 
     def transfer_lattice_shape(self, source_points=None):
@@ -310,8 +310,8 @@ class PluginCommand(OpenMaya.MPxCommand):
             object_space = True
 
         # Get lattice points positions
-        source_point_list = cmds.ls('{}.pt[*][*][*]'.format(self.source), flatten=True)
-        target_point_list = cmds.ls('{}.pt[*][*][*]'.format(self.target), flatten=True)
+        source_point_list = cmds.ls(f'{self.source}.pt[*][*][*]', flatten=True)
+        target_point_list = cmds.ls(f'{self.target}.pt[*][*][*]', flatten=True)
 
         if not source_points:
             source_points = dict()
@@ -330,7 +330,7 @@ class PluginCommand(OpenMaya.MPxCommand):
                                                             translation=True)
         # Set lattices points positions
         for key, value in source_points.items():
-            cmds.xform('{}.{}'.format(self.target, key),
+            cmds.xform(f'{self.target}.{key}',
                     worldSpace=world_space, objectSpace=object_space, translation=value)
 
     @staticmethod
@@ -401,7 +401,7 @@ def initializePlugin(plugin):
     try:
         m_plugin.registerCommand(command_name, command_creator, syntax_creator)
     except:  # noqa: E722
-        sys.stderr.write('Failed to register command: {}'.format(command_name))
+        sys.stderr.write(f'Failed to register command: {command_name}')
 
 
 def uninitializePlugin(plugin):
@@ -412,4 +412,4 @@ def uninitializePlugin(plugin):
     try:
         m_plugin.deregisterCommand(command_name)
     except:  # noqa: E722
-        sys.stderr.write('Failed to de-register command: {}'.format(command_name))
+        sys.stderr.write(f'Failed to de-register command: {command_name}')

@@ -30,17 +30,17 @@ def copy_bifrost_compound(source_file, destination_dir, force=True):
     destination_file = r'{}/{}'.format(destination_dir, source_file)
 
     if not os.path.exists(destination_dir):
-        logging.info('could not create {}, please create the folder.'.format(destination_dir))
+        logging.info(f'could not create {destination_dir}, please create the folder.')
 
     else:
         if not os.path.exists(destination_file):
             shutil.copy(source_file, destination_dir)
-            logging.info('{} copied to {}.'.format(source_file, destination_file))
+            logging.info(f'{source_file} copied to {destination_file}.')
 
         else:
             if force:
                 shutil.copy(source_file, destination_dir)
-                logging.info('{} copied to {}.'.format(source_file, destination_file))
+                logging.info(f'{source_file} copied to {destination_file}.')
 
 
 def copy_bifrost_compounds(source_dir, destination_dir, force=True):
@@ -55,7 +55,7 @@ def copy_bifrost_compounds(source_dir, destination_dir, force=True):
     compound_file_list = [x for x in os.listdir(source_dir) if x.endswith('.json')]
 
     if not os.path.exists(destination_dir):
-        logging.info('could not create {}, please create the folder.'.format(destination_dir))
+        logging.info(f'could not create {destination_dir}, please create the folder.')
 
     else:
         for compound_file in compound_file_list:
@@ -64,12 +64,12 @@ def copy_bifrost_compounds(source_dir, destination_dir, force=True):
 
             if not os.path.exists(destination_file):
                 shutil.copy(source_file, destination_dir)
-                logging.info('{} copied to {}.'.format(source_file, destination_file))
+                logging.info(f'{source_file} copied to {destination_file}.')
 
             else:
                 if force:
                     shutil.copy(source_file, destination_dir)
-                    logging.info('{} copied to {}.'.format(source_file, destination_file))
+                    logging.info(f'{source_file} copied to {destination_file}.')
 
 
 def import_compound(compound_namespace, compound_name):
@@ -83,4 +83,4 @@ def import_compound(compound_namespace, compound_name):
     Returns:
         str: name of the bifrost node imported
     """
-    return mel.eval('bifrostGraph -importGraphAsShape "{}::{}"'.format(compound_namespace, compound_name))
+    return mel.eval(f'bifrostGraph -importGraphAsShape "{compound_namespace}::{compound_name}"')

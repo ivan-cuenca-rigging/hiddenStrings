@@ -19,22 +19,22 @@ def set_labels():
     for jnt in joint_list:
         if len(jnt.split('_')) == 3:
             desc, side, usage = jnt.split('_')
-            usage_capitalize = '{}{}'.format(usage[0].upper(), usage[1:])
+            usage_capitalize = f'{usage[0].upper()}{usage[1:]}'
 
             if side == side_lib.center:
-                cmds.setAttr('{}.side'.format(jnt), 0)
+                cmds.setAttr(f'{jnt}.side', 0)
             if side == side_lib.left:
-                cmds.setAttr('{}.side'.format(jnt), 1)
+                cmds.setAttr(f'{jnt}.side', 1)
             if side == side_lib.right:
-                cmds.setAttr('{}.side'.format(jnt), 2)
+                cmds.setAttr(f'{jnt}.side', 2)
 
-            cmds.setAttr('{}.type'.format(jnt), 18)
-            cmds.setAttr('{}.otherType'.format(jnt), '{}{}'.format(desc, usage_capitalize), type='string')
+            cmds.setAttr(f'{jnt}.type', 18)
+            cmds.setAttr(f'{jnt}.otherType', f'{desc}{usage_capitalize}', type='string')
 
             logging.info('labels has been set.')
         else:
-            cmds.setAttr('{}.type'.format(jnt), 18)
-            cmds.setAttr('{}.otherType'.format(jnt), jnt, type='string')
+            cmds.setAttr(f'{jnt}.type', 18)
+            cmds.setAttr(f'{jnt}.otherType', jnt, type='string')
             logging.info('{} has an incorrect name, should be renamed with the following pattern:'
                          ' descriptor_side_usage.'.format(jnt))
 
@@ -46,7 +46,7 @@ def set_skin_pose(*args):
     """
     skin_pose_attr = 'skinPoseData'
 
-    control_list = cmds.ls('*_{}'.format(usage_lib.control))
+    control_list = cmds.ls(f'*_{usage_lib.control}')
 
     for ctr in control_list:
         user_attrs = cmds.listAttr(ctr, userDefined=True)
@@ -54,7 +54,7 @@ def set_skin_pose(*args):
             for user_attr in cmds.listAttr(ctr, userDefined=True):
                 try:
                     user_attr_dv = cmds.attributeQuery(user_attr, node=ctr, listDefault=True)[0]
-                    cmds.setAttr('{}.{}'.format(ctr, user_attr), user_attr_dv)
+                    cmds.setAttr(f'{ctr}.{user_attr}', user_attr_dv)
                 except:
                     pass
 
@@ -62,12 +62,12 @@ def set_skin_pose(*args):
             for axis in 'xyz':
                 attr_value = 1 if attr == 's' else 0
                 try:
-                    cmds.setAttr('{}.{}{}'.format(ctr, attr, axis), attr_value)
+                    cmds.setAttr(f'{ctr}.{attr}{axis}', attr_value)
                 except:
                     pass
 
         if cmds.attributeQuery(skin_pose_attr, node=ctr, exists=True):
-            skin_pose_data = cmds.getAttr('{}.{}'.format(ctr, skin_pose_attr))
+            skin_pose_data = cmds.getAttr(f'{ctr}.{skin_pose_attr}')
             skin_pose_data = skin_pose_data.split('[')[-1].split(']')[0].split(',')
             skin_pose_data = [float(x) for x in skin_pose_data]
 
@@ -87,7 +87,7 @@ def format_skin_cluster_name(node,
         str: skinCluster name
     """
     if len(node.split('_')) != 3:
-        return '{}{}_{}'.format(node, str(skin_index).zfill(1), usage_lib.skin_cluster)
+        return f'{node}{str(skin_index).zfill(1)}_{usage_lib.skin_cluster}'
     else:
         descriptor, side, usage = node.split('_')
         return '{}{}{}_{}_{}'.format(descriptor, usage.capitalize(), str(skin_index).zfill(1),
@@ -146,13 +146,13 @@ def create_skin_cluster(node,
     if prebinds:
         for prebind in prebinds:
             if not cmds.objExists(prebind):
-                logging.error('{} does not exists in the scene'.format(prebind))
+                logging.error(f'{prebind} does not exists in the scene')
 
     if deformer_list:
         node_shape = cmds.listRelatives(node, shapes=True, noIntermediate=True)[0]
 
         output_geometry_connection = [x for x in cmds.listConnections(
-            '{}'.format(node_shape), plugs=True) if 'outputGeometry' in x][0]
+            f'{node_shape}', plugs=True) if 'outputGeometry' in x][0]
 
 
         node_connection = cmds.listConnections(output_geometry_connection, plugs=True)[0]
@@ -175,11 +175,11 @@ def create_skin_cluster(node,
 
         # Connect new skin between last deform and node
         cmds.connectAttr(original_geometry_connection,
-                            '{}.originalGeometry[0]'.format(skin_cluster), force=True)
+                            f'{skin_cluster}.originalGeometry[0]', force=True)
         cmds.connectAttr(output_geometry_connection,
-                            '{}.input[0].inputGeometry'.format(skin_cluster), force=True)
+                            f'{skin_cluster}.input[0].inputGeometry', force=True)
 
-        cmds.connectAttr('{}.outputGeometry[0]'.format(skin_cluster), node_connection, force=True)
+        cmds.connectAttr(f'{skin_cluster}.outputGeometry[0]', node_connection, force=True)
 
         cmds.delete(node_dup)
 
@@ -205,12 +205,12 @@ def create_skin_cluster(node,
                             name='{}{}_{}_{}'.format(descriptor,
                                                      usage_lib.get_usage_capitalize(usage_lib.prebind),
                                                      side, usage_lib.inverse_matrix))
-                        cmds.connectAttr(prebind, '{}.inputMatrix'.format(inverse_matrix))
-                        cmds.connectAttr('{}.outputMatrix'.format(inverse_matrix),
-                                        '{}.bindPreMatrix[{}]'.format(skin_cluster, index))
+                        cmds.connectAttr(prebind, f'{inverse_matrix}.inputMatrix')
+                        cmds.connectAttr(f'{inverse_matrix}.outputMatrix',
+                                        f'{skin_cluster}.bindPreMatrix[{index}]')
                 else:
-                    cmds.connectAttr('{}.worldInverseMatrix'.format(prebind),
-                                    '{}.bindPreMatrix[{}]'.format(skin_cluster, index))
+                    cmds.connectAttr(f'{prebind}.worldInverseMatrix',
+                                    f'{skin_cluster}.bindPreMatrix[{index}]')
 
     return skin_cluster
 
@@ -269,7 +269,7 @@ def transfer_skin(source, target, source_skin_index=1, target_skin_index=1, surf
     # Get source skin cluster and source skin joints
     source_skin_cluster = get_skin_cluster_index(node=source, index=source_skin_index)
     if not source_skin_cluster:
-        cmds.error('{} skinCluster index {} does not exists'.format(source, source_skin_index))
+        cmds.error(f'{source} skinCluster index {source_skin_index} does not exists')
     source_skin_joints = cmds.skinCluster(source_skin_cluster, query=True, influence=True)
 
     # Get target skin cluster if it exists
@@ -306,12 +306,12 @@ def add_joint_to_skin_cluster(joint_name, skin_cluster_name, prebind_name=None):
     """
     # Checks
     if not cmds.objExists(joint_name):
-        logging.error('{} does not exists in the scene'.format(joint_name))
+        logging.error(f'{joint_name} does not exists in the scene')
     if not cmds.objExists(skin_cluster_name):
-        logging.error('{} does not exists in the scene'.format(skin_cluster_name))
+        logging.error(f'{skin_cluster_name} does not exists in the scene')
     if prebind_name:
         if not cmds.objExists(prebind_name):
-            logging.error('{} does not exists in the scene'.format(prebind_name))
+            logging.error(f'{prebind_name} does not exists in the scene')
 
     # Create a tmp skin to create some attributes in the joint
     cube_temp = cmds.polyCube()[0]
@@ -325,15 +325,15 @@ def add_joint_to_skin_cluster(joint_name, skin_cluster_name, prebind_name=None):
     cmds.delete(cube_temp)
     
     # Get next joint skin index for the skinCluster connections
-    joint_index = str(len(cmds.listConnections('{}.matrix'.format(skin_cluster_name))))
+    joint_index = str(len(cmds.listConnections(f'{skin_cluster_name}.matrix')))
 
     # Create connections
-    cmds.connectAttr('{}.worldMatrix[0]'.format(joint_name),
-                     '{}.matrix[{}]'.format(skin_cluster_name, joint_index))
-    cmds.connectAttr('{}.lockInfluenceWeights'.format(joint_name),
-                     '{}.lockWeights[{}]'.format(skin_cluster_name, joint_index))
-    cmds.connectAttr('{}.objectColorRGB'.format(joint_name),
-                     '{}.influenceColor[{}]'.format(skin_cluster_name, joint_index))
+    cmds.connectAttr(f'{joint_name}.worldMatrix[0]',
+                     f'{skin_cluster_name}.matrix[{joint_index}]')
+    cmds.connectAttr(f'{joint_name}.lockInfluenceWeights',
+                     f'{skin_cluster_name}.lockWeights[{joint_index}]')
+    cmds.connectAttr(f'{joint_name}.objectColorRGB',
+                     f'{skin_cluster_name}.influenceColor[{joint_index}]')
 
     # If prebind exists then connect it, else set to its default value
     if prebind_name:
@@ -343,13 +343,13 @@ def add_joint_to_skin_cluster(joint_name, skin_cluster_name, prebind_name=None):
                 'inverseMatrix', 
                 name='{}{}_{}_{}'.format(descriptor, usage_lib.get_usage_capitalize(usage_lib.prebind),
                                          side, usage_lib.inverse_matrix))
-            cmds.connectAttr(prebind_name, '{}.inputMatrix'.format(inverse_matrix))
-            cmds.connectAttr('{}.outputMatrix'.format(inverse_matrix), 
-                             '{}.bindPreMatrix[{}]'.format(skin_cluster_name, joint_index))
+            cmds.connectAttr(prebind_name, f'{inverse_matrix}.inputMatrix')
+            cmds.connectAttr(f'{inverse_matrix}.outputMatrix', 
+                             f'{skin_cluster_name}.bindPreMatrix[{joint_index}]')
         else:
-            cmds.connectAttr('{}.worldInverseMatrix'.format(prebind_name),
-                            '{}.bindPreMatrix[{}]'.format(skin_cluster_name, joint_index))
+            cmds.connectAttr(f'{prebind_name}.worldInverseMatrix',
+                            f'{skin_cluster_name}.bindPreMatrix[{joint_index}]')
     else:
-        cmds.setAttr('{}.bindPreMatrix[{}]'.format(skin_cluster_name, joint_index),
-                     cmds.getAttr('{}.worldInverseMatrix'.format(joint_name)),
+        cmds.setAttr(f'{skin_cluster_name}.bindPreMatrix[{joint_index}]',
+                     cmds.getAttr(f'{joint_name}.worldInverseMatrix'),
                      type='matrix')

@@ -29,11 +29,11 @@ def create_nurbs_from_points(descriptor,
 
     crv_0 = cmds.curve(p=positions, degree=3)
     crv_1 = cmds.curve(p=positions, degree=3)
-    cmds.setAttr('{}.translate{}'.format(crv_0, axis.upper()), -width/2)
-    cmds.setAttr('{}.translate{}'.format(crv_1, axis.upper()), width/2)
+    cmds.setAttr(f'{crv_0}.translate{axis.upper()}', -width/2)
+    cmds.setAttr(f'{crv_1}.translate{axis.upper()}', width/2)
 
     nurbs_transform = cmds.loft(crv_0, crv_1, degree=3, constructionHistory=False)
-    nurbs_transform = cmds.rename(nurbs_transform, '{}_{}_{}'.format(descriptor, side, usage_lib.nurbs))
+    nurbs_transform = cmds.rename(nurbs_transform, f'{descriptor}_{side}_{usage_lib.nurbs}')
 
     cmds.delete(crv_0, crv_1)
 
@@ -65,9 +65,9 @@ def get_param_along_x(nurbs):
         str: 'U' or 'V', depending on which axis affects X.
     """
     # Key CV points in U and V:
-    cv_u0_v0 = cmds.xform('{}.cv[0][0]'.format(nurbs), q=True, ws=True, t=True)  # U=0, V=0
-    cv_u1_v0 = cmds.xform('{}.cv[1][0]'.format(nurbs), q=True, ws=True, t=True)  # U=1, V=0
-    cv_u0_v1 = cmds.xform('{}.cv[0][1]'.format(nurbs), q=True, ws=True, t=True)  # U=0, V=1
+    cv_u0_v0 = cmds.xform(f'{nurbs}.cv[0][0]', q=True, ws=True, t=True)  # U=0, V=0
+    cv_u1_v0 = cmds.xform(f'{nurbs}.cv[1][0]', q=True, ws=True, t=True)  # U=1, V=0
+    cv_u0_v1 = cmds.xform(f'{nurbs}.cv[0][1]', q=True, ws=True, t=True)  # U=0, V=1
 
     # Changes on the X axis:
     delta_u_x = abs(cv_u1_v0[0] - cv_u0_v0[0])  # Change in X along U

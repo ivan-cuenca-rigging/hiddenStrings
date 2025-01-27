@@ -111,11 +111,11 @@ class ConnectTranslateWindow(window_lib.Helper):
         translate_z = cmds.checkBoxGrp(self.translate_axis, query=True, value3=True, enable=True)
 
         if translate or translate_x:
-            cmds.connectAttr('{}.translateX'.format(sel[0]), '{}.translateX'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.translateX', f'{sel[1]}.translateX', force=True)
         if translate or translate_y:
-                cmds.connectAttr('{}.translateY'.format(sel[0]), '{}.translateY'.format(sel[1]), force=True)
+                cmds.connectAttr(f'{sel[0]}.translateY', f'{sel[1]}.translateY', force=True)
         if translate or translate_z:
-                cmds.connectAttr('{}.translateZ'.format(sel[0]), '{}.translateZ'.format(sel[1]), force=True)
+                cmds.connectAttr(f'{sel[0]}.translateZ', f'{sel[1]}.translateZ', force=True)
 
 
     def set_translate_axis_enable(self, *args):
@@ -175,11 +175,11 @@ class ConnectRotateWindow(window_lib.Helper):
         rotate_z = cmds.checkBoxGrp(self.rotate_axis, query=True, value3=True, enable=True)
 
         if rotate or rotate_x:
-            cmds.connectAttr('{}.rotateX'.format(sel[0]), '{}.rotateX'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.rotateX', f'{sel[1]}.rotateX', force=True)
         if rotate or  rotate_y:
-            cmds.connectAttr('{}.rotateY'.format(sel[0]), '{}.rotateY'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.rotateY', f'{sel[1]}.rotateY', force=True)
         if rotate or  rotate_z:
-            cmds.connectAttr('{}.rotateZ'.format(sel[0]), '{}.rotateZ'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.rotateZ', f'{sel[1]}.rotateZ', force=True)
 
 
     def set_rotate_axis_enable(self, *args):
@@ -238,11 +238,11 @@ class ConnectScaleWindow(window_lib.Helper):
         scale_y = cmds.checkBoxGrp(self.scale_axis, query=True, value2=True, enable=True)
         scale_z = cmds.checkBoxGrp(self.scale_axis, query=True, value3=True, enable=True)
         if scale or scale_x:
-            cmds.connectAttr('{}.scaleX'.format(sel[0]), '{}.scaleX'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.scaleX', f'{sel[1]}.scaleX', force=True)
         if scale or scale_y:
-            cmds.connectAttr('{}.scaleY'.format(sel[0]), '{}.scaleY'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.scaleY', f'{sel[1]}.scaleY', force=True)
         if scale or scale_z:
-            cmds.connectAttr('{}.scaleZ'.format(sel[0]), '{}.scaleZ'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.scaleZ', f'{sel[1]}.scaleZ', force=True)
 
 
     def set_scale_axis_enable(self, *args):
@@ -321,11 +321,11 @@ class ConnectTranslateRotateScaleWindow(window_lib.Helper):
         translate_z = cmds.checkBoxGrp(self.translate_axis, query=True, value3=True, enable=True)
 
         if translate or translate_x:
-            cmds.connectAttr('{}.translateX'.format(sel[0]), '{}.translateX'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.translateX', f'{sel[1]}.translateX', force=True)
         if translate or translate_y:
-            cmds.connectAttr('{}.translateY'.format(sel[0]), '{}.translateY'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.translateY', f'{sel[1]}.translateY', force=True)
         if translate or translate_z:
-            cmds.connectAttr('{}.translateZ'.format(sel[0]), '{}.translateZ'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.translateZ', f'{sel[1]}.translateZ', force=True)
 
         rotate = cmds.checkBoxGrp(self.rotate, query=True, value1=True)
         rotate_x = cmds.checkBoxGrp(self.rotate_axis, query=True, value1=True, enable=True)
@@ -333,11 +333,11 @@ class ConnectTranslateRotateScaleWindow(window_lib.Helper):
         rotate_z = cmds.checkBoxGrp(self.rotate_axis, query=True, value3=True, enable=True)
 
         if rotate or rotate_x:
-            cmds.connectAttr('{}.rotateX'.format(sel[0]), '{}.rotateX'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.rotateX', f'{sel[1]}.rotateX', force=True)
         if rotate or rotate_y:
-            cmds.connectAttr('{}.rotateY'.format(sel[0]), '{}.rotateY'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.rotateY', f'{sel[1]}.rotateY', force=True)
         if rotate or rotate_z:
-            cmds.connectAttr('{}.rotateZ'.format(sel[0]), '{}.rotateZ'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.rotateZ', f'{sel[1]}.rotateZ', force=True)
 
         scale = cmds.checkBoxGrp(self.scale, query=True, value1=True)
         scale_x = cmds.checkBoxGrp(self.scale_axis, query=True, value1=True, enable=True)
@@ -345,11 +345,11 @@ class ConnectTranslateRotateScaleWindow(window_lib.Helper):
         scale_z = cmds.checkBoxGrp(self.scale_axis, query=True, value3=True, enable=True)
 
         if scale or scale_x:
-            cmds.connectAttr('{}.scaleX'.format(sel[0]), '{}.scaleX'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.scaleX', f'{sel[1]}.scaleX', force=True)
         if scale or scale_y:
-            cmds.connectAttr('{}.scaleY'.format(sel[0]), '{}.scaleY'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.scaleY', f'{sel[1]}.scaleY', force=True)
         if scale or scale_z:
-            cmds.connectAttr('{}.scaleZ'.format(sel[0]), '{}.scaleZ'.format(sel[1]), force=True)
+            cmds.connectAttr(f'{sel[0]}.scaleZ', f'{sel[1]}.scaleZ', force=True)
 
 
     def set_translate_axis_enable(self, *args):
@@ -480,7 +480,7 @@ class ExportNodesAndConnectionsWindow(window_lib.Helper):
         self.export_edges = cmds.checkBoxGrp(label='Export edges: ', value1=False)
         self.export_connections = cmds.checkBoxGrp(label='Export connections: ', value1=True)
 
-        export_path = '{}/connections'.format(os.path.dirname(cmds.file(query=True, sceneName=True)))
+        export_path = f'{os.path.dirname(cmds.file(query=True, sceneName=True))}/connections'
         self.export_path = cmds.textFieldGrp(label='Path: ', text=export_path)
 
         self.file_search = cmds.iconTextButton(style='iconOnly', image1='folder-closed.png',
@@ -562,7 +562,7 @@ class ImportNodesAndConnectionsWindow(window_lib.Helper):
 
         self.replace_with = cmds.textFieldGrp(label='Replace with: ')
 
-        import_path = '{}/connections'.format(os.path.dirname(cmds.file(query=True, sceneName=True)))
+        import_path = f'{os.path.dirname(cmds.file(query=True, sceneName=True))}/connections'
         self.import_path = cmds.textFieldGrp(label='Path: ', text=import_path)
 
         self.file_search = cmds.iconTextButton(style='iconOnly', image1='folder-closed.png',

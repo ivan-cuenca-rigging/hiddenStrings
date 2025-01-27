@@ -142,7 +142,7 @@ def load_plugins():
         if not cmds.pluginInfo(plugin_name, query=True, loaded=True):
             cmds.loadPlugin(r'{}/{}'.format(plugins_path, plugin_name))
         else:
-            logging.warning('{} is already loaded'.format(plugin_name))
+            logging.warning(f'{plugin_name} is already loaded')
 
 
 def unload_plugins():
@@ -157,4 +157,4 @@ def unload_plugins():
         if cmds.pluginInfo(plugin_name, query=True, loaded=True):
             cmds.unloadPlugin(plugin_name)
         else:
-            logging.warning('{} is not loaded'.format(plugin_name))
+            logging.warning(f'{plugin_name} is not loaded')

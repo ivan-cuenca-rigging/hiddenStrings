@@ -20,7 +20,7 @@ def connect_3_axis(driver, driven, attr):
         attr (str): name of the attribute
     """
     for axis in ['X', 'Y', 'Z']:
-        cmds.connectAttr('{}.{}{}'.format(driver, attr, axis), '{}.{}{}'.format(driven, attr, axis), force=True)
+        cmds.connectAttr(f'{driver}.{attr}{axis}', f'{driven}.{attr}{axis}', force=True)
 
 
 def connect_translate(driver, driven):
@@ -81,7 +81,7 @@ def format_constraint_name(driven, usage):
         str: constraint name format
     """
     node_desc, node_side, node_usage = driven.split('_')
-    return '{}{}_{}_{}'.format(node_desc, node_usage.capitalize(), node_side, usage)
+    return f'{node_desc}{node_usage.capitalize()}_{node_side}_{usage}'
 
 
 def create_parent_constraint(driver, driven, *args, **kwargs):
@@ -201,7 +201,7 @@ def create_pole_with_matrices(driver, driven, start_joint):
         start_joint (str): name of the start joint
     """
     start_descriptor, start_side, start_usage = start_joint.split('_')
-    start_usage_capitalize = '{}{}'.format(start_usage[0].upper(), start_usage[1:])
+    start_usage_capitalize = f'{start_usage[0].upper()}{start_usage[1:]}'
 
     driver_descriptor, driver_side, driver_usage = driver.split('_')
 
@@ -210,42 +210,42 @@ def create_pole_with_matrices(driver, driven, start_joint):
                                                                                        start_side,
                                                                                        usage_lib.point_matrix_mult))
 
-    cmds.connectAttr('{}.parentMatrix'.format(start_joint), '{}.inMatrix'.format(start_point_mat_mult))
-    cmds.connectAttr('{}.translate'.format(start_joint), '{}.inPoint'.format(start_point_mat_mult))
+    cmds.connectAttr(f'{start_joint}.parentMatrix', f'{start_point_mat_mult}.inMatrix')
+    cmds.connectAttr(f'{start_joint}.translate', f'{start_point_mat_mult}.inPoint')
 
     start_point_compose = cmds.createNode('composeMatrix', name='{}{}_{}_{}'.format(start_descriptor,
                                                                                     start_usage_capitalize,
                                                                                     start_side,
                                                                                     usage_lib.compose_matrix))
 
-    cmds.connectAttr('{}.output'.format(start_point_mat_mult), '{}.inputTranslate'.format(start_point_compose))
+    cmds.connectAttr(f'{start_point_mat_mult}.output', f'{start_point_compose}.inputTranslate')
 
     start_point_inverse_matrix = cmds.createNode('inverseMatrix', name='{}{}_{}_{}'.format(start_descriptor,
                                                                                            start_usage_capitalize,
                                                                                            start_side,
                                                                                            usage_lib.inverse_matrix))
 
-    cmds.connectAttr('{}.outputMatrix'.format(start_point_compose),
-                     '{}.inputMatrix'.format(start_point_inverse_matrix))
+    cmds.connectAttr(f'{start_point_compose}.outputMatrix',
+                     f'{start_point_inverse_matrix}.inputMatrix')
 
     pole_vector_mult_mat = cmds.createNode('multMatrix', name='{}_{}_{}'.format(driver_descriptor,
                                                                                 driver_side,
                                                                                 usage_lib.mult_matrix))
 
-    cmds.connectAttr('{}.worldMatrix'.format(driver), '{}.matrixIn[0]'.format(pole_vector_mult_mat))
+    cmds.connectAttr(f'{driver}.worldMatrix', f'{pole_vector_mult_mat}.matrixIn[0]')
 
-    cmds.connectAttr('{}.outputMatrix'.format(start_point_inverse_matrix),
-                     '{}.matrixIn[1]'.format(pole_vector_mult_mat))
+    cmds.connectAttr(f'{start_point_inverse_matrix}.outputMatrix',
+                     f'{pole_vector_mult_mat}.matrixIn[1]')
 
     pole_vector_decompose = cmds.createNode('decomposeMatrix', name='{}_{}_{}'.format(driver_descriptor,
                                                                                       driver_side,
                                                                                       usage_lib.decompose_matrix))
 
-    cmds.connectAttr('{}.matrixSum'.format(pole_vector_mult_mat),
-                     '{}.inputMatrix'.format(pole_vector_decompose))
+    cmds.connectAttr(f'{pole_vector_mult_mat}.matrixSum',
+                     f'{pole_vector_decompose}.inputMatrix')
 
-    cmds.connectAttr('{}.outputTranslate'.format(pole_vector_decompose),
-                     '{}.poleVector'.format(driven))
+    cmds.connectAttr(f'{pole_vector_decompose}.outputTranslate',
+                     f'{driven}.poleVector')
 
 
 def create_aim_matrix(input_matrix, 
@@ -269,20 +269,20 @@ def create_aim_matrix(input_matrix,
     aim_mat = cmds.createNode('aimMatrix', name='{}{}_{}_{}'.format(desc, usage.capitalize(), 
                                                                     side, usage_lib.aim_matrix))
     
-    cmds.connectAttr(input_matrix, '{}.inputMatrix'.format(aim_mat))
+    cmds.connectAttr(input_matrix, f'{aim_mat}.inputMatrix')
     
-    cmds.connectAttr(primary_target_matrix, '{}.primaryTargetMatrix'.format(aim_mat))
-    cmds.setAttr('{}.primaryInputAxisX'.format(aim_mat), primary_input_axis[0])
-    cmds.setAttr('{}.primaryInputAxisY'.format(aim_mat), primary_input_axis[1])
-    cmds.setAttr('{}.primaryInputAxisZ'.format(aim_mat), primary_input_axis[2])
+    cmds.connectAttr(primary_target_matrix, f'{aim_mat}.primaryTargetMatrix')
+    cmds.setAttr(f'{aim_mat}.primaryInputAxisX', primary_input_axis[0])
+    cmds.setAttr(f'{aim_mat}.primaryInputAxisY', primary_input_axis[1])
+    cmds.setAttr(f'{aim_mat}.primaryInputAxisZ', primary_input_axis[2])
 
     if secondary_target_matrix:
-        cmds.connectAttr(secondary_target_matrix, '{}.secondaryTargetMatrix'.format(aim_mat))
-    cmds.setAttr('{}.secondaryInputAxisX'.format(aim_mat), secondary_input_axis[0])
-    cmds.setAttr('{}.secondaryInputAxisY'.format(aim_mat), secondary_input_axis[1])
-    cmds.setAttr('{}.secondaryInputAxisZ'.format(aim_mat), secondary_input_axis[2])
+        cmds.connectAttr(secondary_target_matrix, f'{aim_mat}.secondaryTargetMatrix')
+    cmds.setAttr(f'{aim_mat}.secondaryInputAxisX', secondary_input_axis[0])
+    cmds.setAttr(f'{aim_mat}.secondaryInputAxisY', secondary_input_axis[1])
+    cmds.setAttr(f'{aim_mat}.secondaryInputAxisZ', secondary_input_axis[2])
 
-    cmds.connectAttr('{}.outputMatrix'.format(aim_mat), driven, force=True)
+    cmds.connectAttr(f'{aim_mat}.outputMatrix', driven, force=True)
 
 
 def connect_offset_parent_matrix(driver, driven,
@@ -316,42 +316,42 @@ def connect_offset_parent_matrix(driver, driven,
 
     # Logic
     mult_matrix = cmds.createNode('multMatrix',
-                              name='{}{}_{}_{}'.format(descriptor, usage.capitalize(), side, usage_lib.mult_matrix))
+                              name=f'{descriptor}{usage.capitalize()}_{side}_{usage_lib.mult_matrix}')
 
     if world:
-        driven_matrix = cmds.getAttr('{}.worldMatrix'.format(driven))
-        driver_inverse_matrix = cmds.getAttr('{}.worldInverseMatrix'.format(driver))
+        driven_matrix = cmds.getAttr(f'{driven}.worldMatrix')
+        driver_inverse_matrix = cmds.getAttr(f'{driver}.worldInverseMatrix')
         matrix_difference = math_lib.multiply_matrices_4_by_4(driven_matrix, driver_inverse_matrix)
-        cmds.setAttr('{}.matrixIn[0]'.format(mult_matrix), matrix_difference, type='matrix')
-        cmds.connectAttr('{}.worldMatrix'.format(driver), '{}.matrixIn[1]'.format(mult_matrix))
+        cmds.setAttr(f'{mult_matrix}.matrixIn[0]', matrix_difference, type='matrix')
+        cmds.connectAttr(f'{driver}.worldMatrix', f'{mult_matrix}.matrixIn[1]')
 
     else:
-        matrix_difference = cmds.getAttr('{}.worldMatrix'.format(driven))
-        cmds.connectAttr('{}.matrix'.format(driver), '{}.matrixIn[0]'.format(mult_matrix))
-        cmds.setAttr('{}.matrixIn[1]'.format(mult_matrix), matrix_difference, type='matrix')
+        matrix_difference = cmds.getAttr(f'{driven}.worldMatrix')
+        cmds.connectAttr(f'{driver}.matrix', f'{mult_matrix}.matrixIn[0]')
+        cmds.setAttr(f'{mult_matrix}.matrixIn[1]', matrix_difference, type='matrix')
 
     if translate and rotate and scale and shear:
-        cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.offsetParentMatrix'.format(driven))
+        cmds.connectAttr(f'{mult_matrix}.matrixSum', f'{driven}.offsetParentMatrix')
     else:
-        pick_mat = cmds.createNode('pickMatrix', name='{}_{}_{}'.format(descriptor, side, usage_lib.pick_matrix))
-        cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.inputMatrix'.format(pick_mat))
+        pick_mat = cmds.createNode('pickMatrix', name=f'{descriptor}_{side}_{usage_lib.pick_matrix}')
+        cmds.connectAttr(f'{mult_matrix}.matrixSum', f'{pick_mat}.inputMatrix')
 
         if not translate:
-            cmds.setAttr('{}.useTranslate'.format(pick_mat), 0)
+            cmds.setAttr(f'{pick_mat}.useTranslate', 0)
         if not rotate:
-            cmds.setAttr('{}.useRotate'.format(pick_mat), 0)
+            cmds.setAttr(f'{pick_mat}.useRotate', 0)
         if not scale:
-            cmds.setAttr('{}.useScale'.format(pick_mat), 0)
+            cmds.setAttr(f'{pick_mat}.useScale', 0)
         if not shear:
-            cmds.setAttr('{}.useShear'.format(pick_mat), 0)
+            cmds.setAttr(f'{pick_mat}.useShear', 0)
 
-        cmds.connectAttr('{}.outputMatrix'.format(pick_mat), '{}.offsetParentMatrix'.format(driven))
+        cmds.connectAttr(f'{pick_mat}.outputMatrix', f'{driven}.offsetParentMatrix')
 
     for attr in 'trs':
         value = 0 if attr != 's' else 1
         for axis in 'xyz':
-            if cmds.getAttr('{}.{}{}'.format(driven, attr, axis), settable=True):
-                cmds.setAttr('{}.{}{}'.format(driven, attr, axis), value)
+            if cmds.getAttr(f'{driven}.{attr}{axis}', settable=True):
+                cmds.setAttr(f'{driven}.{attr}{axis}', value)
     return mult_matrix
 
 
@@ -376,33 +376,33 @@ def connect_matrix_to_attribute(driver, driven_and_attr,
     if '_' in attr:
         side = attr.split('_')[1]
         attr = attr.split('_')[0] + attr.split('_')[1].capitalize() + attr.split('_')[2].capitalize()
-    attr_capitalize = '{}{}'.format(attr[0].upper(), attr[1:])
+    attr_capitalize = f'{attr[0].upper()}{attr[1:]}'
 
     mult_matrix = cmds.createNode('multMatrix', name='{}{}_{}_{}'.format(descriptor,
                                                                          attr_capitalize,
                                                                          side,
                                                                          usage_lib.mult_matrix))
     
-    cmds.setAttr('{}.matrixIn[0]'.format(mult_matrix), cmds.getAttr('{}.worldInverseMatrix'.format(driver)),
+    cmds.setAttr(f'{mult_matrix}.matrixIn[0]', cmds.getAttr(f'{driver}.worldInverseMatrix'),
                  type='matrix')
-    cmds.connectAttr('{}.worldMatrix'.format(driver), '{}.matrixIn[1]'.format(mult_matrix))
+    cmds.connectAttr(f'{driver}.worldMatrix', f'{mult_matrix}.matrixIn[1]')
 
     if translate and rotate and scale and shear:
-        cmds.connectAttr('{}.matrixSum'.format(mult_matrix), driven_and_attr)
+        cmds.connectAttr(f'{mult_matrix}.matrixSum', driven_and_attr)
     else:
-        pick_mat = cmds.createNode('pickMatrix', name='{}_{}_{}'.format(descriptor, side, usage_lib.pick_matrix))
-        cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.inputMatrix'.format(pick_mat))
+        pick_mat = cmds.createNode('pickMatrix', name=f'{descriptor}_{side}_{usage_lib.pick_matrix}')
+        cmds.connectAttr(f'{mult_matrix}.matrixSum', f'{pick_mat}.inputMatrix')
 
         if not translate:
-            cmds.setAttr('{}.useTranslate'.format(pick_mat), 0)
+            cmds.setAttr(f'{pick_mat}.useTranslate', 0)
         if not rotate:
-            cmds.setAttr('{}.useRotate'.format(pick_mat), 0)
+            cmds.setAttr(f'{pick_mat}.useRotate', 0)
         if not scale:
-            cmds.setAttr('{}.useScale'.format(pick_mat), 0)
+            cmds.setAttr(f'{pick_mat}.useScale', 0)
         if not shear:
-            cmds.setAttr('{}.useShear'.format(pick_mat), 0)
+            cmds.setAttr(f'{pick_mat}.useShear', 0)
 
-        cmds.connectAttr('{}.outputMatrix'.format(pick_mat), driven_and_attr)
+        cmds.connectAttr(f'{pick_mat}.outputMatrix', driven_and_attr)
 
 
 def connect_matrix_from_attribute(driver_and_attr, driven,
@@ -425,49 +425,49 @@ def connect_matrix_from_attribute(driver_and_attr, driven,
         str: mult_matrix
     """
     descriptor, side, usage = driven.split('_')
-    mult_matrix = '{}{}_{}_{}'.format(descriptor, usage.capitalize(), side, usage_lib.mult_matrix)
+    mult_matrix = f'{descriptor}{usage.capitalize()}_{side}_{usage_lib.mult_matrix}'
 
     if not cmds.objExists(mult_matrix):
         mult_matrix = cmds.createNode('multMatrix', name=mult_matrix)
 
     driver_inverse_matrix = cmds.createNode('inverseMatrix')
-    cmds.connectAttr(driver_and_attr, '{}.inputMatrix'.format(driver_inverse_matrix))
+    cmds.connectAttr(driver_and_attr, f'{driver_inverse_matrix}.inputMatrix')
     
     matrix_difference = math_lib.multiply_matrices_4_by_4(
-        matrix_a=cmds.getAttr('{}.worldMatrix'.format(driven)),
-        matrix_b=cmds.getAttr('{}.outputMatrix'.format(driver_inverse_matrix)))
+        matrix_a=cmds.getAttr(f'{driven}.worldMatrix'),
+        matrix_b=cmds.getAttr(f'{driver_inverse_matrix}.outputMatrix'))
 
-    cmds.setAttr('{}.matrixIn[0]'.format(mult_matrix), matrix_difference, type='matrix')
-    cmds.connectAttr(driver_and_attr, '{}.matrixIn[1]'.format(mult_matrix), force=True)
+    cmds.setAttr(f'{mult_matrix}.matrixIn[0]', matrix_difference, type='matrix')
+    cmds.connectAttr(driver_and_attr, f'{mult_matrix}.matrixIn[1]', force=True)
 
     cmds.delete(driver_inverse_matrix)
     
     if translate and rotate and scale and shear:
-        cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.offsetParentMatrix'.format(driven))
+        cmds.connectAttr(f'{mult_matrix}.matrixSum', f'{driven}.offsetParentMatrix')
     else:
         pick_mat = cmds.createNode('pickMatrix', 
                                    name='{}{}_{}_{}'.format(descriptor, 
                                                             usage_lib.get_usage_capitalize(usage=usage),
                                                             side, 
                                                             usage_lib.pick_matrix))
-        cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.inputMatrix'.format(pick_mat))
+        cmds.connectAttr(f'{mult_matrix}.matrixSum', f'{pick_mat}.inputMatrix')
 
         if not translate:
-            cmds.setAttr('{}.useTranslate'.format(pick_mat), 0)
+            cmds.setAttr(f'{pick_mat}.useTranslate', 0)
         if not rotate:
-            cmds.setAttr('{}.useRotate'.format(pick_mat), 0)
+            cmds.setAttr(f'{pick_mat}.useRotate', 0)
         if not scale:
-            cmds.setAttr('{}.useScale'.format(pick_mat), 0)
+            cmds.setAttr(f'{pick_mat}.useScale', 0)
         if not shear:
-            cmds.setAttr('{}.useShear'.format(pick_mat), 0)
+            cmds.setAttr(f'{pick_mat}.useShear', 0)
 
-        cmds.connectAttr('{}.outputMatrix'.format(pick_mat), '{}.offsetParentMatrix'.format(driven))
+        cmds.connectAttr(f'{pick_mat}.outputMatrix', f'{driven}.offsetParentMatrix')
 
     for attr in 'trs':
         value = 0 if attr != 's' else 1
         for axis in 'xyz':
-            if cmds.getAttr('{}.{}{}'.format(driven, attr, axis), settable=True):
-                cmds.setAttr('{}.{}{}'.format(driven, attr, axis), value)
+            if cmds.getAttr(f'{driven}.{attr}{axis}', settable=True):
+                cmds.setAttr(f'{driven}.{attr}{axis}', value)
 
     return mult_matrix
 
@@ -488,13 +488,13 @@ def transform_to_offset_parent_matrix(node, world_space=False, *args):
     else:
         node_matrix = cmds.xform(node, query=True, objectSpace=True, matrix=True)
 
-    cmds.setAttr('{}.offsetParentMatrix'.format(node), node_matrix, type='matrix')
+    cmds.setAttr(f'{node}.offsetParentMatrix', node_matrix, type='matrix')
 
     for attr in ['translate', 'rotate', 'scale']:
         for axis in 'XYZ':
             value = 0 if attr != 'scale' else 1
-            if cmds.getAttr('{}.{}{}'.format(node, attr, axis), settable=True):
-                cmds.setAttr('{}.{}{}'.format(node, attr, axis), value)
+            if cmds.getAttr(f'{node}.{attr}{axis}', settable=True):
+                cmds.setAttr(f'{node}.{attr}{axis}', value)
 
 
 def offset_parent_matrix_to_transform(node, world_space=True, *args):
@@ -513,7 +513,7 @@ def offset_parent_matrix_to_transform(node, world_space=True, *args):
     else:
         node_matrix = cmds.xform(node, query=True, objectSpace=True, matrix=True)
 
-    cmds.setAttr('{}.offsetParentMatrix'.format(node), math_lib.identity_matrix, type='matrix')
+    cmds.setAttr(f'{node}.offsetParentMatrix', math_lib.identity_matrix, type='matrix')
 
     if world_space:
         cmds.xform(node, worldSpace=True, matrix=node_matrix)
@@ -533,27 +533,27 @@ def connect_point_matrix_mult_to_a_cv(driver, crv_and_cv):
     crv = crv_and_cv.split('.')[0]
     cv = crv_and_cv.split('[')[-1].split(']')[0]
 
-    descriptor = '{}Crv{}'.format(crv.split('_')[0], cv)
+    descriptor = f"{crv.split('_')[0]}Crv{cv}"
     side = crv_and_cv.split('_')[1]
 
     cv_pos = cmds.getAttr(crv_and_cv)[0]
-    mult_matrix = cmds.createNode('multMatrix', name='{}_{}_{}'.format(descriptor, side, usage_lib.mult_matrix))
-    cmds.setAttr('{}.matrixIn[0]'.format(mult_matrix),
-                 math_lib.multiply_matrices_4_by_4(matrix_b=cmds.getAttr('{}.worldInverseMatrix'.format(driver)),
+    mult_matrix = cmds.createNode('multMatrix', name=f'{descriptor}_{side}_{usage_lib.mult_matrix}')
+    cmds.setAttr(f'{mult_matrix}.matrixIn[0]',
+                 math_lib.multiply_matrices_4_by_4(matrix_b=cmds.getAttr(f'{driver}.worldInverseMatrix'),
                                                   matrix_a=[1, 0, 0, 0,
                                                             0, 1, 0, 0,
                                                             0, 0, 1, 0,
                                                             cv_pos[0], cv_pos[1], cv_pos[2], 1]),
                  type='matrix')
-    cmds.connectAttr('{}.worldMatrix'.format(driver), '{}.matrixIn[1]'.format(mult_matrix))
+    cmds.connectAttr(f'{driver}.worldMatrix', f'{mult_matrix}.matrixIn[1]')
 
     point_matrix_mult = cmds.createNode('pointMatrixMult', name='{}_{}_{}'.format(descriptor,
                                                                                   side,
                                                                                   usage_lib.point_matrix_mult))
 
-    cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.inMatrix'.format(point_matrix_mult))
+    cmds.connectAttr(f'{mult_matrix}.matrixSum', f'{point_matrix_mult}.inMatrix')
 
-    cmds.connectAttr('{}.output'.format(point_matrix_mult), '{}.controlPoints[{}]'.format(crv, cv))
+    cmds.connectAttr(f'{point_matrix_mult}.output', f'{crv}.controlPoints[{cv}]')
 
 
 def create_nurbs_uvpin(nurbs, 
@@ -589,13 +589,13 @@ def create_nurbs_uvpin(nurbs,
     descriptor, side = nurbs.split('_')[:2]
     nurbs_shape = cmds.listRelatives(nurbs, shapes=True)[0]
 
-    uvpin_node = cmds.createNode('uvPin', name='{}_{}_{}'.format(descriptor, side, usage_lib.uvpin))
+    uvpin_node = cmds.createNode('uvPin', name=f'{descriptor}_{side}_{usage_lib.uvpin}')
 
-    cmds.setAttr('{}.normalAxis'.format(uvpin_node), 1)
-    cmds.setAttr('{}.tangentAxis'.format(uvpin_node), 0)
-    cmds.setAttr('{}.normalAxis'.format(uvpin_node), 2)
+    cmds.setAttr(f'{uvpin_node}.normalAxis', 1)
+    cmds.setAttr(f'{uvpin_node}.tangentAxis', 0)
+    cmds.setAttr(f'{uvpin_node}.normalAxis', 2)
 
-    cmds.connectAttr('{}.worldSpace[0]'.format(nurbs_shape), '{}.deformedGeometry'.format(uvpin_node))
+    cmds.connectAttr(f'{nurbs_shape}.worldSpace[0]', f'{uvpin_node}.deformedGeometry')
 
     # Connections for each driven
     index = 0
@@ -605,17 +605,17 @@ def create_nurbs_uvpin(nurbs,
         cmds.xform(transform_temp, worldSpace=True, matrix=cmds.xform(node, query=True, worldSpace=True, matrix=True))
         cpos_temp = cmds.createNode('closestPointOnSurface')
 
-        cmds.connectAttr('{}.worldSpace[0]'.format(nurbs_shape), '{}.inputSurface'.format(cpos_temp))
-        cmds.connectAttr('{}.translate'.format(transform_temp), '{}.inPosition'.format(cpos_temp))
+        cmds.connectAttr(f'{nurbs_shape}.worldSpace[0]', f'{cpos_temp}.inputSurface')
+        cmds.connectAttr(f'{transform_temp}.translate', f'{cpos_temp}.inPosition')
 
-        u_value = cmds.getAttr('{}.parameterU'.format(cpos_temp))
-        v_value = cmds.getAttr('{}.parameterV'.format(cpos_temp))
+        u_value = cmds.getAttr(f'{cpos_temp}.parameterU')
+        v_value = cmds.getAttr(f'{cpos_temp}.parameterV')
 
-        cmds.setAttr('{}.coordinate[{}].coordinateU'.format(uvpin_node, index), u_value)
-        cmds.setAttr('{}.coordinate[{}].coordinateV'.format(uvpin_node, index), v_value)
+        cmds.setAttr(f'{uvpin_node}.coordinate[{index}].coordinateU', u_value)
+        cmds.setAttr(f'{uvpin_node}.coordinate[{index}].coordinateV', v_value)
         
         if maintain_offset:
-            connect_matrix_from_attribute(driver_and_attr='{}.outputMatrix[{}]'.format(uvpin_node, index),
+            connect_matrix_from_attribute(driver_and_attr=f'{uvpin_node}.outputMatrix[{index}]',
                                         driven=node,
                                         translate=translate,
                                         rotate=rotate,
@@ -623,26 +623,26 @@ def create_nurbs_uvpin(nurbs,
                                         shear=shear)
         else:
             if translate and rotate and scale and shear:
-                cmds.connectAttr('{}.outputMatrix[{}]'.format(uvpin_node, index),
-                                 '{}.offsetParentMatrix'.format(node))
+                cmds.connectAttr(f'{uvpin_node}.outputMatrix[{index}]',
+                                 f'{node}.offsetParentMatrix')
             else:
                 pick_mat = cmds.createNode('pickMatrix',
                                            name='{}{}_{}_{}'.format(node_descriptor,
                                                                     usage_lib.get_usage_capitalize(usage=node_usage),
                                                                     node_side,
                                                                     usage_lib.pick_matrix))
-                cmds.connectAttr('{}.outputMatrix[{}]'.format(uvpin_node, index), '{}.inputMatrix'.format(pick_mat))
+                cmds.connectAttr(f'{uvpin_node}.outputMatrix[{index}]', f'{pick_mat}.inputMatrix')
 
                 if not translate:
-                    cmds.setAttr('{}.useTranslate'.format(pick_mat), 0)
+                    cmds.setAttr(f'{pick_mat}.useTranslate', 0)
                 if not rotate:
-                    cmds.setAttr('{}.useRotate'.format(pick_mat), 0)
+                    cmds.setAttr(f'{pick_mat}.useRotate', 0)
                 if not scale:
-                    cmds.setAttr('{}.useScale'.format(pick_mat), 0)
+                    cmds.setAttr(f'{pick_mat}.useScale', 0)
                 if not shear:
-                    cmds.setAttr('{}.useShear'.format(pick_mat), 0)
+                    cmds.setAttr(f'{pick_mat}.useShear', 0)
 
-                cmds.connectAttr('{}.outputMatrix'.format(pick_mat), '{}.offsetParentMatrix'.format(node))
+                cmds.connectAttr(f'{pick_mat}.outputMatrix', f'{node}.offsetParentMatrix')
 
 
         cmds.delete(transform_temp, cpos_temp)
@@ -686,14 +686,14 @@ def create_follow(driver,
         else:
             base_descriptor = base.split('_')[0]
             base_usage = base.split('_')[-1]
-            base_output = '{}.worldMatrix'.format(base)
-            base_inverse_matrix = cmds.getAttr('{}.worldInverseMatrix'.format(base))
+            base_output = f'{base}.worldMatrix'
+            base_inverse_matrix = cmds.getAttr(f'{base}.worldInverseMatrix')
 
         base_capitalize_descriptor = '{}{}{}'.format(base_descriptor[0].upper(), base_descriptor[1:], 
                                                      base_usage.capitalize())
 
     else:
-        base_inverse_matrix = cmds.getAttr('{}.worldInverseMatrix'.format(driven))
+        base_inverse_matrix = cmds.getAttr(f'{driven}.worldInverseMatrix')
         base_capitalize_descriptor = ''
 
     # base multmat
@@ -705,33 +705,33 @@ def create_follow(driver,
 
         if not cmds.objExists(base_mult_matrix):
             base_mult_matrix = cmds.createNode('multMatrix', name=base_mult_matrix)
-            cmds.connectAttr(base_output, '{}.matrixIn[1]'.format(base_mult_matrix))
+            cmds.connectAttr(base_output, f'{base_mult_matrix}.matrixIn[1]')
 
-        cmds.setAttr('{}.matrixIn[0]'.format(base_mult_matrix),
+        cmds.setAttr(f'{base_mult_matrix}.matrixIn[0]',
                      math_lib.multiply_matrices_4_by_4(matrix_a=driven_matrix, matrix_b=base_inverse_matrix), type='matrix')
 
     # driver
     if '.' in driver:
         driver_descriptor = driver.split('.')[-1].split('_')[0]
-        driver_capitalize_descriptor = '{}{}'.format(driver_descriptor[0].upper(), driver_descriptor[1:])
+        driver_capitalize_descriptor = f'{driver_descriptor[0].upper()}{driver_descriptor[1:]}'
         driver_output = driver
         driver_inverse_matrix = math_lib.inverse_matrix(cmds.getAttr(driver))
     else:
         driver_descriptor = driver.split('_')[0]
-        driver_capitalize_descriptor = '{}{}'.format(driver_descriptor[0].upper(), driver_descriptor[1:])
-        driver_output = '{}.worldMatrix'.format(driver)
-        driver_inverse_matrix = cmds.getAttr('{}.worldInverseMatrix'.format(driver))
+        driver_capitalize_descriptor = f'{driver_descriptor[0].upper()}{driver_descriptor[1:]}'
+        driver_output = f'{driver}.worldMatrix'
+        driver_inverse_matrix = cmds.getAttr(f'{driver}.worldInverseMatrix')
 
     # driver multmat
     driver_mult_matrix = cmds.createNode('multMatrix', name='{}{}_{}_{}'.format(driven_descriptor,
                                                                                 driver_capitalize_descriptor,
                                                                                 driven_side,
                                                                                 usage_lib.mult_matrix))
-    cmds.setAttr('{}.matrixIn[0]'.format(driver_mult_matrix),
+    cmds.setAttr(f'{driver_mult_matrix}.matrixIn[0]',
                  math_lib.multiply_matrices_4_by_4(matrix_a=driven_matrix,
                                                    matrix_b=driver_inverse_matrix), type='matrix')
 
-    cmds.connectAttr(driver_output, '{}.matrixIn[1]'.format(driver_mult_matrix))
+    cmds.connectAttr(driver_output, f'{driver_mult_matrix}.matrixIn[1]')
 
     # blendMatrix
     blend_matrix = '{}{}_{}_{}'.format(driven_descriptor,
@@ -741,37 +741,37 @@ def create_follow(driver,
     if not cmds.objExists(blend_matrix):
         blend_matrix = cmds.createNode('blendMatrix', name=blend_matrix)
         if base:
-            cmds.connectAttr('{}.matrixSum'.format(base_mult_matrix), '{}.inputMatrix'.format(blend_matrix))
+            cmds.connectAttr(f'{base_mult_matrix}.matrixSum', f'{blend_matrix}.inputMatrix')
         else:
-            cmds.setAttr('{}.inputMatrix'.format(blend_matrix),
+            cmds.setAttr(f'{blend_matrix}.inputMatrix',
                          cmds.xform(driven, query=True, worldSpace=True, matrix=True),
                          type='matrix')
 
-    target_index_list = cmds.ls('{}.target[*]'.format(blend_matrix))
+    target_index_list = cmds.ls(f'{blend_matrix}.target[*]')
     target_index = 0
     if len(target_index_list) != 0:
         target_index = int(max(target_index_list).split('[')[-1].split(']')[0]) + 1
 
-    target_index = 'target[{}]'.format(target_index)
+    target_index = f'target[{target_index}]'
 
-    cmds.connectAttr('{}.matrixSum'.format(driver_mult_matrix), '{}.{}.targetMatrix'.format(blend_matrix, target_index))
+    cmds.connectAttr(f'{driver_mult_matrix}.matrixSum', f'{blend_matrix}.{target_index}.targetMatrix')
 
     # Store old multMatrix
-    mult_mat_connection = cmds.listConnections('{}.offsetParentMatrix'.format(driven))
+    mult_mat_connection = cmds.listConnections(f'{driven}.offsetParentMatrix')
     if mult_mat_connection:
-        mult_mat_connection = [x for x in cmds.listConnections('{}.offsetParentMatrix'.format(driven))
+        mult_mat_connection = [x for x in cmds.listConnections(f'{driven}.offsetParentMatrix')
                                if x.endswith(usage_lib.mult_matrix)]
 
     # new offsetParentMatrix connection
-    if not cmds.isConnected('{}.outputMatrix'.format(blend_matrix),
-                            '{}.offsetParentMatrix'.format(driven)):
-        cmds.connectAttr('{}.outputMatrix'.format(blend_matrix),
-                         '{}.offsetParentMatrix'.format(driven), force=True)
+    if not cmds.isConnected(f'{blend_matrix}.outputMatrix',
+                            f'{driven}.offsetParentMatrix'):
+        cmds.connectAttr(f'{blend_matrix}.outputMatrix',
+                         f'{driven}.offsetParentMatrix', force=True)
 
-    cmds.setAttr('{}.{}.translateWeight'.format(blend_matrix, target_index), 0)
-    cmds.setAttr('{}.{}.rotateWeight'.format(blend_matrix, target_index), 0)
-    cmds.setAttr('{}.{}.scaleWeight'.format(blend_matrix, target_index), 0)
-    cmds.setAttr('{}.{}.shearWeight'.format(blend_matrix, target_index), 0)
+    cmds.setAttr(f'{blend_matrix}.{target_index}.translateWeight', 0)
+    cmds.setAttr(f'{blend_matrix}.{target_index}.rotateWeight', 0)
+    cmds.setAttr(f'{blend_matrix}.{target_index}.scaleWeight', 0)
+    cmds.setAttr(f'{blend_matrix}.{target_index}.shearWeight', 0)
 
     # Add follow attr
     driven_ah = attribute_lib.Helper(driven)
@@ -780,23 +780,23 @@ def create_follow(driver,
     if follow_name:
         follow_name = follow_name
     else:
-        follow_name = 'follow{}'.format(driver_capitalize_descriptor)
+        follow_name = f'follow{driver_capitalize_descriptor}'
 
     if pos:
-        attr_name = '{}Pos'.format(follow_name)
+        attr_name = f'{follow_name}Pos'
         driven_ah.add_float_attribute(attr_name, minValue=0, maxValue=1, defaultValue=default_value)
-        cmds.connectAttr('{}.{}'.format(driven, attr_name), '{}.{}.translateWeight'.format(blend_matrix, target_index))
+        cmds.connectAttr(f'{driven}.{attr_name}', f'{blend_matrix}.{target_index}.translateWeight')
 
     if rot:
-        attr_name = '{}Rot'.format(follow_name)
+        attr_name = f'{follow_name}Rot'
         driven_ah.add_float_attribute(attr_name, minValue=0, maxValue=1, defaultValue=default_value)
-        cmds.connectAttr('{}.{}'.format(driven, attr_name), '{}.{}.rotateWeight'.format(blend_matrix, target_index))
+        cmds.connectAttr(f'{driven}.{attr_name}', f'{blend_matrix}.{target_index}.rotateWeight')
 
     if not pos and not rot:
         attr_name = follow_name
         driven_ah.add_float_attribute(attr_name, minValue=0, maxValue=1, defaultValue=default_value)
-        cmds.connectAttr('{}.{}'.format(driven, attr_name), '{}.{}.translateWeight'.format(blend_matrix, target_index))
-        cmds.connectAttr('{}.{}'.format(driven, attr_name), '{}.{}.rotateWeight'.format(blend_matrix, target_index))
+        cmds.connectAttr(f'{driven}.{attr_name}', f'{blend_matrix}.{target_index}.translateWeight')
+        cmds.connectAttr(f'{driven}.{attr_name}', f'{blend_matrix}.{target_index}.rotateWeight')
 
     # Delete stored mult matrix if they do not have connections
     if mult_mat_connection:

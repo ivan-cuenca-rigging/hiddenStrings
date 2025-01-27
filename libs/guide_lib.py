@@ -28,7 +28,7 @@ class Helper(node_lib.Helper):
         self.name = name
         self.check_usage()
 
-        self.guides_grp = 'guides_{}_{}'.format(side_lib.center, usage_lib.group)
+        self.guides_grp = f'guides_{side_lib.center}_{usage_lib.group}'
         self.vis_labels_attribute = 'visLabels'
 
 
@@ -38,7 +38,7 @@ class Helper(node_lib.Helper):
         Check if the usage is in the guides usage_lib
         """
         if self.get_usage() not in usage_lib.guide_valid_usages:
-            logging.info('this guide has not a valid usage, use "{}".'.format(usage_lib.guide_valid_usages))
+            logging.info(f'this guide has not a valid usage, use "{usage_lib.guide_valid_usages}".')
 
 
     # ---------- Set Methods ----------
@@ -70,7 +70,7 @@ class Helper(node_lib.Helper):
         Args:
             value (int): 0 == bone, 1 == multi-child as box, 2 == None, 3 == joint
         """
-        cmds.setAttr('{}.drawLabel'.format(self.name), value)
+        cmds.setAttr(f'{self.name}.drawLabel', value)
 
 
     # ---------- Create Methods ----------
@@ -89,22 +89,22 @@ class Helper(node_lib.Helper):
         """
         # Check if exists
         if cmds.objExists(self.name):
-            cmds.error('the {} already exists in the scene'.format(self.name))
+            cmds.error(f'the {self.name} already exists in the scene')
 
         self.name = cmds.createNode('joint', name=self.name)
 
         # Add the shape to the guide
         self.set_shape(shape_scale=guide_shape_scale)
-        cmds.setAttr('{}.radius'.format(self.name), 0)
+        cmds.setAttr(f'{self.name}.radius', 0)
 
         # Lock attributes
         self.lock_and_hide_attributes(['scaleX', 'scaleY', 'scaleZ', 'radius', 'visibility'])
 
         # Draw guide's label
         skeleton_lib.set_joint_guide_label(self.name)
-        cmds.setAttr('{}.side'.format(self.name), 0)
+        cmds.setAttr(f'{self.name}.side', 0)
         self.set_draw_label(True)
-        cmds.setAttr('{}.drawLabel'.format(self.name), keyable=True)
+        cmds.setAttr(f'{self.name}.drawLabel', keyable=True)
 
         if parent:
             cmds.parent(self.name, parent)
@@ -122,13 +122,13 @@ class Helper(node_lib.Helper):
             world (bool, optional): If true it will use worldMatrix. Defaults to True.
         """
         if self.side == side_lib.center:
-            cmds.error('the guide "{}" does not have opposite side'.format(self.name))
+            cmds.error(f'the guide "{self.name}" does not have opposite side')
 
         opposite_side = side_lib.left if self.side == side_lib.right else side_lib.right
 
-        opposite_name = '{}_{}_{}'.format(self.descriptor, opposite_side, self.usage)
+        opposite_name = f'{self.descriptor}_{opposite_side}_{self.usage}'
         if not cmds.objExists(opposite_name):
-            logging.info('{} does not exist in the scene, cannot connect opposite side.'.format(opposite_name))
+            logging.info(f'{opposite_name} does not exist in the scene, cannot connect opposite side.')
         else:
             mult_matrix = cmds.createNode('multMatrix', name='{}{}_{}_{}'.format(self.descriptor,
                                                                                  self.usage.capitalize(),
@@ -136,39 +136,39 @@ class Helper(node_lib.Helper):
                                                                                  usage_lib.mult_matrix))
 
             if world:
-                cmds.connectAttr('{}.worldMatrix'.format(opposite_name), '{}.matrixIn[0]'.format(mult_matrix))
+                cmds.connectAttr(f'{opposite_name}.worldMatrix', f'{mult_matrix}.matrixIn[0]')
             else:
-                cmds.connectAttr('{}.matrix'.format(opposite_name), '{}.matrixIn[0]'.format(mult_matrix))
+                cmds.connectAttr(f'{opposite_name}.matrix', f'{mult_matrix}.matrixIn[0]')
 
-            cmds.setAttr('{}.matrixIn[1]'.format(mult_matrix), math_lib.identity_matrix_x_negative, type='matrix')
+            cmds.setAttr(f'{mult_matrix}.matrixIn[1]', math_lib.identity_matrix_x_negative, type='matrix')
 
-            cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.offsetParentMatrix'.format(self.name))
+            cmds.connectAttr(f'{mult_matrix}.matrixSum', f'{self.name}.offsetParentMatrix')
 
 
     def connect_to_opposite_side_with_parent(self, parent_node):
         if self.side == side_lib.center:
-            cmds.error('the guide "{}" does not have opposite side'.format(self.name))
+            cmds.error(f'the guide "{self.name}" does not have opposite side')
 
         opposite_side = side_lib.left if self.side == side_lib.right else side_lib.right
 
-        opposite_name = '{}_{}_{}'.format(self.descriptor, opposite_side, self.usage)
+        opposite_name = f'{self.descriptor}_{opposite_side}_{self.usage}'
         if not cmds.objExists(opposite_name):
-            logging.info('{} does not exist in the scene, cannot connect opposite side.'.format(opposite_name))
+            logging.info(f'{opposite_name} does not exist in the scene, cannot connect opposite side.')
         else:
             mult_matrix = cmds.createNode('multMatrix', name='{}{}_{}_{}'.format(self.descriptor,
                                                                                  self.usage.capitalize(),
                                                                                  self.side,
                                                                                  usage_lib.mult_matrix))
 
-            cmds.connectAttr('{}.matrix'.format(opposite_name), '{}.matrixIn[0]'.format(mult_matrix))
-            cmds.connectAttr('{}.worldMatrix'.format(parent_node), '{}.matrixIn[1]'.format(mult_matrix))
+            cmds.connectAttr(f'{opposite_name}.matrix', f'{mult_matrix}.matrixIn[0]')
+            cmds.connectAttr(f'{parent_node}.worldMatrix', f'{mult_matrix}.matrixIn[1]')
 
-            cmds.connectAttr('{}.matrixSum'.format(mult_matrix), '{}.offsetParentMatrix'.format(self.name))
+            cmds.connectAttr(f'{mult_matrix}.matrixSum', f'{self.name}.offsetParentMatrix')
 
 
 def delete_guides(*args):
-    guides_grp = 'guides_{}_{}'.format(side_lib.center, usage_lib.group)
+    guides_grp = f'guides_{side_lib.center}_{usage_lib.group}'
     if cmds.objExists(guides_grp):
         cmds.delete(cmds.ls(guides_grp))
     else:
-        logging.info('{} does not exists.'.format(guides_grp))
+        logging.info(f'{guides_grp} does not exists.')

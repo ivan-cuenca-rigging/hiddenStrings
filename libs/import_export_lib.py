@@ -143,7 +143,7 @@ def export_nodes_and_connections(file_name, path, export_nodes=True, export_edge
                     output_value = [x for x in cmds.listConnections(input_value, plugs=True, source=True,
                                                                     skipConversionNodes=True)
                                     if node in x][0]
-                    connections_string += '\nconnectAttr "{}" "{}";'.format(input_value, output_value)
+                    connections_string += f'\nconnectAttr "{input_value}" "{output_value}";'
 
             # Get outputs
             outputs_list = cmds.listConnections(node, source=False, plugs=True, skipConversionNodes=True)
@@ -255,7 +255,7 @@ def export_blend_shape(node, path):
         path (str): export file folder
     """
     if not cmds.objExists(node):
-        cmds.error('{} does not exists in the scene'.format(node))
+        cmds.error(f'{node} does not exists in the scene')
     blend_shape_name = blend_shape_lib.get_blend_shape(node)
 
     blend_shape_lib.check_blendshape(blend_shape=blend_shape_name)
@@ -338,12 +338,12 @@ def export_skin_cluster(node, path, skin_index=1):
         skin_path = r'{}/{}.json'.format(path, skin_cluster)
         # Check if the file exists and is writable
         if os.path.exists(skin_path) and not os.access(skin_path, os.W_OK):
-            logging.info('{} is not writeable. Check Permissions.'.format(skin_path))
+            logging.info(f'{skin_path} is not writeable. Check Permissions.')
         else:
             if not os.path.exists(path):
                 os.makedirs(path)
             # Export JSON
-            cmds.deformerWeights('{}.json'.format(skin_cluster), deformer=skin_cluster, method='index',
+            cmds.deformerWeights(f'{skin_cluster}.json', deformer=skin_cluster, method='index',
                                  export=True, format='JSON', path=path)
     else:
         skin_cluster_list = skin_lib.get_skin_cluster_list(node)
@@ -352,12 +352,12 @@ def export_skin_cluster(node, path, skin_index=1):
             skin_path = r'{}/{}.json'.format(path, skin_cluster)
             # Check if the file exists and is writable
             if os.path.exists(skin_path) and not os.access(skin_path, os.W_OK):
-                logging.info('{} is not writeable. Check Permissions.'.format(skin_path))
+                logging.info(f'{skin_path} is not writeable. Check Permissions.')
             else:
                 if not os.path.exists(path):
                     os.makedirs(path)
                 # Export skinCluster JSON
-                cmds.deformerWeights('{}.json'.format(skin_cluster), deformer=skin_cluster, method='index',
+                cmds.deformerWeights(f'{skin_cluster}.json', deformer=skin_cluster, method='index',
                                      export=True, format='JSON', path=path)
 
 
@@ -408,7 +408,7 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index', search_
         if not cmds.objExists(jnt):
             joints_not_in_scene.append(jnt)
     if len(joints_not_in_scene) > 0:
-        cmds.error('missing in the scene: {}'.format(joints_not_in_scene))
+        cmds.error(f'missing in the scene: {joints_not_in_scene}')
 
     # If skinCluster exists get its joints and add the joints that are not in the skinCluster
     joints_to_lock = list()
@@ -438,7 +438,7 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index', search_
     else:
         component_type = 'vtx'
 
-    shape_components = '{}.{}[:]'.format(cmds.listRelatives(node, shapes=True, noIntermediate=True)[0], component_type)
+    shape_components = f'{cmds.listRelatives(node, shapes=True, noIntermediate=True)[0]}.{component_type}[:]'
 
     cmds.skinPercent(skin_cluster, shape_components, normalize=False, pruneWeights=100)
     if joints_to_lock:
@@ -449,7 +449,7 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index', search_
     try:
         cmds.deformerWeights(file_name, path=path, deformer=skin_cluster, im=True, method=import_method)
     except:
-        logging.warning('{} has not been imported, check the topology'.format(skin_cluster))
+        logging.warning(f'{skin_cluster} has not been imported, check the topology')
 
     # Restore normalize weights
     cmds.skinCluster(skin_cluster, edit=True, normalizeWeights=skin_normalize)
@@ -458,7 +458,7 @@ def import_skin_cluster(node, path, skin_index=1, import_method='index', search_
     if search_for:
         search_and_replace_in_file(r'{}/{}'.format(path, file_name), search_for=replace_with, replace_with=search_for)
 
-    logging.info('{} has been imported.'.format(file_name))
+    logging.info(f'{file_name} has been imported.')
 
 
 def import_skin_clusters(path, import_method='index'):
@@ -501,9 +501,9 @@ def export_data_to_json(data, file_name, file_path, relative_path=True, use_inde
     """
     if relative_path:
         module_path = os.path.dirname(os.path.dirname(__file__))
-        file_path_name_with_extension = '{}/{}/{}.json'.format(module_path, file_path, file_name)
+        file_path_name_with_extension = f'{module_path}/{file_path}/{file_name}.json'
     else:
-        file_path_name_with_extension = '{}/{}.json'.format(file_path, file_name)
+        file_path_name_with_extension = f'{file_path}/{file_name}.json'
 
     if compact:
         with open(file_path_name_with_extension, 'w') as write_file:
@@ -530,9 +530,9 @@ def import_data_from_json(file_name, file_path, relative_path=True):
     """
     if relative_path:
         script_path = os.path.dirname(os.path.dirname(__file__))
-        file_path_name_with_extension = '{}/{}/{}.json'.format(script_path, file_path, file_name)
+        file_path_name_with_extension = f'{script_path}/{file_path}/{file_name}.json'
     else:
-        file_path_name_with_extension = '{}/{}.json'.format(file_path, file_name)
+        file_path_name_with_extension = f'{file_path}/{file_name}.json'
 
     with open(file_path_name_with_extension, 'r') as read_file:
         data = json.load(read_file)

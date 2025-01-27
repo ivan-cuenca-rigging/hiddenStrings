@@ -58,9 +58,9 @@ def get_spl_data(spl):
     spline_data = dict()
     for crv in crv_list:
         spline_data[crv] = dict()
-        crv_degree = cmds.getAttr('{}.degree'.format(crv))
-        crv_per = cmds.getAttr('{}.form'.format(crv))
-        crv_cvs = cmds.ls('{}.cv[*]'.format(crv), flatten=True)
+        crv_degree = cmds.getAttr(f'{crv}.degree')
+        crv_per = cmds.getAttr(f'{crv}.form')
+        crv_cvs = cmds.ls(f'{crv}.cv[*]', flatten=True)
         cvs_pos = list()
         for cv in crv_cvs:
             cv_pos = cmds.xform(cv, query=True, worldSpace=True, translation=True)
@@ -103,8 +103,8 @@ def create_spl_from_data(spl_name, spl_data, spl_scale=1):
         cmds.delete(crv)
     crv_shapes = cmds.listRelatives(spline, children=True)
     for i, shp in enumerate(crv_shapes):
-        shp = cmds.rename(shp, '{}Shape{}'.format(spline, i + 1))
-        cmds.scale(spl_scale, spl_scale, spl_scale, cmds.select('{}.cv[*]'.format(shp)), r=True, ocp=True)
+        shp = cmds.rename(shp, f'{spline}Shape{i + 1}')
+        cmds.scale(spl_scale, spl_scale, spl_scale, cmds.select(f'{shp}.cv[*]'), r=True, ocp=True)
     cmds.select(spline)
     return spline
 
@@ -150,7 +150,7 @@ def set_shape(node, shape_name, shape_scale=1, shape_offset=None):
                                     spl_scale=shape_scale)
     if shape_offset:
         for key, value in shape_offset.items():
-            cmds.setAttr('{}.{}'.format(temp_spl, key), value)
+            cmds.setAttr(f'{temp_spl}.{key}', value)
     replace_shape(node=node, shape_transform=temp_spl)
 
 
@@ -186,7 +186,7 @@ def replace_shape(node, shape_transform, keep_shapes=False):
     for index, shape in enumerate(shapes_list):
         cmds.parent(shape, node, relative=True, shape=True)
         index = '' if shape == shapes_list[0] else index
-        cmds.rename(shape, "{}Shape{}".format(node, index))
+        cmds.rename(shape, f"{node}Shape{index}")
 
     cmds.delete(shape_transform)
 
@@ -207,11 +207,11 @@ def transfer_shape(source, target):
     spline_color = get_override_color(target)
 
     # Create a temporal transform in the source position
-    spline_transform = cmds.createNode('transform', name='{}Spl'.format(target))
+    spline_transform = cmds.createNode('transform', name=f'{target}Spl')
     cmds.xform(spline_transform, worldSpace=True, matrix=cmds.xform(source, query=True, worldSpace=True, matrix=True))
 
     # Create the spline and transfer it to the temporal transform
-    spline = create_spl_from_data(spl_name='{}Spl'.format(target), spl_data=spline_data)
+    spline = create_spl_from_data(spl_name=f'{target}Spl', spl_data=spline_data)
     replace_shape(node=spline_transform, shape_transform=spline, keep_shapes=False)
 
     # Place the shape in the target position
@@ -239,20 +239,20 @@ def set_override_color(splines_list=None, color_key='red'):
         if 1 <= color_key <= 31:
             color_value = color_key
         else:
-            cmds.error('{} is out of range of 1 - 31'.format(color_key))
+            cmds.error(f'{color_key} is out of range of 1 - 31')
     else:
         if color_key in colors_dict.keys():
             color_value = colors_dict[color_key]
         else:
-            cmds.error('{} is not a valid color, try any of these: {}'.format(color_key, list(colors_dict.keys())))
+            cmds.error(f'{color_key} is not a valid color, try any of these: {list(colors_dict.keys())}')
 
     override_value = 0 if color_value == 0 else 1
     for spl in splines_list:
         spl_shapes = cmds.listRelatives(spl, shapes=True)
         for spl_shape in spl_shapes:
-            cmds.setAttr('{}.overrideEnabled'.format(spl_shape), override_value)
-            cmds.setAttr('{}.overrideRGBColors'.format(spl_shape), 0)
-            cmds.setAttr('{}.overrideColor'.format(spl_shape), color_value)
+            cmds.setAttr(f'{spl_shape}.overrideEnabled', override_value)
+            cmds.setAttr(f'{spl_shape}.overrideRGBColors', 0)
+            cmds.setAttr(f'{spl_shape}.overrideColor', color_value)
 
 
 def get_override_color(spl):
@@ -266,7 +266,7 @@ def get_override_color(spl):
         int: spline.overrideColor value
     """
     spl_shape = cmds.listRelatives(spl, shapes=True)[0]
-    return cmds.getAttr('{}.overrideColor'.format(spl_shape))
+    return cmds.getAttr(f'{spl_shape}.overrideColor')
 
 
 def create_curve_from_a_to_b(name, a, b, n, degree=3):
@@ -302,7 +302,7 @@ def attach_curve_from_a_to_b(a, b):
     b_nh = node_lib.Helper(b)
 
     spl = create_curve_from_a_to_b('temp', a, b, 2, degree=1)
-    cmds.setAttr('{}.template'.format(cmds.listRelatives(spl, shapes=True)[0]), 1)
+    cmds.setAttr(f'{cmds.listRelatives(spl, shapes=True)[0]}.template', 1)
     spl = replace_shape(node=a, shape_transform=spl, keep_shapes=True)[-1]
 
     b_pmatmult = cmds.createNode('pointMatrixMult', name='{}_{}_{}'.format(b_nh.get_descriptor(),
@@ -313,13 +313,13 @@ def attach_curve_from_a_to_b(a, b):
                                                                              a_nh.get_side(),
                                                                              usage_lib.point_matrix_mult))
 
-    cmds.connectAttr('{}.worldMatrix'.format(b), '{}.inMatrix'.format(b_pmatmult))
-    cmds.connectAttr('{}.worldInverseMatrix'.format(a), '{}.inMatrix'.format(a_pmatmult))
+    cmds.connectAttr(f'{b}.worldMatrix', f'{b_pmatmult}.inMatrix')
+    cmds.connectAttr(f'{a}.worldInverseMatrix', f'{a_pmatmult}.inMatrix')
 
     for axis in ['X', 'Y', 'Z']:
-        cmds.connectAttr('{}.output{}'.format(b_pmatmult, axis), '{}.inPoint{}'.format(a_pmatmult, axis))
+        cmds.connectAttr(f'{b_pmatmult}.output{axis}', f'{a_pmatmult}.inPoint{axis}')
 
-        cmds.connectAttr('{}.output{}'.format(a_pmatmult, axis), '{}.controlPoints[1].{}Value'.format(spl,
+        cmds.connectAttr(f'{a_pmatmult}.output{axis}', '{}.controlPoints[1].{}Value'.format(spl,
                                                                                                       axis.lower()))
 
     return spl

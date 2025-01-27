@@ -36,7 +36,7 @@ class Helper(node_lib.Helper):
         Check if the usage is valid
         """
         if self.get_usage() not in usage_lib.skeleton_valid_usages:
-            logging.info('this control has not a valid usage, {}.'.format(usage_lib.skeleton_valid_usages))
+            logging.info(f'this control has not a valid usage, {usage_lib.skeleton_valid_usages}.')
 
 
     # ---------- Create Method ----------
@@ -59,7 +59,7 @@ class Helper(node_lib.Helper):
             str: joint name
         """
         if cmds.objExists(self.name):
-            cmds.error('the {} already exists in the scene'.format(self.name))
+            cmds.error(f'the {self.name} already exists in the scene')
 
         cmds.createNode('joint', name=self.name)
 
@@ -88,17 +88,17 @@ def set_joint_label(node, other_type_override=False):
     descriptor, side, usage = node.split('_')
 
     if side == side_lib.center:
-        cmds.setAttr('{}.side'.format(node), 0)
+        cmds.setAttr(f'{node}.side', 0)
     if side == side_lib.left:
-        cmds.setAttr('{}.side'.format(node), 1)
+        cmds.setAttr(f'{node}.side', 1)
     if side == side_lib.right:
-        cmds.setAttr('{}.side'.format(node), 2)
+        cmds.setAttr(f'{node}.side', 2)
 
-    cmds.setAttr('{}.type'.format(node), 18)
-    other_type_value = '{}{}'.format(descriptor, usage.capitalize())
-    cmds.setAttr('{}.otherType'.format(node), other_type_value, type='string')
+    cmds.setAttr(f'{node}.type', 18)
+    other_type_value = f'{descriptor}{usage.capitalize()}'
+    cmds.setAttr(f'{node}.otherType', other_type_value, type='string')
     if other_type_override:
-        cmds.setAttr('{}.otherType'.format(node), other_type_override, type='string')
+        cmds.setAttr(f'{node}.otherType', other_type_override, type='string')
 
 
 def set_joint_guide_label(node):
@@ -195,7 +195,7 @@ def create_push_joint(parent_node, driver_node,
 
     rotation_axis = rotation_axis.lower()
     if '-' in rotation_axis:
-        rotation_axis = '{}M'.format(rotation_axis[-1])
+        rotation_axis = f'{rotation_axis[-1]}M'
 
     # driver matrix
     driver_mult_matrix = cmds.createNode('multMatrix', name='{}R{}Push{}_{}_{}'.format(parent_descriptor,
@@ -204,11 +204,11 @@ def create_push_joint(parent_node, driver_node,
                                                                                        parent_side,
                                                                                        usage_lib.mult_matrix))
 
-    driven_matrix = cmds.getAttr('{}.worldMatrix'.format(driver_node))
-    driver_inverse_matrix = cmds.getAttr('{}.worldInverseMatrix'.format(parent_node))
+    driven_matrix = cmds.getAttr(f'{driver_node}.worldMatrix')
+    driver_inverse_matrix = cmds.getAttr(f'{parent_node}.worldInverseMatrix')
     matrix_difference = math_lib.multiply_matrices_4_by_4(driven_matrix, driver_inverse_matrix)
-    cmds.setAttr('{}.matrixIn[0]'.format(driver_mult_matrix), matrix_difference, type='matrix')
-    cmds.connectAttr('{}.worldMatrix'.format(parent_node), '{}.matrixIn[1]'.format(driver_mult_matrix))
+    cmds.setAttr(f'{driver_mult_matrix}.matrixIn[0]', matrix_difference, type='matrix')
+    cmds.connectAttr(f'{parent_node}.worldMatrix', f'{driver_mult_matrix}.matrixIn[1]')
 
     # BlendMatrix to get the position of the driver and half rotation from each
     blend_matrix = cmds.createNode('blendMatrix', name='{}R{}Push{}_{}_{}'.format(descriptor,
@@ -217,13 +217,13 @@ def create_push_joint(parent_node, driver_node,
                                                                                   side,
                                                                                   usage_lib.blend_matrix))
 
-    cmds.connectAttr('{}.matrixSum'.format(driver_mult_matrix), '{}.inputMatrix'.format(blend_matrix))
+    cmds.connectAttr(f'{driver_mult_matrix}.matrixSum', f'{blend_matrix}.inputMatrix')
 
-    cmds.connectAttr('{}.worldMatrix'.format(driver_node), '{}.target[0].targetMatrix'.format(blend_matrix))
-    cmds.setAttr('{}.target[0].translateWeight'.format(blend_matrix), 1)
-    cmds.setAttr('{}.target[0].rotateWeight'.format(blend_matrix), 0.5)
-    cmds.setAttr('{}.target[0].scaleWeight'.format(blend_matrix), 0)
-    cmds.setAttr('{}.target[0].shearWeight'.format(blend_matrix), 0)
+    cmds.connectAttr(f'{driver_node}.worldMatrix', f'{blend_matrix}.target[0].targetMatrix')
+    cmds.setAttr(f'{blend_matrix}.target[0].translateWeight', 1)
+    cmds.setAttr(f'{blend_matrix}.target[0].rotateWeight', 0.5)
+    cmds.setAttr(f'{blend_matrix}.target[0].scaleWeight', 0)
+    cmds.setAttr(f'{blend_matrix}.target[0].shearWeight', 0)
 
     # Zero the blend matrix rotation
     blend_mult_matrix = cmds.createNode('multMatrix', name='{}{}{}_{}_{}'.format(descriptor,
@@ -232,9 +232,9 @@ def create_push_joint(parent_node, driver_node,
                                                                                  side,
                                                                                  usage_lib.mult_matrix))
 
-    cmds.setAttr('{}.matrixIn[0]'.format(blend_mult_matrix),
-                 math_lib.inverse_matrix(matrix_a=cmds.getAttr('{}.outputMatrix'.format(blend_matrix))), type='matrix')
-    cmds.connectAttr('{}.outputMatrix'.format(blend_matrix), '{}.matrixIn[1]'.format(blend_mult_matrix))
+    cmds.setAttr(f'{blend_mult_matrix}.matrixIn[0]',
+                 math_lib.inverse_matrix(matrix_a=cmds.getAttr(f'{blend_matrix}.outputMatrix')), type='matrix')
+    cmds.connectAttr(f'{blend_matrix}.outputMatrix', f'{blend_mult_matrix}.matrixIn[1]')
 
     # Decompose the matrix to get the rotation in 1 axis
     decompose_matrix = cmds.createNode('decomposeMatrix', name='{}R{}Push{}_{}_{}'.format(descriptor,
@@ -243,7 +243,7 @@ def create_push_joint(parent_node, driver_node,
                                                                                           side,
                                                                                           usage_lib.decompose_matrix))
 
-    cmds.connectAttr('{}.matrixSum'.format(blend_mult_matrix), '{}.inputMatrix'.format(decompose_matrix))
+    cmds.connectAttr(f'{blend_mult_matrix}.matrixSum', f'{decompose_matrix}.inputMatrix')
 
     # Create structural parent if it does not exist
     if not cmds.objExists(structural_parent):
@@ -257,13 +257,13 @@ def create_push_joint(parent_node, driver_node,
                                                       usage_lib.skin_joint))
     joint_sh.create(parent=structural_parent)
 
-    cmds.connectAttr('{}.outputMatrix'.format(blend_matrix), '{}.offsetParentMatrix'.format(joint_sh.get_name()))
+    cmds.connectAttr(f'{blend_matrix}.outputMatrix', f'{joint_sh.get_name()}.offsetParentMatrix')
 
     # Create attributes
     joint_sh.add_separator_attribute(separator_name='Attributes')
-    joint_sh.add_float_attribute(attribute_name='{}X'.format(push_attribute))
-    joint_sh.add_float_attribute(attribute_name='{}Y'.format(push_attribute))
-    joint_sh.add_float_attribute(attribute_name='{}Z'.format(push_attribute))
+    joint_sh.add_float_attribute(attribute_name=f'{push_attribute}X')
+    joint_sh.add_float_attribute(attribute_name=f'{push_attribute}Y')
+    joint_sh.add_float_attribute(attribute_name=f'{push_attribute}Z')
 
     # Clamp push joint values
     push_clamp = cmds.createNode('clamp', name='{}R{}Push{}_{}_{}'.format(descriptor,
@@ -273,18 +273,18 @@ def create_push_joint(parent_node, driver_node,
                                                                           usage_lib.clamp))
 
     if 'M' in rotation_axis:
-        cmds.setAttr('{}.minR'.format(push_clamp), -9999)
-        cmds.setAttr('{}.minG'.format(push_clamp), -9999)
-        cmds.setAttr('{}.minB'.format(push_clamp), -9999)
+        cmds.setAttr(f'{push_clamp}.minR', -9999)
+        cmds.setAttr(f'{push_clamp}.minG', -9999)
+        cmds.setAttr(f'{push_clamp}.minB', -9999)
 
     else:
-        cmds.setAttr('{}.maxR'.format(push_clamp), 9999)
-        cmds.setAttr('{}.maxG'.format(push_clamp), 9999)
-        cmds.setAttr('{}.maxB'.format(push_clamp), 9999)
+        cmds.setAttr(f'{push_clamp}.maxR', 9999)
+        cmds.setAttr(f'{push_clamp}.maxG', 9999)
+        cmds.setAttr(f'{push_clamp}.maxB', 9999)
 
-    cmds.connectAttr('{}.outputRotateY'.format(decompose_matrix), '{}.inputR'.format(push_clamp))
-    cmds.connectAttr('{}.outputRotateY'.format(decompose_matrix), '{}.inputG'.format(push_clamp))
-    cmds.connectAttr('{}.outputRotateY'.format(decompose_matrix), '{}.inputB'.format(push_clamp))
+    cmds.connectAttr(f'{decompose_matrix}.outputRotateY', f'{push_clamp}.inputR')
+    cmds.connectAttr(f'{decompose_matrix}.outputRotateY', f'{push_clamp}.inputG')
+    cmds.connectAttr(f'{decompose_matrix}.outputRotateY', f'{push_clamp}.inputB')
 
     # Create multiplier connected to the attribute
     push_multiply = cmds.createNode('multiplyDivide', name='{}R{}Push{}_{}_{}'.format(descriptor,
@@ -293,20 +293,20 @@ def create_push_joint(parent_node, driver_node,
                                                                                       side,
                                                                                       usage_lib.multiply))
 
-    cmds.connectAttr('{}.outputR'.format(push_clamp), '{}.input1X'.format(push_multiply))
-    cmds.connectAttr('{}.outputG'.format(push_clamp), '{}.input1Y'.format(push_multiply))
-    cmds.connectAttr('{}.outputB'.format(push_clamp), '{}.input1Z'.format(push_multiply))
+    cmds.connectAttr(f'{push_clamp}.outputR', f'{push_multiply}.input1X')
+    cmds.connectAttr(f'{push_clamp}.outputG', f'{push_multiply}.input1Y')
+    cmds.connectAttr(f'{push_clamp}.outputB', f'{push_multiply}.input1Z')
 
-    cmds.connectAttr('{}.{}'.format(joint_sh.get_name(), '{}X'.format(push_attribute)),
-                     '{}.input2X'.format(push_multiply))
-    cmds.connectAttr('{}.{}'.format(joint_sh.get_name(), '{}Y'.format(push_attribute)),
-                     '{}.input2Y'.format(push_multiply))
-    cmds.connectAttr('{}.{}'.format(joint_sh.get_name(), '{}Z'.format(push_attribute)),
-                     '{}.input2Z'.format(push_multiply))
+    cmds.connectAttr(f'{joint_sh.get_name()}.{push_attribute}X',
+                     f'{push_multiply}.input2X')
+    cmds.connectAttr(f'{joint_sh.get_name()}.{push_attribute}Y',
+                     f'{push_multiply}.input2Y')
+    cmds.connectAttr(f'{joint_sh.get_name()}.{push_attribute}Z',
+                     f'{push_multiply}.input2Z')
 
-    cmds.connectAttr('{}.outputX'.format(push_multiply), '{}.translateX'.format(joint_sh.get_name()))
-    cmds.connectAttr('{}.outputY'.format(push_multiply), '{}.translateY'.format(joint_sh.get_name()))
-    cmds.connectAttr('{}.outputZ'.format(push_multiply), '{}.translateZ'.format(joint_sh.get_name()))
+    cmds.connectAttr(f'{push_multiply}.outputX', f'{joint_sh.get_name()}.translateX')
+    cmds.connectAttr(f'{push_multiply}.outputY', f'{joint_sh.get_name()}.translateY')
+    cmds.connectAttr(f'{push_multiply}.outputZ', f'{joint_sh.get_name()}.translateZ')
 
     # Lock attributes
     joint_sh.lock_and_hide_attributes(attributes_list=['translateX', 'translateY', 'translateZ',
@@ -352,30 +352,30 @@ def create_local_skeleton(skeleton_grp,
                                                                                  skin_joint_helper.get_side(),
                                                                                  usage_lib.mult_matrix))
 
-            cmds.connectAttr('{}.worldMatrix'.format(skin_joint), '{}.matrixIn[0]'.format(mult_mat))
-            cmds.connectAttr('{}.worldInverseMatrix'.format(world_control), '{}.matrixIn[1]'.format(mult_mat))
+            cmds.connectAttr(f'{skin_joint}.worldMatrix', f'{mult_mat}.matrixIn[0]')
+            cmds.connectAttr(f'{world_control}.worldInverseMatrix', f'{mult_mat}.matrixIn[1]')
 
-            cmds.connectAttr('{}.matrixSum'.format(mult_mat), '{}.offsetParentMatrix'.format(skin_joint_local))
+            cmds.connectAttr(f'{mult_mat}.matrixSum', f'{skin_joint_local}.offsetParentMatrix')
 
         return local_joint_list
 
 
 def show_skeleton(*args):
-    skeleton_grp_list = cmds.ls('*_*_{}'.format(usage_lib.skeleton))
+    skeleton_grp_list = cmds.ls(f'*_*_{usage_lib.skeleton}')
     if skeleton_grp_list:
         for grp in skeleton_grp_list:
             try:
-                cmds.setAttr('{}.visibility'.format(grp), 1)
+                cmds.setAttr(f'{grp}.visibility', 1)
             except:
-                logging.info('{} visibility is locked or connected'.format(grp))
+                logging.info(f'{grp} visibility is locked or connected')
 
 
 def hide_skeleton(*args):
-    skeleton_grp_list = cmds.ls('*_*_{}'.format(usage_lib.skeleton))
+    skeleton_grp_list = cmds.ls(f'*_*_{usage_lib.skeleton}')
     if skeleton_grp_list:
         for grp in skeleton_grp_list:
             try:
-                cmds.setAttr('{}.visibility'.format(grp), 0)
+                cmds.setAttr(f'{grp}.visibility', 0)
             except:
                 logging.info(
-                    '{} visibility is locked or connected'.format(grp))
+                    f'{grp} visibility is locked or connected')

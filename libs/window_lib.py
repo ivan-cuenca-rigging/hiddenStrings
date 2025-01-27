@@ -40,7 +40,7 @@ class Helper(object):
             size (list): (width, height). Defaults to (400, 400)
         """
         self.window = ''.join([x.capitalize() for x in title.split(' ')])
-        self.window = '{}_window'.format(self.window)
+        self.window = f'{self.window}_window'
         self.title = title
         self.size = size
 
@@ -144,7 +144,7 @@ class Helper(object):
         """
         Apply button command
         """
-        logging.info('{} need an Apply Command.'.format(self.title))
+        logging.info(f'{self.title} need an Apply Command.')
 
     def close_window(self, *args):
         """

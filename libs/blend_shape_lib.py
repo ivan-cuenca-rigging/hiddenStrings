@@ -19,9 +19,9 @@ def check_blendshape(blend_shape):
         blend_shape (str): name of the blendshape
     """
     if not cmds.objExists(blend_shape):
-        cmds.error('{} does not exists in the scene'.format(blend_shape))
+        cmds.error(f'{blend_shape} does not exists in the scene')
     if cmds.objectType(blend_shape) != 'blendShape':
-        cmds.error('{} is not a blendShape'.format(blend_shape))
+        cmds.error(f'{blend_shape} is not a blendShape')
 
 
 def check_target(blend_shape, target):
@@ -57,7 +57,7 @@ def check_in_between(blend_shape, target, value):
         bool: True == in-between exists
     """
     target_index = get_target_index(blend_shape=blend_shape, target=target)
-    target_data = cmds.listAttr('{}.inputTarget[0].inputTargetGroup[{}]'.format(blend_shape, target_index), multi=True)
+    target_data = cmds.listAttr(f'{blend_shape}.inputTarget[0].inputTargetGroup[{target_index}]', multi=True)
 
     target_values_list = list()
     for target in target_data:
@@ -87,12 +87,10 @@ def get_blend_shape_name(node):
         logging.error('Invalid input for node')
         return
     if len(node.split('_')) != 3:
-        return '{}_{}'.format(node, usage_lib.blend_shape)
+        return f'{node}_{usage_lib.blend_shape}'
     else:
         descriptor, side, usage = node.split('_')
-        return '{}{}_{}_{}'.format(descriptor, usage.capitalize(),
-                                   side,
-                                   usage_lib.blend_shape)
+        return f'{descriptor}{usage.capitalize()}_{side}_{usage_lib.blend_shape}'
 
 
 def get_blend_shape(node):
@@ -139,7 +137,7 @@ def get_blend_shape_index(blend_shape):
     Returns:
         str: blendshape index in the shapeEditor
     """
-    return cmds.listConnections('{}.midLayerParent'.format(blend_shape), plugs=True)[0].split('[')[-1].split(']')[0]
+    return cmds.listConnections(f'{blend_shape}.midLayerParent', plugs=True)[0].split('[')[-1].split(']')[0]
 
 
 def get_blendshape_target_list(blend_shape):
@@ -193,7 +191,7 @@ def get_target_values(blend_shape, target):
     check_blendshape(blend_shape=blend_shape)
 
     target_index = get_target_index(blend_shape=blend_shape, target=target)
-    target_data = cmds.listAttr('{}.inputTarget[0].inputTargetGroup[{}]'.format(blend_shape, target_index), multi=True)
+    target_data = cmds.listAttr(f'{blend_shape}.inputTarget[0].inputTargetGroup[{target_index}]', multi=True)
 
     target_values_list = list()
     for target in target_data:
@@ -350,7 +348,7 @@ def get_blend_shape_data(blend_shape):
     blend_shape_data['blendShape'] = blend_shape
     blend_shape_data['targets'] = dict()
 
-    targets_order_list = cmds.getAttr('{}.targetDirectory[0].childIndices'.format(blend_shape))
+    targets_order_list = cmds.getAttr(f'{blend_shape}.targetDirectory[0].childIndices')
     for target_order in targets_order_list:
         target = get_target_name(blend_shape=blend_shape, target_index=target_order)
 
@@ -372,7 +370,7 @@ def get_target_data(blend_shape, target):
     """
     target_dict = dict()
 
-    target_dict['envelope'] = round(cmds.getAttr('{}.{}'.format(blend_shape, target)), 3)
+    target_dict['envelope'] = round(cmds.getAttr(f'{blend_shape}.{target}'), 3)
 
     target_dict['target_values'] = dict()
     target_value_list = get_target_values(blend_shape=blend_shape, target=target)
@@ -437,7 +435,7 @@ def set_target_data(blend_shape, target, target_data):
                                                          value=target_value):
             add_in_between(blend_shape=blend_shape,
                            existing_target=target,
-                           in_between_target='{}_{}'.format(target, pretty_target_value),
+                           in_between_target=f'{target}_{pretty_target_value}',
                            value=pretty_target_value)
 
         if points_target and components_target:
@@ -460,11 +458,11 @@ def set_target_data(blend_shape, target, target_data):
             cmds.setAttr('{}.inbetweenInfoGroup[{}].inbetweenInfo[{}].inbetweenTargetName'.format(blend_shape,
                                                                                                   target_index,
                                                                                                   target_value),
-                         '{}_{}'.format(target, pretty_target_value),
+                         f'{target}_{pretty_target_value}',
                          type='string')
 
-        if cmds.getAttr('{}.{}'.format(blend_shape, target), settable=True):
-            cmds.setAttr('{}.{}'.format(blend_shape, target), target_data['envelope'])
+        if cmds.getAttr(f'{blend_shape}.{target}', settable=True):
+            cmds.setAttr(f'{blend_shape}.{target}', target_data['envelope'])
 
 
 def rename_blend_shape(blend_shape):
@@ -505,7 +503,7 @@ def rename_target(blend_shape, target, new_name):
         str: new target name
     """
     if new_name != target:
-        cmds.aliasAttr(new_name, '{}.{}'.format(blend_shape, target))
+        cmds.aliasAttr(new_name, f'{blend_shape}.{target}')
 
     return new_name
 
@@ -620,7 +618,7 @@ def remove_target(blend_shape, target):
     check_blendshape(blend_shape=blend_shape)
 
     target_index = get_target_index(blend_shape=blend_shape, target=target)
-    mel.eval('blendShapeDeleteTargetGroup {} {}'.format(blend_shape, target_index))
+    mel.eval(f'blendShapeDeleteTargetGroup {blend_shape} {target_index}')
 
 
 def remove_in_between(blend_shape, target, value):
@@ -640,9 +638,9 @@ def remove_in_between(blend_shape, target, value):
         value = float(value)
         value = value * 1000 + 5000
 
-        mel.eval('blendShapeDeleteInBetweenTarget {} {} {}'.format(blend_shape, index, value))
+        mel.eval(f'blendShapeDeleteInBetweenTarget {blend_shape} {index} {value}')
     else:
-        cmds.error('the in-between at {} does not exists in {}.{}'.format(value, blend_shape, target))
+        cmds.error(f'the in-between at {value} does not exists in {blend_shape}.{target}')
 
 
 def edit_target_or_in_between(*args):
@@ -679,7 +677,7 @@ def mirror_target(blend_shape, target):
         descriptor = target
         side = side_lib.left
         usage = usage_lib.corrective
-    target_mirror_name = '{}_{}_{}'.format(descriptor, side_lib.get_opposite_side(side), usage)
+    target_mirror_name = f'{descriptor}_{side_lib.get_opposite_side(side)}_{usage}'
 
     # Get target data
     target_data = get_target_data(blend_shape=blend_shape, target=target)
@@ -735,7 +733,7 @@ def mirror_target(blend_shape, target):
             if 'nurbsCurve' in node_type:
                 component_type = 'cv'
 
-                target_cv_list = cmds.ls('{}.{}[*]'.format(target_rebuild, component_type), flatten=True)
+                target_cv_list = cmds.ls(f'{target_rebuild}.{component_type}[*]', flatten=True)
 
                 target_cv_indices = [int(cv.split('[')[1].split(']')[0]) for cv in target_cv_list]
 
@@ -749,15 +747,15 @@ def mirror_target(blend_shape, target):
                     opposite_cv = list(range(0, source_cv_max + 1))[::-1][cv_index]
 
                     cmds.xform(cv.replace(
-                            target_rebuild, mirror_rebuild).replace('.{}[{}]'.format(component_type, cv_index),
-                                                                    '.{}[{}]'.format(component_type, opposite_cv)),
+                            target_rebuild, mirror_rebuild).replace(f'.{component_type}[{cv_index}]',
+                                                                    f'.{component_type}[{opposite_cv}]'),
                         objectSpace=True, translation=[cv_position[0] * -1, cv_position[1], cv_position[2]])
 
             # If it is a nurbs
             if 'nurbsSurface' in node_type:
                 component_type = 'cv'
 
-                target_cv_list = cmds.ls('{}.{}[*]'.format(target_rebuild, component_type), flatten=True)
+                target_cv_list = cmds.ls(f'{target_rebuild}.{component_type}[*]', flatten=True)
                 print(max(target_cv_list), target_cv_list)
                 param_x = nurbs_lib.get_param_along_x(nurbs=target_rebuild)
 
@@ -797,7 +795,7 @@ def mirror_target(blend_shape, target):
             if 'lattice' in node_type:
                 component_type = 'pt'
 
-                target_pt_list = cmds.ls('{}.{}[*]'.format(target_rebuild, component_type), flatten=True)
+                target_pt_list = cmds.ls(f'{target_rebuild}.{component_type}[*]', flatten=True)
 
                 target_pt_x_indices = [int(pt.split('[')[1].split(']')[0]) for pt in target_pt_list]
 
@@ -825,7 +823,7 @@ def mirror_target(blend_shape, target):
             cmds.delete(target_rebuild)
             cmds.delete(mirror_rebuild)
     
-    logging.info('{} has been transfered and flipped to --> {}'.format(target, target_mirror_name))
+    logging.info(f'{target} has been transfered and flipped to --> {target_mirror_name}')
 
 
 def copy_target_connection(source=None, destination_list=None, *args):
@@ -873,10 +871,10 @@ def copy_blendshape_connections(source=None, destination_list=None, *args):
     for destination in destination_list:
         for target in source_target_list:
             if check_target(blend_shape=destination, target=target):
-                copy_target_connection(source='{}.{}'.format(source, target),
-                                       destination_list=['{}.{}'.format(destination, target)])
+                copy_target_connection(source=f'{source}.{target}',
+                                       destination_list=[f'{destination}.{target}'])
             else:
-                logging.info('{}.{} does not exists.'.format(destination, target))
+                logging.info(f'{destination}.{target} does not exists.')
 
 
 def transfer_blend_shape(source=None, destination=None, *args):
@@ -913,22 +911,22 @@ def transfer_blend_shape(source=None, destination=None, *args):
 
     # Create the source base geometry
     source_base = cmds.rename(cmds.listRelatives(cmds.createNode('mesh'), parent=True)[0], 
-                              '{}Base'.format(source))
+                              f'{source}Base')
     source_base_shape = cmds.listRelatives(source_base, shapes=True, noIntermediate=True)[0]
 
-    cmds.connectAttr('{}.originalGeometry[0]'.format(source), '{}.inMesh'.format(source_base_shape))
+    cmds.connectAttr(f'{source}.originalGeometry[0]', f'{source_base_shape}.inMesh')
 
     # Create the destination base geometry
     destination_base = cmds.rename(cmds.listRelatives(cmds.createNode('mesh'), parent=True)[0], 
-                                   '{}Base'.format(destination))
+                                   f'{destination}Base')
     destination_base_shape = cmds.listRelatives(destination_base, shapes=True, noIntermediate=True)[0]
 
-    cmds.connectAttr('{}.originalGeometry[0]'.format(destination), '{}.inMesh'.format(destination_base_shape))
+    cmds.connectAttr(f'{destination}.originalGeometry[0]', f'{destination_base_shape}.inMesh')
 
     # Wrap
     cmds.select(destination_base)
     proximity_wrap = cmds.deformer(type='proximityWrap')[0]
-    cmds.setAttr('{}.wrapMode'.format(proximity_wrap), 0)
+    cmds.setAttr(f'{proximity_wrap}.wrapMode', 0)
 
     # Get source target list
     source_target_list = get_blendshape_target_list(blend_shape=source)
@@ -955,20 +953,20 @@ def transfer_blend_shape(source=None, destination=None, *args):
                                                                               target_index=0)), 1)
 
             # Wrap driver connections (now that we have the shapeOrig)
-            if not cmds.isConnected('{}Orig.outMesh'.format(source_base_shape),
-                                    '{}.drivers[0].driverBindGeometry'.format(proximity_wrap)):
-                cmds.connectAttr('{}Orig.outMesh'.format(source_base_shape),
-                                 '{}.drivers[0].driverBindGeometry'.format(proximity_wrap))
-                cmds.connectAttr('{}.outMesh'.format(source_base_shape),
-                                 '{}.drivers[0].driverGeometry'.format(proximity_wrap))
+            if not cmds.isConnected(f'{source_base_shape}Orig.outMesh',
+                                    f'{proximity_wrap}.drivers[0].driverBindGeometry'):
+                cmds.connectAttr(f'{source_base_shape}Orig.outMesh',
+                                 f'{proximity_wrap}.drivers[0].driverBindGeometry')
+                cmds.connectAttr(f'{source_base_shape}.outMesh',
+                                 f'{proximity_wrap}.drivers[0].driverGeometry')
 
             delta = cmds.duplicate(destination_base)[0]
 
             if value == 1.0:
                 new_target = add_target(blend_shape=destination, target=delta)
                 rename_target(blend_shape=destination, target=new_target, new_name=target)
-                copy_target_connection(source='{}.{}'.format(source, target),
-                                       destination_list=['{}.{}'.format(destination, target)])
+                copy_target_connection(source=f'{source}.{target}',
+                                       destination_list=[f'{destination}.{target}'])
             else:
                 add_in_between(blend_shape=destination, existing_target=target, in_between_target=delta, value=value)
 
@@ -1026,7 +1024,7 @@ def automatic_corrective(geometry_name='test_c_geo',
         control_descriptor = control_name
         control_side = side_lib.center
 
-    default_attr_value = cmds.getAttr('{}.{}'.format(control_name, attr_name))
+    default_attr_value = cmds.getAttr(f'{control_name}.{attr_name}')
 
     # Get blendshape
     blend_shape = get_blend_shape(node=geometry_name)
@@ -1041,7 +1039,7 @@ def automatic_corrective(geometry_name='test_c_geo',
                                           usage_lib.corrective)
 
     if check_target(blend_shape=blend_shape, target=target_name):
-        logging.error('{}.{} already exists, delete it before using this tool'.format(blend_shape, target_name))
+        logging.error(f'{blend_shape}.{target_name} already exists, delete it before using this tool')
         return
 
     target = add_target(blend_shape=blend_shape, target=target_name)
@@ -1056,15 +1054,15 @@ def automatic_corrective(geometry_name='test_c_geo',
     # Create delta Mush
     cmds.refresh()
     delta_mush_name = cmds.deltaMush(geometry_name, smoothingIterations=10, smoothingStep=0.5, envelope=1)[0]
-    cmds.setAttr('{}.distanceWeight'.format(delta_mush_name), 1)
-    cmds.setAttr('{}.inwardConstraint'.format(delta_mush_name), 1)
+    cmds.setAttr(f'{delta_mush_name}.distanceWeight', 1)
+    cmds.setAttr(f'{delta_mush_name}.inwardConstraint', 1)
 
-    skin_method_default_value = cmds.getAttr('{}.skinningMethod'.format(skin_name))
-    cmds.setAttr('{}.skinningMethod'.format(skin_name), 1)
+    skin_method_default_value = cmds.getAttr(f'{skin_name}.skinningMethod')
+    cmds.setAttr(f'{skin_name}.skinningMethod', 1)
 
     # Set pose
     cmds.refresh()
-    cmds.setAttr('{}.{}'.format(control_name, attr_name), attr_value)
+    cmds.setAttr(f'{control_name}.{attr_name}', attr_value)
 
     # Extract delta
     cmds.refresh()
@@ -1072,7 +1070,7 @@ def automatic_corrective(geometry_name='test_c_geo',
 
     # Set skinCluster to its default
     cmds.refresh()
-    cmds.setAttr('{}.skinningMethod'.format(skin_name), skin_method_default_value)
+    cmds.setAttr(f'{skin_name}.skinningMethod', skin_method_default_value)
 
     # Delete deltaMush
     cmds.delete(delta_mush_name)
@@ -1081,7 +1079,7 @@ def automatic_corrective(geometry_name='test_c_geo',
     cmds.refresh()
     target_index = get_target_index(blend_shape=blend_shape, target=target)
 
-    cmds.setAttr('{}.{}'.format(blend_shape, target), 1)
+    cmds.setAttr(f'{blend_shape}.{target}', 1)
 
     cmds.sculptTarget(blend_shape, edit=True, target=target_index)
     cmds.transferShape(source=delta, target=geometry_name, worldSpace=True)
@@ -1089,7 +1087,7 @@ def automatic_corrective(geometry_name='test_c_geo',
 
     cmds.delete(delta)
 
-    cmds.setAttr('{}.{}'.format(control_name, attr_name), default_attr_value)
+    cmds.setAttr(f'{control_name}.{attr_name}', default_attr_value)
 
     # Anim curve creation
     if create_sdk:
@@ -1100,8 +1098,8 @@ def automatic_corrective(geometry_name='test_c_geo',
         cmds.setKeyframe(sdk_name, float=attr_value, value=1, inTangentType='linear', outTangentType='linear')
 
         # Connections
-        cmds.connectAttr('{}.{}'.format(control_name, attr_name), '{}.input'.format(sdk_name))
-        cmds.connectAttr('{}.output'.format(sdk_name), '{}.{}'.format(blend_shape, target))
+        cmds.connectAttr(f'{control_name}.{attr_name}', f'{sdk_name}.input')
+        cmds.connectAttr(f'{sdk_name}.output', f'{blend_shape}.{target}')
 
     else:
-        cmds.setAttr('{}.{}'.format(blend_shape, target), 0)
+        cmds.setAttr(f'{blend_shape}.{target}', 0)

@@ -558,7 +558,7 @@ class MarkingMenu(object):
         guides_grp = 'guides_c_grp'
 
         if not cmds.objExists(guides_grp):
-            logging.warning('"{}" not found to build the rig'.format(guides_grp))
+            logging.warning(f'"{guides_grp}" not found to build the rig')
 
         else:
             logging.info('--------------------------------------------------')
@@ -571,13 +571,13 @@ class MarkingMenu(object):
                 descriptor = guide_group.split('Guides')[0]
                 side = guide_group.split('_')[1]
 
-                module_name = cmds.getAttr('{}.moduleName'.format(guide_group))
+                module_name = cmds.getAttr(f'{guide_group}.moduleName')
                 root_path = r'{}/builder/modules'.format(module_utils.hidden_strings_path)
 
                 for i in os.scandir(root_path):
                     if i.is_dir():
                         for file in os.listdir(i):
-                            if file == '{}.py'.format(module_name.lower()):
+                            if file == f'{module_name.lower()}.py':
                                 file = file.split('.py')[0]
                                 file_capitalize = file.capitalize()
                                 file_path = i.path.split(module_utils.hidden_strings_name)[-1]  # Get relative path
@@ -1008,7 +1008,7 @@ class MarkingMenu(object):
 
         for node in selection_list:
             if cmds.attributeQuery('displayLocalAxis', node=node, exists=True):
-                cmds.setAttr('{}.displayLocalAxis'.format(node), True)
+                cmds.setAttr(f'{node}.displayLocalAxis', True)
 
     def show_local_rotation_axis_with_hierarchy(self, *args):
         """
@@ -1032,7 +1032,7 @@ class MarkingMenu(object):
 
         for node in selection_list:
             if cmds.attributeQuery('displayLocalAxis', node=node, exists=True):
-                cmds.setAttr('{}.displayLocalAxis'.format(node), False)
+                cmds.setAttr(f'{node}.displayLocalAxis', False)
 
     def hide_local_rotation_axis_with_hierarchy(self, *args):
         """
@@ -1047,16 +1047,16 @@ class MarkingMenu(object):
         """
         Show the drawlabel of the guides
         """
-        for guide in cmds.ls('*{}'.format(usage_lib.guide)):
-            cmds.setAttr('{}.drawLabel'.format(guide), True)
+        for guide in cmds.ls(f'*{usage_lib.guide}'):
+            cmds.setAttr(f'{guide}.drawLabel', True)
 
     @staticmethod
     def hide_guides_draw_label(*args):
         """
         Hide the drawlabel of the guides
         """
-        for guide in cmds.ls('*{}'.format(usage_lib.guide)):
-            cmds.setAttr('{}.drawLabel'.format(guide), False)
+        for guide in cmds.ls(f'*{usage_lib.guide}'):
+            cmds.setAttr(f'{guide}.drawLabel', False)
 
     def snap_fk_ik(self, *args):
         node_list = cmds.ls(selection=True)
@@ -1064,10 +1064,10 @@ class MarkingMenu(object):
             for node in node_list:
                 module_grp = [x for x in cmds.listRelatives(node, fullPath=True)[0].split('|') if 'Module' in x][-1]
                 
-                if 'Arm' in cmds.getAttr('{}.moduleName'.format(module_grp)) \
-                        or 'Leg' in cmds.getAttr('{}.moduleName'.format(module_grp)):
+                if 'Arm' in cmds.getAttr(f'{module_grp}.moduleName') \
+                        or 'Leg' in cmds.getAttr(f'{module_grp}.moduleName'):
                     namespace = self.get_namespace()
-                    limb = cmds.getAttr('{}.moduleName'.format(module_grp)).lower()
+                    limb = cmds.getAttr(f'{module_grp}.moduleName').lower()
                     side = node.split('_')[-2]
 
                     self.snap_fk_ik_script(namespace=namespace, limb=limb, side=side)
@@ -1076,28 +1076,28 @@ class MarkingMenu(object):
     def snap_fk_ik_script(namespace=None, limb='arm', side='l', * args):
         end_name = 'hand' if limb == 'arm' else 'foot'
 
-        snap_info = {'start': {'fk_control': '{}up{}Fk_{}_ctr'.format(namespace, limb.capitalize(), side),
+        snap_info = {'start': {'fk_control': f'{namespace}up{limb.capitalize()}Fk_{side}_ctr',
                                'ik_control': None,
-                               'fk_snap': '{}up{}_{}_jnt'.format(namespace, limb.capitalize(), side),
+                               'fk_snap': f'{namespace}up{limb.capitalize()}_{side}_jnt',
                                'ik_snap': None,
                                'snap_xform': None
                                },
-                     'mid': {'fk_control': '{}low{}Fk_{}_ctr'.format(namespace, limb.capitalize(), side),
-                             'ik_control': '{}{}PoleVector_{}_ctr'.format(namespace, limb, side),
-                             'fk_snap': '{}low{}_{}_jnt'.format(namespace, limb.capitalize(), side),
-                              'ik_snap': '{}{}PoleVector_{}_snap'.format(namespace, limb, side),
+                     'mid': {'fk_control': f'{namespace}low{limb.capitalize()}Fk_{side}_ctr',
+                             'ik_control': f'{namespace}{limb}PoleVector_{side}_ctr',
+                             'fk_snap': f'{namespace}low{limb.capitalize()}_{side}_jnt',
+                              'ik_snap': f'{namespace}{limb}PoleVector_{side}_snap',
                              'snap_xform': None
                              },
-                     'end': {'fk_control': '{}{}{}Fk_{}_ctr'.format(namespace, end_name, limb.capitalize(), side),
-                             'ik_control': '{}{}{}Ik_{}_ctr'.format(namespace, end_name, limb.capitalize(), side),
-                               'fk_snap': '{}{}{}_{}_skn'.format(namespace, end_name, limb.capitalize(), side),
-                             'ik_snap': '{}{}{}_{}_skn'.format(namespace, end_name, limb.capitalize(), side),
+                     'end': {'fk_control': f'{namespace}{end_name}{limb.capitalize()}Fk_{side}_ctr',
+                             'ik_control': f'{namespace}{end_name}{limb.capitalize()}Ik_{side}_ctr',
+                               'fk_snap': f'{namespace}{end_name}{limb.capitalize()}_{side}_skn',
+                             'ik_snap': f'{namespace}{end_name}{limb.capitalize()}_{side}_skn',
                                  'snap_xform': None
                              }
                      }
 
-        settings_control = '{}{}Settings_{}_ctr'.format(namespace, limb, side)
-        state = cmds.getAttr('{}.fkIk'.format(settings_control))  # 0 == Fk; 1 == Ik
+        settings_control = f'{namespace}{limb}Settings_{side}_ctr'
+        state = cmds.getAttr(f'{settings_control}.fkIk')  # 0 == Fk; 1 == Ik
 
         snap_value = 'ik_snap' if state == 0 else 'fk_snap'
         control_value = 'ik_control' if state == 0 else 'fk_control'
@@ -1108,7 +1108,7 @@ class MarkingMenu(object):
                                                           query=True, worldSpace=True, matrix=True)
 
         new_state = 1 if state == 0 else 0
-        cmds.setAttr('{}.fkIk'.format(settings_control), new_state)
+        cmds.setAttr(f'{settings_control}.fkIk', new_state)
 
         for key in snap_info.keys():
             if snap_info[key][control_value]:
@@ -1120,7 +1120,7 @@ class MarkingMenu(object):
         if len(selection) >= 1:
             selection = selection[0]
             if ':' in selection:
-                namespace = '{}:'.format(':'.join(selection.split(':')[:-1]))
+                namespace = f"{':'.join(selection.split(':')[:-1])}:"
             else:
                 namespace = ''
         else:

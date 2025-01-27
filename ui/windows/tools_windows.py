@@ -212,14 +212,14 @@ class RenamerWindow(window_lib.Helper):
                 node = cmds.rename(node, cmds.textFieldGrp(self.rename, query=True, text=True))
 
             if increment:
-                node = cmds.rename(node, '{}{}'.format(node, increment))
+                node = cmds.rename(node, f'{node}{increment}')
                 increment = self.increment_string(increment)
 
             if prefix:
-                node = cmds.rename(node, '{}{}'.format(prefix, node.split('|')[-1]))
+                node = cmds.rename(node, f"{prefix}{node.split('|')[-1]}")
 
             if suffix:
-                cmds.rename(node, '{}{}'.format(node.split('|')[-1], suffix))
+                cmds.rename(node, f"{node.split('|')[-1]}{suffix}")
 
         # rename blendShapes
         if blend_shape_lib.get_blend_shapes_from_shape_editor():
@@ -229,18 +229,18 @@ class RenamerWindow(window_lib.Helper):
 
                 if increment:
                     blend_shape = cmds.rename(
-                        blend_shape, "{}{}".format(blend_shape, increment)
+                        blend_shape, f"{blend_shape}{increment}"
                     )
                     increment = self.increment_string(increment)
 
                 if prefix:
                     blend_shape = cmds.rename(
-                        blend_shape, "{}{}".format(prefix, blend_shape.split("|")[-1])
+                        blend_shape, f"{prefix}{blend_shape.split('|')[-1]}"
                     )
 
                 if suffix:
                     cmds.rename(
-                        blend_shape, "{}{}".format(blend_shape.split("|")[-1], suffix)
+                        blend_shape, f"{blend_shape.split('|')[-1]}{suffix}"
                     )
 
         # rename targets of blendShapes
@@ -258,7 +258,7 @@ class RenamerWindow(window_lib.Helper):
                     target = blend_shape_lib.rename_target(
                         blend_shape=blend_shape,
                         target=target,
-                        new_name="{}{}".format(target, increment)
+                        new_name=f"{target}{increment}"
                     )
                     increment = self.increment_string(increment)
 
@@ -266,13 +266,13 @@ class RenamerWindow(window_lib.Helper):
                     target = blend_shape_lib.rename_target(
                         blend_shape=blend_shape,
                         target=target,
-                        new_name="{}{}".format(prefix, target.split("|")[-1]))
+                        new_name=f"{prefix}{target.split('|')[-1]}")
 
                 if suffix:
                     target = blend_shape_lib.rename_target(
                         blend_shape=blend_shape,
                         target=target,
-                        new_name="{}{}".format(target.split("|")[-1], suffix),
+                        new_name=f"{target.split('|')[-1]}{suffix}",
                     )
         
         # rename in betweens of targets of blendshapes                
@@ -298,20 +298,20 @@ class RenamerWindow(window_lib.Helper):
                     in_between_name = blend_shape_lib.rename_in_between(blend_shape=blend_shape,
                                                                         target=target,
                                                                         in_between=in_between_name,
-                        new_name="{}{}".format(in_between_name, increment))
+                        new_name=f"{in_between_name}{increment}")
                     increment = self.increment_string(increment)
 
                 if prefix:
                     in_between_name = blend_shape_lib.rename_in_between(blend_shape=blend_shape,
                                                                         target=target,
                                                                         in_between=in_between_name,
-                        new_name="{}{}".format(prefix, in_between_name))
+                        new_name=f"{prefix}{in_between_name}")
 
                 if suffix:
                     in_between_name = blend_shape_lib.rename_in_between(blend_shape=blend_shape,
                                                                         target=target,
                                                                         in_between=in_between_name,
-                        new_name="{}{}".format(in_between_name, suffix))
+                        new_name=f"{in_between_name}{suffix}")
 
 
     def clean_command(self, *args):
@@ -496,7 +496,7 @@ class ShapeManagerWindow(window_lib.Helper):
             cmds.xform(shape_imported, worldSpace=True,
                        matrix=cmds.xform(node, query=True, worldSpace=True, matrix=True))
 
-            node_temporal_name = cmds.rename(node, '{}_{}_{}'.format(export_name, side_lib.center, usage_lib.spline))
+            node_temporal_name = cmds.rename(node, f'{export_name}_{side_lib.center}_{usage_lib.spline}')
             spline_lib.replace_shape(node=node_temporal_name,
                                      shape_transform=shape_imported)
             cmds.rename(node_temporal_name, node)
@@ -522,7 +522,7 @@ class ShapeManagerWindow(window_lib.Helper):
             if os.path.exists(r'{}/images/{}.png'.format(self.shapes_path, export_name)):
                 os.remove(r'{}/images/{}.png'.format(self.shapes_path, export_name))
         else:
-            cmds.error('{} does not exists in the library'.format(export_name))
+            cmds.error(f'{export_name} does not exists in the library')
 
         self.refresh_shapes()
 
@@ -581,14 +581,14 @@ class ShapeManagerWindow(window_lib.Helper):
         shape_data = spline_lib.get_spl_data(spl=cmds.ls(selection=True)[0])
 
         spline_name = cmds.ls(selection=True)[0]
-        cmds.rename(spline_name, '{}_{}_{}'.format(export_name, side_lib.center, usage_lib.spline))
+        cmds.rename(spline_name, f'{export_name}_{side_lib.center}_{usage_lib.spline}')
 
         import_export_lib.export_data_to_json(data=shape_data,
                                               file_name=export_name,
                                               file_path=self.shapes_path,
                                               relative_path=False)
         self.save_screenshot()
-        cmds.rename('{}_{}_{}'.format(export_name, side_lib.center, usage_lib.spline), spline_name)
+        cmds.rename(f'{export_name}_{side_lib.center}_{usage_lib.spline}', spline_name)
         self.refresh_shapes()
 
 
