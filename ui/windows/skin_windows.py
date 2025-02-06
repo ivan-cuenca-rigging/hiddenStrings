@@ -215,19 +215,25 @@ class PushJointWindow(window_lib.Helper):
         """
         super(PushJointWindow, self).__init__(title='Push Joint', size=(450, 215))
 
-        # Search and replace
+        # Parent
         self.parent_node = cmds.textFieldGrp(label='Parent: ')
         self.get_parent = cmds.iconTextButton(image='addClip.png', 
                                               command=partial(self.get_last_selection_and_set_text_field,
                                                               text_field=self.parent_node))
+        
+        # Driver
         self.driver_node = cmds.textFieldGrp(label='Driver: ')
         self.get_driver = cmds.iconTextButton(image='addClip.png', 
                                               command=partial(self.get_last_selection_and_set_text_field,
                                                               text_field=self.driver_node))
+        
+        # Suffix
         self.suffix = cmds.textFieldGrp(label='Suffix: ')
 
+        # Forbbinden word
         self.forbidden_word = cmds.textFieldGrp(label='Forbidden word: ', text='01')
 
+        # Rotation axis
         self.rotation_axis = cmds.optionMenu(label='Rotation axis')
         cmds.menuItem(self.rotation_axis, label=' X')
         cmds.menuItem(self.rotation_axis, label='-X')
@@ -237,6 +243,7 @@ class PushJointWindow(window_lib.Helper):
         cmds.menuItem(self.rotation_axis, label='-Z')
         cmds.optionMenu(self.rotation_axis, edit=True, value='-Y')
 
+        # Estructural parent
         self.structural_parent = cmds.textFieldGrp(label='Structural parent: ', text='pushJoints_c_grp')
 
         # --------------------------------------------------------------------------------------------------------------

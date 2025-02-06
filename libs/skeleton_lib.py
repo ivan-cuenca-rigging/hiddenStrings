@@ -5,7 +5,7 @@ import logging
 from maya import cmds
 
 # Project imports
-from hiddenStrings.libs import node_lib, side_lib, usage_lib, math_lib
+from hiddenStrings.libs import node_lib, side_lib, usage_lib, math_lib, connection_lib
 
 logging = logging.getLogger(__name__)
 
@@ -115,24 +115,31 @@ def create_skeleton_chain_from_a_to_b(descriptor,
                                       a,
                                       b,
                                       joints_number,
-                                      joint_parent,
-                                      joint_usage=usage_lib.skin_joint):
+                                      joints_parent,
+                                      side=None,
+                                      joint_usage=None):
     """
-    Create a skeleton chain between two points
+    Create a skeleton chain between two points the joints orient will be the same as the "a" node
 
     Args:
         descriptor (str): descriptor
         a (str): node a
         b (str): node b
         joints_number (int): number of joints from a to b
-        joint_parent (str): joint's parent
+        joints_parent (str): joint's parent
+        side (str): side
         joint_usage (str): joints usage
     
     Returns:
         list: joints list
     """
-    a_descriptor, a_side, a_usage = a.split('_')
-    skin_joint_parent = joint_parent
+    if not side:
+        side = side_lib.center
+
+    if not joint_usage:
+        joint_usage = usage_lib.skin_joint
+    
+    skin_joint_parent = joints_parent
 
     skin_start_mid_joint_point_list = math_lib.get_n_positions_from_a_to_b(a, b, joints_number)
     joint_list = list()
@@ -141,7 +148,7 @@ def create_skeleton_chain_from_a_to_b(descriptor,
         joint_usage = usage_lib.joint if joint_index == joints_number else joint_usage
         skin_joint_sh = Helper(name='{}{}_{}_{}'.format(descriptor,
                                                         str(joint_index).zfill(2),
-                                                        a_side,
+                                                        side,
                                                         joint_usage))
         skin_joint_sh.create(parent=skin_joint_parent)
         skin_joint_parent = skin_joint_sh.get_name()
@@ -155,6 +162,87 @@ def create_skeleton_chain_from_a_to_b(descriptor,
         else:
             skin_joint_sh.set_position_from_point(skin_start_mid_joint_point_list[index])
             skin_joint_sh.set_rotation_from_point(a)
+
+    return joint_list
+
+
+def create_n_joints_in_a_nurbs(nurbs,
+                               joints_number,
+                               joints_parent,
+                               descriptor,
+                               side=None,
+                               joint_usage=None,
+                               direction='U',
+                               create_uv_pin=True,
+                               use_Translate=True,
+                               use_rotate=True,
+                               use_scale=True,
+                               use_shear=True):
+    """
+    Create a number of joints in a nurbs
+
+    Args:
+        nurbs (str): Name of the nurbs surface.
+        joints_number (int): Number of joints to create along the nurbs.
+        joints_parent (str): Name of the parent node for the joints.
+        descriptor (str): Descriptor to name the joints.
+        side (str, optional): Side (e.g., 'l', 'r', 'c'). Defaults to None.
+        joint_usage (str, optional): Usage for the joints. Defaults to None.
+        direction (str, optional): Direction of the parameterization ('U' or 'V'). Defaults to 'U'.
+        create_uv_pin (bool, optional): Whether to create UV pinning for the joints. Defaults to True.
+        use_Translate (bool, optional): If True, translate attributes will be used in the uvPin. Defaults to True.
+        use_rotate (bool, optional): If True, rotate attributes will be used in the uvPin. Defaults to True.
+        use_scale (bool, optional): If True, scale attributes will be used in the uvPin. Defaults to True.
+        use_shear (bool, optional): If True, shear attributes will be used in the uvPin. Defaults to True.
+    
+    Returns:
+        list: joints list
+    """
+    if not side:
+        side = side_lib.center
+
+    if not joint_usage:
+        joint_usage = usage_lib.skin_joint
+
+    nurbs_shape = cmds.listRelatives(nurbs, children=True, shapes=True)[0]
+    
+    default_u = 0.5
+    default_v = 0.5
+    param_value = 0
+    param_step = 1.0 / (joints_number - 1)
+    joint_list=list()
+    for index in range(0, joints_number):
+        
+        transform_temp = cmds.createNode('transform')
+        
+        uv_pin_temp = cmds.createNode('uvPin')
+        cmds.connectAttr(f'{nurbs_shape}.worldSpace[0]', f'{uv_pin_temp}.deformedGeometry')
+        cmds.connectAttr(f'{uv_pin_temp}.outputMatrix[0]', f'{transform_temp}.offsetParentMatrix')
+
+        if direction.upper() == 'U':
+            cmds.setAttr(f'{uv_pin_temp}.coordinate[0].coordinateU', param_value)
+            cmds.setAttr(f'{uv_pin_temp}.coordinate[0].coordinateV', default_v)
+        else:
+            cmds.setAttr(f'{uv_pin_temp}.coordinate[0].coordinateU', default_u)
+            cmds.setAttr(f'{uv_pin_temp}.coordinate[0].coordinateV', param_value)
+
+        jnt_helper = Helper(f'{descriptor}{str(index).zfill(2)}_{side}_{joint_usage}')
+        jnt_helper.create(matrix=transform_temp,
+                          parent=joints_parent)
+        
+        joint_list.append((jnt_helper.get_name()))
+        cmds.delete(transform_temp, uv_pin_temp)
+
+        param_value += param_step
+    
+    if create_uv_pin:
+        connection_lib.create_nurbs_uvpin(nurbs=nurbs,
+                                        maintain_offset=False,
+                                        node_list=joint_list,
+                                        translate=use_Translate,
+                                        rotate=use_rotate,
+                                        scale=use_scale, 
+                                        shear=use_shear)
 
     return joint_list
 

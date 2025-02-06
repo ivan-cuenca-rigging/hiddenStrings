@@ -13,7 +13,8 @@ from hiddenStrings import config as hiddenStrings_config
 from hiddenStrings.libs import (guide_lib, blend_shape_lib, skeleton_lib, connection_lib, skin_lib,
                                 import_export_lib, trigger_lib, reference_lib, side_lib, usage_lib, scene_lib)
 
-from hiddenStrings.ui.windows import blend_shape_windows, connections_windows, skin_windows, tools_windows
+from hiddenStrings.ui.windows import (blend_shape_windows, connections_windows, skin_windows, tools_windows, 
+                                      skeleton_windows)
 
 builder_exists = os.path.exists(r'{}/builder'.format(module_utils.hidden_strings_path))
 if builder_exists:
@@ -149,6 +150,8 @@ class MarkingMenu(object):
                       command=cmds.ArtPaintSkinWeightsToolOptions)
 
         self.skins_menu(menu_parent=deformation_menu, radial_position='W')
+        
+        self.skeleton_menu(menu_parent=deformation_menu, radial_position='SW')
 
         # ---- south ----
         cmds.menuItem(parent=deformation_menu, label='          Triggers', enable=False)
@@ -259,6 +262,27 @@ class MarkingMenu(object):
         cmds.menuItem(parent=skin_menu, label='Export Skins',
                       command=self.export_skin_clusters)
         cmds.menuItem(parent=skin_menu, optionBox=True, command=skin_windows.ExportSkinWindow)
+
+    def skeleton_menu(self, menu_parent, radial_position):
+        """
+        Create the skeleton menu items
+
+        Args:
+            menu_parent (str): name of the menu parent
+            radial_position (str): radial position. 'N', 'NE', 'E', 'SE', 'S', 'SW', 'W' or 'NW'.
+        """
+        sekelton_menu = cmds.menuItem(parent=menu_parent, label='Skeleton', radialPosition=radial_position,
+                                      subMenu=True)
+
+        cmds.menuItem(parent=sekelton_menu, label='             Skeleton Utils', enable=False)
+        cmds.menuItem(parent=sekelton_menu, divider=True)
+
+        cmds.menuItem(parent=sekelton_menu, label='Create skeleton chain',
+                      command=skeleton_windows.CreateSkeletonChainWindow)
+        
+        cmds.menuItem(parent=sekelton_menu, label='Create ribbon joints',
+                      command=skeleton_windows.CreateRibbonJoints)
+        
 
     def reference_menu(self, menu_parent, radial_position):
         """
