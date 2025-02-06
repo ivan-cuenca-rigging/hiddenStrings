@@ -125,6 +125,6 @@ Hold <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>Right click</kbd> to open the mark
 --------------------------------------------
 
 ## SOCIAL NETWORKS ##
+[Web](https://ivan-cuenca.com/)
 [GitHub](https://github.com/ivan-cuenca-rigging/)
 [LinkedIn](https://www.linkedin.com/in/ivan-cuenca-ruiz/)
-[Web](https://ivan-cuenca.com/)
