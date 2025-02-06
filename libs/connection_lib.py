@@ -557,12 +557,12 @@ def connect_point_matrix_mult_to_a_cv(driver, crv_and_cv):
 
 
 def create_nurbs_uvpin(nurbs, 
-                 node_list,
-                 maintain_offset=True,
-                 translate=True,
-                 rotate=True,
-                 scale=True,
-                 shear=True):
+                       node_list,
+                       maintain_offset=True,
+                       translate=True,
+                       rotate=True,
+                       scale=True,
+                       shear=True):
     """
     Create an uvPin
 
@@ -616,11 +616,11 @@ def create_nurbs_uvpin(nurbs,
         
         if maintain_offset:
             connect_matrix_from_attribute(driver_and_attr=f'{uvpin_node}.outputMatrix[{index}]',
-                                        driven=node,
-                                        translate=translate,
-                                        rotate=rotate,
-                                        scale=scale,
-                                        shear=shear)
+                                          driven=node,
+                                          translate=translate,
+                                          rotate=rotate,
+                                          scale=scale,
+                                          shear=shear)
         else:
             if translate and rotate and scale and shear:
                 cmds.connectAttr(f'{uvpin_node}.outputMatrix[{index}]',
