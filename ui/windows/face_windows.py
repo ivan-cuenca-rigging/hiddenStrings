@@ -588,8 +588,8 @@ class EyelidWindow(window_lib.Helper):
 
         eyelid_module.create_guides(connect_to_opposite=connect_to_opposite,
                                     hook_default_value=hook,
-                                    upper_vertices_list=upper_vertices_list,
-                                    lower_vertices_list=lower_vertices_list)
+                                    upper_vertices_list_value=upper_vertices_list,
+                                    lower_vertices_list_value=lower_vertices_list)
         
 
 class EyelineWindow(window_lib.Helper):
@@ -632,12 +632,12 @@ class EyelineWindow(window_lib.Helper):
         vertices_list_inputs_text = cmds.text(label=' Vertices list inputs',
                                               backgroundColor=(0.4, 0.4, 0.4), height=20, align='left')
 
-        self.upper_vertices_list = cmds.textFieldGrp(label='Upper eyelid: ', enable=True)
+        self.upper_vertices_list = cmds.textFieldGrp(label='Upper eyeline: ', enable=True)
         self.upper_vertices_list_button = cmds.iconTextButton(image='addClip.png',
                                                               command=partial(self.get_selection_and_set_text_field,
                                                                               text_field=self.upper_vertices_list))
 
-        self.lower_vertices_list = cmds.textFieldGrp(label='Lower eyelid: ', enable=True)
+        self.lower_vertices_list = cmds.textFieldGrp(label='Lower eyeline: ', enable=True)
         self.lower_vertices_list_button = cmds.iconTextButton(image='addClip.png',
                                                               command=partial(self.get_selection_and_set_text_field,
                                                                               text_field=self.lower_vertices_list))
@@ -693,8 +693,8 @@ class EyelineWindow(window_lib.Helper):
 
         eyeline_module.create_guides(connect_to_opposite=connect_to_opposite,
                                     hook_default_value=hook,
-                                    upper_vertices_list=upper_vertices_list,
-                                    lower_vertices_list=lower_vertices_list)
+                                    upper_vertices_list_value=upper_vertices_list,
+                                    lower_vertices_list_value=lower_vertices_list)
 
 
 class EarWindow(window_lib.Helper):
@@ -944,12 +944,12 @@ class MouthWindow(window_lib.Helper):
         vertices_list_inputs_text = cmds.text(label=' Vertices list inputs',
                                               backgroundColor=(0.4, 0.4, 0.4), height=20, align='left')
 
-        self.upper_vertices_list = cmds.textFieldGrp(label='Upper eyelid: ', enable=True)
+        self.upper_vertices_list = cmds.textFieldGrp(label='Upper lip: ', enable=True)
         self.upper_vertices_list_button = cmds.iconTextButton(image='addClip.png',
                                                               command=partial(self.get_selection_and_set_text_field,
                                                                               text_field=self.upper_vertices_list))
 
-        self.lower_vertices_list = cmds.textFieldGrp(label='Lower eyelid: ', enable=True)
+        self.lower_vertices_list = cmds.textFieldGrp(label='Lower lip: ', enable=True)
         self.lower_vertices_list_button = cmds.iconTextButton(image='addClip.png',
                                                               command=partial(self.get_selection_and_set_text_field,
                                                                               text_field=self.lower_vertices_list))
@@ -990,8 +990,8 @@ class MouthWindow(window_lib.Helper):
         mouth_module = mouth.Mouth(descriptor=descriptor)
 
         mouth_module.create_guides(hook_default_value=hook,
-                                   upper_vertices_list=upper_vertices_list,
-                                   lower_vertices_list=lower_vertices_list)
+                                   upper_vertices_list_value=upper_vertices_list,
+                                   lower_vertices_list_value=lower_vertices_list)
 
 
 class TongueWindow(window_lib.Helper):
